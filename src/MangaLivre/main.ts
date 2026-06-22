@@ -25,7 +25,7 @@ import type ContentTemplateConfig from "./pbconfig";
 
 const BASE_URL = "https://mangalivre.to";
 
-export class MangaLivre implements ExtensionImpl<typeof ContentTemplateConfig> {
+export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplateConfig> {
   mainRateLimiter = new BasicRateLimiter("main", {
     numberOfRequests: 10,
     bufferInterval: 5,
@@ -265,4 +265,4 @@ export class MangaLivre implements ExtensionImpl<typeof ContentTemplateConfig> {
     };
   }
 }
-export const MangaLivreExtension = new MangaLivre();
+export const MangaLivre = new MangaLivreExtension();
