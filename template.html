@@ -13,10 +13,7 @@
       rel="stylesheet"
     />
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
-    <script
-      defer
-      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
-    ></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   </head>
 
   <body
@@ -30,16 +27,8 @@
           class="absolute w-28 h-28 md:w-40 md:h-40 -top-4 left-1/2 -translate-x-1/2 rounded-full"
           style="
             background:
-              radial-gradient(
-                circle at 30% 30%,
-                rgba(251, 146, 60, 0.4) 0%,
-                transparent 70%
-              ),
-              radial-gradient(
-                circle at 70% 70%,
-                rgba(249, 115, 22, 0.4) 0%,
-                transparent 70%
-              );
+              radial-gradient(circle at 30% 30%, rgba(251, 146, 60, 0.4) 0%, transparent 70%),
+              radial-gradient(circle at 70% 70%, rgba(249, 115, 22, 0.4) 0%, transparent 70%);
             filter: blur(25px);
           "
         ></div>
@@ -70,7 +59,10 @@
         >
           Adicionar ao Paperback
         </a>
-        <div x-show="repository" class="mt-4 p-3 bg-yellow-100 text-yellow-800 text-sm font-semibold rounded-lg border border-yellow-300 max-w-sm">
+        <div
+          x-show="repository"
+          class="mt-4 p-3 bg-yellow-100 text-yellow-800 text-sm font-semibold rounded-lg border border-yellow-300 max-w-sm"
+        >
           ⚠️ Compatível exclusivamente com o aplicativo Paperback versão 0.9.
         </div>
       </header>
@@ -117,11 +109,7 @@
               >
                 Filtrar
               </label>
-              <div
-                class="inline-flex gap-2 pb-2"
-                role="group"
-                aria-labelledby="badge-filter-label"
-              >
+              <div class="inline-flex gap-2 pb-2" role="group" aria-labelledby="badge-filter-label">
                 <template x-for="badge in availableBadges" :key="badge.label">
                   <button
                     @click="toggleBadgeFilter(badge)"
@@ -149,10 +137,7 @@
             </div>
           </div>
 
-          <div
-            x-show="repository"
-            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
+          <div x-show="repository" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <template x-for="source in filteredSources" :key="source.id">
               <div
                 @click="toggleSource(source.id)"
@@ -171,14 +156,11 @@
                         class="w-14 h-14 rounded-xl shadow-sm object-cover bg-white p-1 border border-gray-100"
                         loading="lazy"
                         onerror="
-                          this.src = 'logo.png'
-                          this.onerror = ''
+                          this.src = 'logo.png';
+                          this.onerror = '';
                         "
                       />
-                      <h3
-                        class="text-xl font-extrabold text-gray-900"
-                        x-text="source.name"
-                      ></h3>
+                      <h3 class="text-xl font-extrabold text-gray-900" x-text="source.name"></h3>
                     </div>
                     <span
                       class="px-2 py-1 rounded text-xs font-bold tracking-wider"
@@ -200,10 +182,7 @@
                       class="flex flex-nowrap gap-2 overflow-x-auto pb-2"
                       x-show="source.badges && source.badges.length"
                     >
-                      <template
-                         x-for="badge in sortBadges(source.badges)"
-                        :key="badge.label"
-                      >
+                      <template x-for="badge in sortBadges(source.badges)" :key="badge.label">
                         <span
                           class="px-2.5 py-1 rounded-md text-[11px] uppercase tracking-wide font-bold whitespace-nowrap shrink-0 transition-all duration-200 border"
                           :style="selectedBadges.some(b => b.label === badge.label) ?
@@ -218,7 +197,13 @@
                         x-show="selectedSources.has(source.id)"
                         class="text-orange-600 text-xs font-bold flex items-center gap-1"
                       >
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path
+                            fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clip-rule="evenodd"
+                          ></path>
+                        </svg>
                         Selecionada
                       </span>
                     </div>
@@ -234,8 +219,8 @@
                         class="w-14 h-14 rounded-xl shadow-sm object-cover bg-white p-1 border border-gray-100"
                         loading="lazy"
                         onerror="
-                          this.src = 'logo.png'
-                          this.onerror = ''
+                          this.src = 'logo.png';
+                          this.onerror = '';
                         "
                       />
                       <div class="flex flex-col space-y-1">
@@ -264,10 +249,7 @@
                       class="flex flex-nowrap gap-2 overflow-x-auto pb-2"
                       x-show="source.badges && source.badges.length"
                     >
-                      <template
-                        x-for="badge in sortBadges(source.badges)"
-                        :key="badge.label"
-                      >
+                      <template x-for="badge in sortBadges(source.badges)" :key="badge.label">
                         <span
                           class="px-2.5 py-1 rounded-md text-[11px] uppercase tracking-wide font-bold whitespace-nowrap shrink-0 transition-all duration-200 border"
                           :style="selectedBadges.some(b => b.label === badge.label) ?
@@ -281,7 +263,13 @@
                       x-show="selectedSources.has(source.id)"
                       class="text-orange-600 text-xs font-bold flex items-center gap-1 mt-3"
                     >
-                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fill-rule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clip-rule="evenodd"
+                        ></path>
+                      </svg>
                       Selecionada
                     </span>
                   </div>
@@ -295,7 +283,19 @@
             x-show="repository && filteredSources.length === 0"
             class="p-12 text-center bg-gray-50 rounded-2xl border border-gray-200 border-dashed mt-6 shadow-sm"
           >
-            <svg class="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <svg
+              class="w-12 h-12 mx-auto text-gray-400 mb-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              ></path>
+            </svg>
             <p class="text-lg text-gray-500 font-bold">
               Nenhuma fonte encontrada com os filtros atuais
             </p>
@@ -325,7 +325,8 @@
         </p>
         <p>
           Última Atualização:
-          <span class="text-gray-500"
+          <span
+            class="text-gray-500"
             x-text="buildInfo?.buildTime ? new Date(buildInfo.buildTime).toLocaleString('pt-BR') : ''"
           >
           </span>
@@ -358,17 +359,14 @@
   </body>
 
   <script>
-    document.addEventListener('alpine:init', () => {
-      Alpine.data('repositoryData', () => ({
-        baseUrl: window.location
-          .toString()
-          .replace('index.html', '')
-          .replace(/\/$/, ''),
+    document.addEventListener("alpine:init", () => {
+      Alpine.data("repositoryData", () => ({
+        baseUrl: window.location.toString().replace("index.html", "").replace(/\/$/, ""),
         repository: null,
         sources: [],
         selectedSources: new Set(),
         buildInfo: null,
-        searchTerm: '',
+        searchTerm: "",
         selectedBadges: [],
         availableBadges: [],
         error: null,
@@ -376,27 +374,21 @@
         get filteredSources() {
           return this.sources.filter((source) => {
             const matchesSearch =
-              source.name
-                .toLowerCase()
-                .includes(this.searchTerm.toLowerCase()) ||
-              source.description
-                .toLowerCase()
-                .includes(this.searchTerm.toLowerCase())
+              source.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+              source.description.toLowerCase().includes(this.searchTerm.toLowerCase());
 
             const matchesBadges =
               this.selectedBadges.length === 0 ||
               this.selectedBadges.every((selectedBadge) =>
-                source.badges?.some(
-                  (badge) => badge.label === selectedBadge.label
-                )
-              )
+                source.badges?.some((badge) => badge.label === selectedBadge.label),
+              );
 
-            return matchesSearch && matchesBadges
-          })
+            return matchesSearch && matchesBadges;
+          });
         },
 
         getCapabilityBadges(capabilities) {
-          const badges = []
+          const badges = [];
           const intents = {
             CHAPTER_PROVIDING: 1,
             PROGRESS_PROVIDING: 2,
@@ -405,161 +397,150 @@
             CLOUDFLARE_BYPASS_PROVIDING: 16,
             SETTINGS_FORM_PROVIDING: 32,
             SEARCH_RESULT_PROVIDING: 64,
-          }
+          };
 
           const capabilityLabels = {
             MANGA_CHAPTERS: {
-              label: 'Conteúdo',
-              textColor: '#FFFFFF',
-              backgroundColor: '#F97316',
-              type: 'capability',
+              label: "Conteúdo",
+              textColor: "#FFFFFF",
+              backgroundColor: "#F97316",
+              type: "capability",
             },
             MANGA_PROGRESS: {
-              label: 'Tracker',
-              textColor: '#FFFFFF',
-              backgroundColor: '#6B7280',
-              type: 'capability',
+              label: "Tracker",
+              textColor: "#FFFFFF",
+              backgroundColor: "#6B7280",
+              type: "capability",
             },
             COLLECTION_MANAGEMENT: {
-              label: 'Coleções',
-              textColor: '#FFFFFF',
-              backgroundColor: '#F97316',
-              type: 'capability',
+              label: "Coleções",
+              textColor: "#FFFFFF",
+              backgroundColor: "#F97316",
+              type: "capability",
             },
             CLOUDFLARE_BYPASS: {
-              label: 'Cloudflare',
-              textColor: '#FFFFFF',
-              backgroundColor: '#EF4444',
-              type: 'capability',
+              label: "Cloudflare",
+              textColor: "#FFFFFF",
+              backgroundColor: "#EF4444",
+              type: "capability",
             },
-          }
+          };
 
           const capabilityValues = Array.isArray(capabilities)
             ? capabilities
             : Object.entries(intents)
                 .filter(([_, value]) => (capabilities & value) === value)
-                .map(([_, value]) => value)
+                .map(([_, value]) => value);
 
           for (const [key, value] of Object.entries(intents)) {
             if (capabilityValues.includes(value) && capabilityLabels[key]) {
-              badges.push(capabilityLabels[key])
+              badges.push(capabilityLabels[key]);
             }
           }
 
-          return badges
+          return badges;
         },
 
         async initialize() {
           try {
-            this.error = null
-            const response = await fetch(`${this.baseUrl}/versioning.json`)
+            this.error = null;
+            const response = await fetch(`${this.baseUrl}/versioning.json`);
 
             if (!response.ok) {
-              throw new Error(
-                `Falha ao carregar dados do servidor (${response.status})`
-              )
+              throw new Error(`Falha ao carregar dados do servidor (${response.status})`);
             }
 
-            const json = await response.json()
-            this.repository = json.repository
+            const json = await response.json();
+            this.repository = json.repository;
 
             this.sources = json.sources.map((source) => ({
               ...source,
-              badges: [
-                ...this.getCapabilityBadges(source.capabilities),
-                ...(source.badges || []),
-              ],
-            }))
+              badges: [...this.getCapabilityBadges(source.capabilities), ...(source.badges || [])],
+            }));
 
             this.buildInfo = {
               buildTime: json.buildTime,
               builtWith: json.builtWith,
-            }
-            document.title = this.repository.name
+            };
+            document.title = this.repository.name;
 
-            const badgeMap = new Map()
+            const badgeMap = new Map();
             this.sources.forEach((source) => {
               source.badges?.forEach((badge) => {
                 if (!badgeMap.has(badge.label)) {
-                  badgeMap.set(badge.label, badge)
+                  badgeMap.set(badge.label, badge);
                 }
-              })
-            })
-            this.availableBadges = Array.from(badgeMap.values())
+              });
+            });
+            this.availableBadges = Array.from(badgeMap.values());
           } catch (err) {
-            console.error('Erro na inicialização:', err)
-            this.error = err.message || 'Falha ao carregar repositório'
+            console.error("Erro na inicialização:", err);
+            this.error = err.message || "Falha ao carregar repositório";
           }
         },
 
         resetFilters() {
-          this.searchTerm = ''
-          this.selectedBadges = []
+          this.searchTerm = "";
+          this.selectedBadges = [];
         },
 
         toggleBadgeFilter(badge) {
-          const index = this.selectedBadges.findIndex(
-            (b) => b.label === badge.label
-          )
+          const index = this.selectedBadges.findIndex((b) => b.label === badge.label);
           if (index === -1) {
-            this.selectedBadges.push(badge)
+            this.selectedBadges.push(badge);
           } else {
-            this.selectedBadges.splice(index, 1)
+            this.selectedBadges.splice(index, 1);
           }
         },
 
         getContentRatingClass(rating) {
           const classes = {
-            MATURE: 'bg-orange-100 text-orange-600 border border-orange-200',
-            ADULT: 'bg-red-100 text-red-600 border border-red-200',
-            SAFE: 'bg-green-100 text-green-600 border border-green-200',
-          }
-          return classes[rating.toUpperCase()] || 'bg-gray-100 text-gray-500 border border-gray-200'
+            MATURE: "bg-orange-100 text-orange-600 border border-orange-200",
+            ADULT: "bg-red-100 text-red-600 border border-red-200",
+            SAFE: "bg-green-100 text-green-600 border border-green-200",
+          };
+          return (
+            classes[rating.toUpperCase()] || "bg-gray-100 text-gray-500 border border-gray-200"
+          );
         },
 
         toggleSource(sourceId) {
           if (this.selectedSources.has(sourceId)) {
-            this.selectedSources.delete(sourceId)
+            this.selectedSources.delete(sourceId);
           } else {
-            this.selectedSources.add(sourceId)
+            this.selectedSources.add(sourceId);
           }
         },
 
         installSelectedSources() {
           if (this.selectedSources.size === 0) {
-            alert('Por favor, selecione pelo menos uma fonte.')
-            return
+            alert("Por favor, selecione pelo menos uma fonte.");
+            return;
           }
-          const sourcesToInstall = Array.from(this.selectedSources).map(
-            (id) => [id, this.baseUrl]
-          )
+          const sourcesToInstall = Array.from(this.selectedSources).map((id) => [id, this.baseUrl]);
           window.location.href = `paperback://installExtensions?data=${btoa(
-            JSON.stringify(sourcesToInstall)
-          )}`
+            JSON.stringify(sourcesToInstall),
+          )}`;
         },
 
         addToPaperback() {
           if (!this.repository) {
-            alert('Informações do repositório ainda não carregaram.')
-            return
+            alert("Informações do repositório ainda não carregaram.");
+            return;
           }
           window.location.href = `paperback://addRepo?displayName=${encodeURI(
-            this.repository.name
-          )}&url=${encodeURI(this.baseUrl)}`
+            this.repository.name,
+          )}&url=${encodeURI(this.baseUrl)}`;
         },
 
         sortBadges(badges) {
           return [...badges].sort((a, b) => {
-            const aSelected = this.selectedBadges.some(
-              (s) => s.label === a.label
-            )
-            const bSelected = this.selectedBadges.some(
-              (s) => s.label === b.label
-            )
-            return bSelected - aSelected
-          })
+            const aSelected = this.selectedBadges.some((s) => s.label === a.label);
+            const bSelected = this.selectedBadges.some((s) => s.label === b.label);
+            return bSelected - aSelected;
+          });
         },
-      }))
-    })
+      }));
+    });
   </script>
 </html>

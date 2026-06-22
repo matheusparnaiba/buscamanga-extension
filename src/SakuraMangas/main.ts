@@ -16,8 +16,8 @@ import {
   type SourceManga,
   type Tag,
 } from "@paperback/types";
-
 import * as cheerio from "cheerio";
+
 import { ContentTemplateAdvancedSearchForm, SettingsForm } from "./forms";
 import type { ContentTemplateSearchMetadata } from "./models";
 import { MainInterceptor } from "./network";
@@ -26,12 +26,14 @@ import type ContentTemplateConfig from "./pbconfig";
 const BASE_URL = "https://sakuramangas.org";
 
 function getImageSrc($img: cheerio.Cheerio<any>): string {
-  let src = $img.attr("data-src") || 
-            $img.attr("data-lazy-src") || 
-            $img.attr("data-original") || 
-            $img.attr("srcset")?.split(" ")[0] || 
-            $img.attr("src") || 
-            $img.attr("data-cfsrc") || "";
+  let src =
+    $img.attr("data-src") ||
+    $img.attr("data-lazy-src") ||
+    $img.attr("data-original") ||
+    $img.attr("srcset")?.split(" ")[0] ||
+    $img.attr("src") ||
+    $img.attr("data-cfsrc") ||
+    "";
   src = src.trim().replace(/-\d+x\d+/g, "");
   return src.startsWith("/") ? BASE_URL + src : src;
 }
@@ -75,7 +77,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
   ): Promise<PagedResults<DiscoverSectionItem>> {
     const page = metadata ?? 1;
     let url = `${BASE_URL}/page/${page}/`;
-    
+
     if (section.id === "popular" && page > 1) {
       return { items: [], metadata: undefined };
     }
@@ -91,25 +93,30 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
     const items: DiscoverSectionItem[] = [];
 
     if (section.id === "popular") {
-      let populars = $('.popular-statuses .widget-content .popular-item-wrap, .widget-content .popular-item-wrap, .popular-item-wrap, .popular-manga');
-      if (populars.length === 0) populars = $('.sidebar .popular-item-wrap');
-      if (populars.length === 0) populars = $('.popular-item-wrap');
+      let populars = $(
+        ".popular-statuses .widget-content .popular-item-wrap, .widget-content .popular-item-wrap, .popular-item-wrap, .popular-manga",
+      );
+      if (populars.length === 0) populars = $(".sidebar .popular-item-wrap");
+      if (populars.length === 0) populars = $(".popular-item-wrap");
 
       populars.each((_, el) => {
         const title = $(el).find(".widget-title a, h5 a, .post-title a").text().trim();
         const href = $(el).find(".widget-title a, h5 a, .post-title a").attr("href");
         const img = getImageSrc($(el).find("img"));
         const subtitle = $(el).find(".list-chapter .chapter-item .chapter a").first().text().trim();
-        
+
         if (href) {
           const idMatch = href.match(/\/manga\/([^/]+)/);
           const mangaId = idMatch ? (idMatch[1] as string) : href;
-          
+
           let safeImg = img;
           if (safeImg && safeImg.startsWith("http")) {
-             safeImg = safeImg.includes("?") ? safeImg + "&v=4" : safeImg + "?v=4";
+            safeImg = safeImg.includes("?") ? safeImg + "&v=4" : safeImg + "?v=4";
           } else {
-             safeImg = "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
+            safeImg =
+              "https://ui-avatars.com/api/?name=" +
+              encodeURIComponent(title) +
+              "&background=random";
           }
 
           items.push({
@@ -132,16 +139,19 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
         const chapterEl = $(el).find(".chapter-list .chapter-button").first();
         const chapterSubtitle = chapterEl.text().trim();
         const chapterHref = chapterEl.attr("href") || "unknown";
-        
+
         if (href) {
           const idMatch = href.match(/\/manga\/([^/]+)/);
           const mangaId = idMatch ? (idMatch[1] as string) : href;
-          
+
           let safeImg = img;
           if (safeImg && safeImg.startsWith("http")) {
-             safeImg = safeImg.includes("?") ? safeImg + "&v=4" : safeImg + "?v=4";
+            safeImg = safeImg.includes("?") ? safeImg + "&v=4" : safeImg + "?v=4";
           } else {
-             safeImg = "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
+            safeImg =
+              "https://ui-avatars.com/api/?name=" +
+              encodeURIComponent(title) +
+              "&background=random";
           }
 
           items.push({
@@ -176,7 +186,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata ?? 1;
     const searchUrl = `${BASE_URL}/page/${page}/?s=${encodeURIComponent(query.title)}&post_type=wp-manga`;
-    
+
     const request = { url: searchUrl, method: "GET" };
     const [response, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
@@ -192,7 +202,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
       if (href) {
         const idMatch = href.match(/\/manga\/([^/]+)/);
         const mangaId = idMatch ? (idMatch[1] as string) : href;
-        
+
         items.push({
           mangaId,
           title,
@@ -218,8 +228,12 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
     const image = getImageSrc($(".summary_image img"));
     const synopsis = $(".description-summary .summary__content").text().trim();
     const author = $(".author-content a").text().trim();
-    const statusText = $(".post-status .post-content_item .summary-content").last().text().trim().toLowerCase();
-    
+    const statusText = $(".post-status .post-content_item .summary-content")
+      .last()
+      .text()
+      .trim()
+      .toLowerCase();
+
     let status = "ONGOING";
     if (statusText.includes("completo") || statusText.includes("completed")) status = "COMPLETED";
 
@@ -248,8 +262,8 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
 
   async getChapters(sourceManga: SourceManga, sinceDate?: Date): Promise<Chapter[]> {
     const url = `${BASE_URL}/manga/${sourceManga.mangaId}/ajax/chapters/`;
-    const request = { 
-      url, 
+    const request = {
+      url,
       method: "POST",
     };
     const [response, buffer] = await Application.scheduleRequest(request);

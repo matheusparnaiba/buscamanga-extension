@@ -16,8 +16,8 @@ import {
   type SourceManga,
   type Tag,
 } from "@paperback/types";
-
 import * as cheerio from "cheerio";
+
 import { ContentTemplateAdvancedSearchForm, SettingsForm } from "./forms";
 import type { ContentTemplateSearchMetadata } from "./models";
 import { MainInterceptor } from "./network";
@@ -25,12 +25,14 @@ import type ContentTemplateConfig from "./pbconfig";
 const BASE_URL = "https://hipertoon.com";
 
 function getImageSrc($img: cheerio.Cheerio<any>): string {
-  let src = $img.attr("data-src") || 
-            $img.attr("data-lazy-src") || 
-            $img.attr("data-original") || 
-            $img.attr("srcset")?.split(" ")[0] || 
-            $img.attr("src") || 
-            $img.attr("data-cfsrc") || "";
+  let src =
+    $img.attr("data-src") ||
+    $img.attr("data-lazy-src") ||
+    $img.attr("data-original") ||
+    $img.attr("srcset")?.split(" ")[0] ||
+    $img.attr("src") ||
+    $img.attr("data-cfsrc") ||
+    "";
   src = src.trim().replace(/-\d+x\d+/g, "");
   return src.startsWith("/") ? BASE_URL + src : src;
 }
@@ -72,8 +74,9 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     section: DiscoverSection,
     metadata: any,
   ): Promise<PagedResults<DiscoverSectionItem>> {
-    const url = "https://hipertoon.com/api/trpc/auth.me,recommendations.trending,recommendations.latestChapters,recommendations.newlyAdded?batch=1&input=%7B%220%22%3A%7B%22json%22%3Anull%2C%22meta%22%3A%7B%22values%22%3A%5B%22undefined%22%5D%7D%7D%2C%221%22%3A%7B%22json%22%3A%7B%22limit%22%3A20%7D%7D%2C%222%22%3A%7B%22json%22%3A%7B%22limit%22%3A20%7D%7D%2C%223%22%3A%7B%22json%22%3A%7B%22limit%22%3A10%7D%7D%7D";
-    
+    const url =
+      "https://hipertoon.com/api/trpc/auth.me,recommendations.trending,recommendations.latestChapters,recommendations.newlyAdded?batch=1&input=%7B%220%22%3A%7B%22json%22%3Anull%2C%22meta%22%3A%7B%22values%22%3A%5B%22undefined%22%5D%7D%7D%2C%221%22%3A%7B%22json%22%3A%7B%22limit%22%3A20%7D%7D%2C%222%22%3A%7B%22json%22%3A%7B%22limit%22%3A20%7D%7D%2C%223%22%3A%7B%22json%22%3A%7B%22limit%22%3A10%7D%7D%7D";
+
     const request = {
       url,
       method: "GET",
@@ -92,7 +95,11 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
           mangaId: `${manga.id}|${manga.slug}`,
           title: manga.title,
           subtitle: manga.latestChapter ? "Capítulo " + manga.latestChapter.number : undefined,
-          imageUrl: manga.coverUrl || "https://ui-avatars.com/api/?name=" + encodeURIComponent(manga.title) + "&background=random",
+          imageUrl:
+            manga.coverUrl ||
+            "https://ui-avatars.com/api/?name=" +
+              encodeURIComponent(manga.title) +
+              "&background=random",
         });
       }
       return { items, metadata: undefined };
@@ -107,7 +114,11 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
           chapterId: manga.latestChapter ? manga.latestChapter.number.toString() : manga.slug,
           title: manga.title,
           subtitle: manga.latestChapter ? "Capítulo " + manga.latestChapter.number : undefined,
-          imageUrl: manga.coverUrl || "https://ui-avatars.com/api/?name=" + encodeURIComponent(manga.title) + "&background=random",
+          imageUrl:
+            manga.coverUrl ||
+            "https://ui-avatars.com/api/?name=" +
+              encodeURIComponent(manga.title) +
+              "&background=random",
         });
       }
       return { items, metadata: undefined };
@@ -124,39 +135,39 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     const page = metadata ?? 0;
     const limit = 30;
     const offset = page * limit;
-    
+
     const input = {
       "0": {
-        "json": {
-          "q": query.title || "",
-          "sort": "relevance",
-          "filters": {
-            "genres": null,
-            "type": null,
-            "status": null,
-            "contentRating": null
+        json: {
+          q: query.title || "",
+          sort: "relevance",
+          filters: {
+            genres: null,
+            type: null,
+            status: null,
+            contentRating: null,
           },
-          "limit": limit,
-          "offset": offset
+          limit: limit,
+          offset: offset,
         },
-        "meta": {
-          "values": {
+        meta: {
+          values: {
             "filters.genres": ["undefined"],
             "filters.type": ["undefined"],
             "filters.status": ["undefined"],
-            "filters.contentRating": ["undefined"]
-          }
-        }
-      }
+            "filters.contentRating": ["undefined"],
+          },
+        },
+      },
     };
 
     const searchUrl = `https://hipertoon.com/api/trpc/search.query?batch=1&input=${encodeURIComponent(JSON.stringify(input))}`;
     const request = { url: searchUrl, method: "GET" };
-    
+
     const [response, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const json = JSON.parse(data);
-    
+
     const hits = json[0]?.result?.data?.json?.hits || [];
     const items: SearchResultItem[] = [];
 
@@ -164,7 +175,11 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
       items.push({
         mangaId: `${manga.id}|${manga.slug}`,
         title: manga.title,
-        imageUrl: manga.coverUrl || "https://ui-avatars.com/api/?name=" + encodeURIComponent(manga.title) + "&background=random",
+        imageUrl:
+          manga.coverUrl ||
+          "https://ui-avatars.com/api/?name=" +
+            encodeURIComponent(manga.title) +
+            "&background=random",
       });
     }
 
@@ -175,33 +190,38 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
   }
 
   async getMangaDetails(mangaId: string): Promise<SourceManga> {
-    const [id, slug] = mangaId.split('|');
+    const [id, slug] = mangaId.split("|");
     const actualSlug = slug || mangaId;
-    
-    const url = `https://hipertoon.com/api/trpc/series.bySlugWithGenres?batch=1&input=${encodeURIComponent(JSON.stringify({ "0": { "json": { "slug": actualSlug } } }))}`;
+
+    const url = `https://hipertoon.com/api/trpc/series.bySlugWithGenres?batch=1&input=${encodeURIComponent(JSON.stringify({ "0": { json: { slug: actualSlug } } }))}`;
     const request = { url, method: "GET" };
-    
+
     const [response, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const json = JSON.parse(data);
-    
+
     const manga = json[0]?.result?.data?.json;
     if (!manga) throw new Error("Failed to parse Manga Details from Hipertoon API");
 
     const statusMap: any = {
-      "releasing": "ONGOING",
-      "completed": "COMPLETED",
-      "ongoing": "ONGOING",
+      releasing: "ONGOING",
+      completed: "COMPLETED",
+      ongoing: "ONGOING",
     };
 
-    const genres: Tag[] = manga.genres?.map((g: any) => ({ id: g.id.toString(), title: g.name })) || [];
+    const genres: Tag[] =
+      manga.genres?.map((g: any) => ({ id: g.id.toString(), title: g.name })) || [];
 
     return {
       mangaId,
       mangaInfo: {
         primaryTitle: manga.title,
         secondaryTitles: [],
-        thumbnailUrl: manga.coverUrl || "https://ui-avatars.com/api/?name=" + encodeURIComponent(manga.title) + "&background=random",
+        thumbnailUrl:
+          manga.coverUrl ||
+          "https://ui-avatars.com/api/?name=" +
+            encodeURIComponent(manga.title) +
+            "&background=random",
         synopsis: manga.synopsis || "",
         contentRating: ContentRating.EVERYONE,
         status: statusMap[manga.status] || "UNKNOWN",
@@ -214,18 +234,18 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
   }
 
   async getChapters(sourceManga: SourceManga, sinceDate?: Date): Promise<Chapter[]> {
-    const [id, slug] = sourceManga.mangaId.split('|');
+    const [id, slug] = sourceManga.mangaId.split("|");
     const seriesId = id;
-    
+
     if (!seriesId) throw new Error("Invalid mangaId format, missing seriesId");
 
-    const url = `https://hipertoon.com/api/trpc/series.chapters?batch=1&input=${encodeURIComponent(JSON.stringify({ "0": { "json": { "seriesId": parseInt(seriesId) } } }))}`;
+    const url = `https://hipertoon.com/api/trpc/series.chapters?batch=1&input=${encodeURIComponent(JSON.stringify({ "0": { json: { seriesId: parseInt(seriesId) } } }))}`;
     const request = { url, method: "GET" };
-    
+
     const [response, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const json = JSON.parse(data);
-    
+
     const chaptersData = json[0]?.result?.data?.json || [];
     const chapters: Chapter[] = [];
 
@@ -244,16 +264,16 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
   }
 
   async getChapterDetails(chapter: Chapter): Promise<ChapterDetails> {
-    const [id, slug] = chapter.sourceManga.mangaId.split('|');
+    const [id, slug] = chapter.sourceManga.mangaId.split("|");
     const actualSlug = slug || chapter.sourceManga.mangaId;
-    
-    const url = `https://hipertoon.com/api/trpc/reader.chapterPages?batch=1&input=${encodeURIComponent(JSON.stringify({ "0": { "json": { "seriesSlug": actualSlug, "chapterNumber": parseFloat(chapter.chapterId) } } }))}`;
+
+    const url = `https://hipertoon.com/api/trpc/reader.chapterPages?batch=1&input=${encodeURIComponent(JSON.stringify({ "0": { json: { seriesSlug: actualSlug, chapterNumber: parseFloat(chapter.chapterId) } } }))}`;
     const request = { url, method: "GET" };
-    
+
     const [response, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const json = JSON.parse(data);
-    
+
     const pagesData = json[0]?.result?.data?.json || [];
     const pages: string[] = [];
 

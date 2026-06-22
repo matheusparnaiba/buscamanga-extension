@@ -8,12 +8,12 @@ Bem-vindo ao repositório do **BuscaMangá Extension**, uma coleção de fontes 
 
 Atualmente, nosso repositório conta com as seguintes fontes:
 
-| Ícone | Nome | Versão | Desenvolvedor | Site Oficial |
-|:---:|---|:---:|---|---|
-| 🔵 | **Manga Online** | `1.0.8` | matheusparnaiba | [mangaonline.blue](https://mangaonline.blue) |
-| 🟢 | **Manga Livre** | `1.0.10` | matheusparnaiba | [mangalivre.to](https://mangalivre.to) |
-| 🌸 | **Sakura Mangas** | `1.0.0` | matheusparnaiba | [sakuramangas.org](https://sakuramangas.org) |
-| 📖 | **MangaLivre Blog** | `1.0.0` | matheusparnaiba | [mangalivre.blog](https://mangalivre.blog) |
+| Ícone | Nome                |  Versão  | Desenvolvedor   | Site Oficial                                 |
+| :---: | ------------------- | :------: | --------------- | -------------------------------------------- |
+|  🔵   | **Manga Online**    | `1.0.8`  | matheusparnaiba | [mangaonline.blue](https://mangaonline.blue) |
+|  🟢   | **Manga Livre**     | `1.0.10` | matheusparnaiba | [mangalivre.to](https://mangalivre.to)       |
+|  🌸   | **Sakura Mangas**   | `1.0.0`  | matheusparnaiba | [sakuramangas.org](https://sakuramangas.org) |
+|  📖   | **MangaLivre Blog** | `1.0.0`  | matheusparnaiba | [mangalivre.blog](https://mangalivre.blog)   |
 
 ## 🚀 Como Instalar
 

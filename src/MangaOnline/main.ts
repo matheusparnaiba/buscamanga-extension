@@ -16,8 +16,8 @@ import {
   type SourceManga,
   type Tag,
 } from "@paperback/types";
-
 import * as cheerio from "cheerio";
+
 import { ContentTemplateAdvancedSearchForm, SettingsForm } from "./forms";
 import type { ContentTemplateSearchMetadata } from "./models";
 import { MainInterceptor } from "./network";
@@ -26,11 +26,13 @@ import type ContentTemplateConfig from "./pbconfig";
 const BASE_URL = "https://mangaonline.blue";
 
 function getImageSrc($img: cheerio.Cheerio<any>): string {
-  let src = $img.attr("data-src") || 
-            $img.attr("data-lazy-src") || 
-            $img.attr("srcset")?.split(" ")[0] || 
-            $img.attr("src") || 
-            $img.attr("data-cfsrc") || "";
+  let src =
+    $img.attr("data-src") ||
+    $img.attr("data-lazy-src") ||
+    $img.attr("srcset")?.split(" ")[0] ||
+    $img.attr("src") ||
+    $img.attr("data-cfsrc") ||
+    "";
   src = src.trim().replace(/-\d+x\d+/g, ""); // Remove dimensões do nome
   return src.startsWith("/") ? BASE_URL + src : src;
 }
@@ -63,7 +65,7 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
       {
         id: "updates",
         title: "Últimas Atualizações",
-        type: DiscoverSectionType.simpleCarousel,
+        type: DiscoverSectionType.chapterUpdates,
       },
     ];
   }
@@ -74,7 +76,7 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
   ): Promise<PagedResults<DiscoverSectionItem>> {
     const page = metadata ?? 1;
     let url = `${BASE_URL}/page/${page}/`;
-    
+
     if (section.id === "latest" && page > 1) {
       return { items: [], metadata: undefined };
     }
@@ -94,11 +96,11 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
         const title = $(el).find(".es-hero-title").text().trim();
         const href = $(el).find(".es-hero-actions a").attr("href");
         const img = getImageSrc($(el).find(".es-hero-cover img"));
-        
+
         if (href) {
           const idMatch = href.match(/\/manga\/([^/]+)/);
           const mangaId = idMatch ? (idMatch[1] as string) : href;
-          
+
           items.push({
             mangaId,
             title,
@@ -115,16 +117,32 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
         const title = $(el).find(".es-upd-title").text().trim();
         const href = $(el).find(".es-upd-title").attr("href");
         const img = getImageSrc($(el).find(".es-upd-cover img"));
-        
+
         if (href) {
           const idMatch = href.match(/\/manga\/([^/]+)/);
           const mangaId = idMatch ? (idMatch[1] as string) : href;
-          
+
+          const firstChapterEl = $(el).find(".es-upd-chap").first();
+          const chapterUrl = firstChapterEl.attr("href");
+          const chapterName = firstChapterEl.find(".es-upd-chap-name").text().trim() || "Cap. ?";
+
+          let chapterId = mangaId;
+          if (chapterUrl) {
+            const chapMatch = chapterUrl.match(/\/manga\/[^/]+\/([^/]+)/);
+            if (chapMatch) chapterId = chapMatch[1] as string;
+          }
+
           items.push({
             mangaId,
+            chapterId,
             title,
-            imageUrl: img,
-            type: "simpleCarouselItem",
+            subtitle: chapterName,
+            imageUrl:
+              img ||
+              "https://ui-avatars.com/api/?name=" +
+                encodeURIComponent(title) +
+                "&background=random",
+            type: "chapterUpdatesCarouselItem",
           });
         }
       });
@@ -150,7 +168,7 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata ?? 1;
     const searchUrl = `${BASE_URL}/page/${page}/?s=${encodeURIComponent(query.title)}&post_type=wp-manga`;
-    
+
     const request = { url: searchUrl, method: "GET" };
     const [response, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
@@ -166,7 +184,7 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
       if (href) {
         const idMatch = href.match(/\/manga\/([^/]+)/);
         const mangaId = idMatch ? (idMatch[1] as string) : href;
-        
+
         items.push({
           mangaId,
           title,
@@ -192,8 +210,12 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
     const image = getImageSrc($(".summary_image a img"));
     const synopsis = $(".description-summary .summary__content").text().trim();
     const author = $(".author-content a").text().trim();
-    const statusText = $(".post-status .post-content_item .summary-content").last().text().trim().toLowerCase();
-    
+    const statusText = $(".post-status .post-content_item .summary-content")
+      .last()
+      .text()
+      .trim()
+      .toLowerCase();
+
     let status = "ONGOING";
     if (statusText.includes("completo") || statusText.includes("completed")) status = "COMPLETED";
 
@@ -234,7 +256,7 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
         url: `${BASE_URL}/wp-admin/admin-ajax.php`,
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `action=manga_get_chapters&manga=${mangaIdAttr}`
+        body: `action=manga_get_chapters&manga=${mangaIdAttr}`,
       };
       const [ajaxResp, ajaxBuffer] = await Application.scheduleRequest(ajaxReq);
       const ajaxData = Application.arrayBufferToUTF8String(ajaxBuffer);

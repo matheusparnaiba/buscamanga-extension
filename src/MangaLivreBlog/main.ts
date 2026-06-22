@@ -16,8 +16,8 @@ import {
   type SourceManga,
   type Tag,
 } from "@paperback/types";
-
 import * as cheerio from "cheerio";
+
 import { ContentTemplateAdvancedSearchForm, SettingsForm } from "./forms";
 import type { ContentTemplateSearchMetadata } from "./models";
 import { MainInterceptor } from "./network";
@@ -26,12 +26,14 @@ import type ContentTemplateConfig from "./pbconfig";
 const BASE_URL = "https://mangalivre.blog";
 
 function getImageSrc($img: cheerio.Cheerio<any>): string {
-  let src = $img.attr("data-src") || 
-            $img.attr("data-lazy-src") || 
-            $img.attr("data-original") || 
-            $img.attr("srcset")?.split(" ")[0] || 
-            $img.attr("src") || 
-            $img.attr("data-cfsrc") || "";
+  let src =
+    $img.attr("data-src") ||
+    $img.attr("data-lazy-src") ||
+    $img.attr("data-original") ||
+    $img.attr("srcset")?.split(" ")[0] ||
+    $img.attr("src") ||
+    $img.attr("data-cfsrc") ||
+    "";
   src = src.trim().replace(/-\d+x\d+/g, "");
   return src.startsWith("/") ? BASE_URL + src : src;
 }
@@ -75,7 +77,7 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
   ): Promise<PagedResults<DiscoverSectionItem>> {
     const page = metadata ?? 1;
     let url = `${BASE_URL}/page/${page}/`;
-    
+
     if (section.id === "popular" && page > 1) {
       return { items: [], metadata: undefined };
     }
@@ -91,25 +93,28 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
     const items: DiscoverSectionItem[] = [];
 
     if (section.id === "popular") {
-      let populars = $('.manga-card-modern');
-      if (populars.length === 0) populars = $('.sidebar .popular-item-wrap');
-      if (populars.length === 0) populars = $('.popular-item-wrap');
+      let populars = $(".manga-card-modern");
+      if (populars.length === 0) populars = $(".sidebar .popular-item-wrap");
+      if (populars.length === 0) populars = $(".popular-item-wrap");
 
       populars.toArray().forEach((el) => {
         const title = $(el).find(".manga-title-modern, .manga-title").text().trim();
         const subtitle = $(el).find(".chapter-item-modern a").first().text().trim();
         const img = getImageSrc($(el).find("img"));
         const href = $(el).find("a.manga-cover-link").attr("href");
-        
+
         if (href) {
           const idMatch = href.match(/\/manga\/([^/]+)/);
           const mangaId = idMatch ? (idMatch[1] as string) : href;
-          
+
           let safeImg = img;
           if (safeImg && safeImg.startsWith("http")) {
-             safeImg = safeImg.includes("?") ? safeImg + "&v=4" : safeImg + "?v=4";
+            safeImg = safeImg.includes("?") ? safeImg + "&v=4" : safeImg + "?v=4";
           } else {
-             safeImg = "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
+            safeImg =
+              "https://ui-avatars.com/api/?name=" +
+              encodeURIComponent(title) +
+              "&background=random";
           }
 
           items.push({
@@ -132,16 +137,19 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
         const chapterEl = $(el).find(".chapter-item-modern a").first();
         const chapterSubtitle = chapterEl.text().trim();
         const chapterHref = chapterEl.attr("href") || "unknown";
-        
+
         if (href) {
           const idMatch = href.match(/\/manga\/([^/]+)/);
           const mangaId = idMatch ? (idMatch[1] as string) : href;
-          
+
           let safeImg = img;
           if (safeImg && safeImg.startsWith("http")) {
-             safeImg = safeImg.includes("?") ? safeImg + "&v=4" : safeImg + "?v=4";
+            safeImg = safeImg.includes("?") ? safeImg + "&v=4" : safeImg + "?v=4";
           } else {
-             safeImg = "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
+            safeImg =
+              "https://ui-avatars.com/api/?name=" +
+              encodeURIComponent(title) +
+              "&background=random";
           }
 
           items.push({
@@ -176,7 +184,7 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata ?? 1;
     const searchUrl = `${BASE_URL}/page/${page}/?s=${encodeURIComponent(query.title)}&post_type=wp-manga`;
-    
+
     const request = { url: searchUrl, method: "GET" };
     const [response, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
@@ -192,7 +200,7 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
       if (href) {
         const idMatch = href.match(/\/manga\/([^/]+)/);
         const mangaId = idMatch ? (idMatch[1] as string) : href;
-        
+
         items.push({
           mangaId,
           title,
@@ -218,8 +226,12 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
     const image = getImageSrc($(".summary_image img"));
     const synopsis = $(".description-summary .summary__content").text().trim();
     const author = $(".author-content a").text().trim();
-    const statusText = $(".post-status .post-content_item .summary-content").last().text().trim().toLowerCase();
-    
+    const statusText = $(".post-status .post-content_item .summary-content")
+      .last()
+      .text()
+      .trim()
+      .toLowerCase();
+
     let status = "ONGOING";
     if (statusText.includes("completo") || statusText.includes("completed")) status = "COMPLETED";
 
@@ -248,8 +260,8 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
 
   async getChapters(sourceManga: SourceManga, sinceDate?: Date): Promise<Chapter[]> {
     const url = `${BASE_URL}/manga/${sourceManga.mangaId}/ajax/chapters/`;
-    const request = { 
-      url, 
+    const request = {
+      url,
       method: "POST",
     };
     const [response, buffer] = await Application.scheduleRequest(request);
