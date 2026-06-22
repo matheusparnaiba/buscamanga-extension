@@ -29,6 +29,20 @@ jobs:
         run: npm install
       - name: Bundle Extensions
         run: npm run bundle
+      - name: Customize Homepage
+        run: |
+          node -e "
+            const fs = require('fs');
+            fs.copyFileSync('src/MangaOnline/icon.png', 'bundles/logo.png');
+            let html = fs.readFileSync('bundles/index.html', 'utf8');
+            html = html.replace(/<title>.*?<\/title>/, '<title>BuscaMangá</title>');
+            html = html.replace(/buscamanga-extension/g, 'BuscaMangá');
+            html = html.replace('https://paperback.moe/pb-logo.svg', 'logo.png');
+            fs.writeFileSync('bundles/index.html', html);
+            let json = fs.readFileSync('bundles/versioning.json', 'utf8');
+            json = json.replace(/buscamanga-extension/g, 'BuscaMangá');
+            fs.writeFileSync('bundles/versioning.json', json);
+          "
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
