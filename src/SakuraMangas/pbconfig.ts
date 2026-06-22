@@ -12,8 +12,9 @@ export default {
     SourceIntents.DISCOVER_SECTION_PROVIDING,
     SourceIntents.SEARCH_RESULT_PROVIDING,
     SourceIntents.CHAPTER_PROVIDING,
+    SourceIntents.CLOUDFLARE_BYPASS_PROVIDING,
   ],
-  badges: [],
+  badges: [{ label: "Cloudflare", textColor: "#000000", backgroundColor: "#ffc107" }],
   developers: [
     {
       name: "matheusparnaiba",
