@@ -1,50 +1,38 @@
-# Template Extensions
+# BuscaMangá Extension
 
-Paperback extensions designed as templates to help developers get started quickly.
+Bem-vindo ao repositório do **BuscaMangá Extension**, uma coleção de fontes para o aplicativo **Paperback** criada para facilitar a leitura de mangás em português.
 
-This includes the following:
+## 📦 Fontes Disponíveis
 
-- Package config
-- TypeScript config
-- oxlint config
-- oxfmt config
-- Dependabot config
-- Development setup
-- Husky pre-push hook
-- GitHub CI/CD Actions
-- VSCode config files (settings + extensions)
-- A basic example content extension
-- A basic example tracker extension
+Atualmente, nosso repositório conta com as seguintes fontes:
 
-All extension repositories in the Inkdex GitHub Organization use this one as their base template.
+| Ícone | Nome | Versão | Desenvolvedor | Site Oficial |
+|:---:|---|:---:|---|---|
+| 🔵 | **Manga Online** | `1.0.4` | matheusparnaiba | [mangaonline.blue](https://mangaonline.blue) |
+| 🔴 | **Hipertoon** | `1.0.3` | matheusparnaiba | [hipertoon.com](https://hipertoon.com) |
 
-## Available Extensions
+## 🚀 Como Instalar
 
-### Content Template
+1. Baixe o aplicativo **Paperback** em seu dispositivo móvel.
+2. Acesse a página do repositório gerada pelo GitHub Pages.
+3. Clique no botão **Adicionar ao Paperback** ou adicione o link do repositório diretamente na aba de repositórios do aplicativo.
+4. Vá em Extensões (Fontes) no app e instale as fontes desejadas.
 
-Template that shows the functionality of content providing extensions.
+## 🛠 Funcionalidades Implementadas
 
-### Tracker Template
+- **Busca Avançada:** Permite buscar os mangás diretamente na base de dados das fontes.
+- **Lançamentos (Banner):** Os últimos lançamentos aparecem diretamente no topo da sua tela inicial no formato de carrossel em destaque.
+- **Leitura de Capítulos:** Suporte completo para visualização de capítulos atualizados.
+- **Bypass de Proteção (Cloudflare):** Interceptadores de rede já embutidos para carregar imagens e capas normalmente sem bloqueios de CDN.
 
-Template that shows the functionality of tracking and collection management providing extensions.
+## 🧑‍💻 Desenvolvimento
 
-> [!NOTE]
-> This template still has to be made.
+Este projeto foi construído usando o `paperback-cli` com `TypeScript`.
+Para compilar novas fontes ou atualizar as existentes, basta rodar os comandos:
 
-## Installation
+```bash
+bun run tsc
+bun run bundle
+```
 
-To add these extensions to Paperback, it’s recommended to install the registry via the [installation page][registry-installation-page] on the Inkdex website. Alternatively, you can install just this repository by visiting [this webpage][repository-installation-page].
-
-## Support Guidelines
-
-Need help? Check out our [Support Guidelines][support-guidelines] in the [registry repository][registry-repository]. Issues and discussions are disabled in the extension repositories and should be posted in the registry repository instead.
-
-## Contributing Guidelines
-
-Want to contribute? Read the [Contributing Guidelines][contributing-guidelines] in the [registry repository][registry-repository] to get started.
-
-[registry-installation-page]: https://inkdex.github.io/installation
-[repository-installation-page]: https://inkdex.github.io/template-extensions/0.9/stable
-[support-guidelines]: https://github.com/inkdex/extensions/blob/master/.github/SUPPORT.md
-[registry-repository]: https://github.com/inkdex/extensions
-[contributing-guidelines]: https://github.com/inkdex/extensions/blob/master/.github/CONTRIBUTING.md
+O script `.github/workflows/bundle-deploy.yaml` vai gerar e subir sua página automaticamente pro GitHub Pages!
