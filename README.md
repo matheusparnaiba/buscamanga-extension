@@ -16,7 +16,7 @@ Atualmente, nosso repositório conta com as seguintes fontes:
 ## 🚀 Como Instalar
 
 1. Baixe o aplicativo **Paperback** em seu dispositivo móvel.
-2. Acesse a página do repositório gerada pelo GitHub Pages.
+2. Acesse a [página do repositório gerada pelo GitHub Pages](https://matheusparnaiba.github.io/buscamanga-extension/0.9/stable/).
 3. Clique no botão **Adicionar ao Paperback** ou adicione o link do repositório diretamente na aba de repositórios do aplicativo.
 4. Vá em Extensões (Fontes) no app e instale as fontes desejadas.
 
