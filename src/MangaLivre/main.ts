@@ -28,6 +28,7 @@ const BASE_URL = "https://mangalivre.to";
 function getImageSrc($img: cheerio.Cheerio<any>): string {
   let src = $img.attr("data-src") || 
             $img.attr("data-lazy-src") || 
+            $img.attr("data-original") || 
             $img.attr("srcset")?.split(" ")[0] || 
             $img.attr("src") || 
             $img.attr("data-cfsrc") || "";
@@ -104,11 +105,16 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
           const idMatch = href.match(/\/manga\/([^/]+)/);
           const mangaId = idMatch ? (idMatch[1] as string) : href;
           
+          let safeImg = img;
+          if (safeImg && safeImg.startsWith("http")) {
+             safeImg = safeImg.includes("?") ? safeImg + "&v=2" : safeImg + "?v=2";
+          }
+
           items.push({
             mangaId,
             title,
             subtitle: subtitle || undefined,
-            imageUrl: img ? (img.includes('?') ? img + '&v=2' : img + '?v=2') : "",
+            imageUrl: safeImg || "",
             type: "simpleCarouselItem",
           });
         }
@@ -123,18 +129,23 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
         const img = getImageSrc($(el).find("img"));
         const chapterEl = $(el).find(".chapter-list .chapter-button").first();
         const chapterSubtitle = chapterEl.text().trim();
-        const chapterHref = chapterEl.attr("href") || "";
+        const chapterHref = chapterEl.attr("href") || "unknown";
         
         if (href) {
           const idMatch = href.match(/\/manga\/([^/]+)/);
           const mangaId = idMatch ? (idMatch[1] as string) : href;
           
+          let safeImg = img;
+          if (safeImg && safeImg.startsWith("http")) {
+             safeImg = safeImg.includes("?") ? safeImg + "&v=3" : safeImg + "?v=3";
+          }
+
           items.push({
             mangaId,
             chapterId: chapterHref,
             title,
             subtitle: chapterSubtitle || undefined,
-            imageUrl: img,
+            imageUrl: safeImg || "",
             type: "chapterUpdatesCarouselItem",
           });
         }
