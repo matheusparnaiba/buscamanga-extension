@@ -50,6 +50,11 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
         title: "Lançamentos",
         type: DiscoverSectionType.featured,
       },
+      {
+        id: "updates",
+        title: "Últimas Atualizações",
+        type: DiscoverSectionType.simpleCarousel,
+      },
     ];
   }
 
@@ -60,6 +65,10 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
     const page = metadata ?? 1;
     let url = `${BASE_URL}/page/${page}/`;
     
+    if (section.id === "latest" && page > 1) {
+      return { items: [], metadata: undefined };
+    }
+
     const request = {
       url,
       method: "GET",
@@ -70,28 +79,52 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
     const $ = cheerio.load(data);
     const items: DiscoverSectionItem[] = [];
 
-    $(".es-upd-card").each((_, el) => {
-      const title = $(el).find(".es-upd-title").text().trim();
-      const href = $(el).find(".es-upd-title").attr("href");
-      const img = $(el).find(".es-upd-cover img").attr("src")?.trim() ?? "";
-      
-      if (href) {
-        const idMatch = href.match(/\/manga\/([^/]+)/);
-        const mangaId = idMatch ? (idMatch[1] as string) : href;
+    if (section.id === "latest") {
+      $(".es-hero-slide").each((_, el) => {
+        const title = $(el).find(".es-hero-title").text().trim();
+        const href = $(el).find(".es-hero-actions a").attr("href");
+        const img = $(el).find(".es-hero-cover img").attr("src")?.trim() ?? "";
         
-        items.push({
-          mangaId,
-          title,
-          imageUrl: img,
-          type: "featuredCarouselItem",
-        });
-      }
-    });
+        if (href) {
+          const idMatch = href.match(/\/manga\/([^/]+)/);
+          const mangaId = idMatch ? (idMatch[1] as string) : href;
+          
+          items.push({
+            mangaId,
+            title,
+            imageUrl: img,
+            type: "featuredCarouselItem",
+          });
+        }
+      });
+      return { items, metadata: undefined };
+    }
 
-    return {
-      items,
-      metadata: items.length > 0 ? page + 1 : undefined,
-    };
+    if (section.id === "updates") {
+      $(".es-upd-card").each((_, el) => {
+        const title = $(el).find(".es-upd-title").text().trim();
+        const href = $(el).find(".es-upd-title").attr("href");
+        const img = $(el).find(".es-upd-cover img").attr("src")?.trim() ?? "";
+        
+        if (href) {
+          const idMatch = href.match(/\/manga\/([^/]+)/);
+          const mangaId = idMatch ? (idMatch[1] as string) : href;
+          
+          items.push({
+            mangaId,
+            title,
+            imageUrl: img,
+            type: "simpleCarouselItem",
+          });
+        }
+      });
+      return {
+        items,
+        metadata: items.length > 0 ? page + 1 : undefined,
+      };
+    }
+
+    return { items: [], metadata: undefined };
   }
 
   async getAdvancedSearchForm(

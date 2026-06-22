@@ -46,9 +46,9 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
   async getDiscoverSections(): Promise<DiscoverSection[]> {
     return [
       {
-        id: "latest",
-        title: "Lançamentos",
-        type: DiscoverSectionType.featured,
+        id: "updates",
+        title: "Últimas Atualizações",
+        type: DiscoverSectionType.simpleCarousel,
       },
     ];
   }
@@ -83,7 +83,7 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
           mangaId,
           title,
           imageUrl: img,
-          type: "featuredCarouselItem",
+          type: "simpleCarouselItem",
         });
       }
     });
