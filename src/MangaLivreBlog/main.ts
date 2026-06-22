@@ -246,7 +246,7 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
       mangaInfo: {
         primaryTitle: title,
         secondaryTitles: [],
-        thumbnailUrl: image,
+        thumbnailUrl: image || "https://ui-avatars.com/api/?name=" + encodeURIComponent(title || "Manga") + "&background=random",
         synopsis,
         contentRating: ContentRating.EVERYONE,
         status,
