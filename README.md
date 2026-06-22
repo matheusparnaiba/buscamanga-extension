@@ -9,7 +9,7 @@ Atualmente, nosso repositório conta com as seguintes fontes:
 | Ícone | Nome | Versão | Desenvolvedor | Site Oficial |
 |:---:|---|:---:|---|---|
 | 🔵 | **Manga Online** | `1.0.7` | matheusparnaiba | [mangaonline.blue](https://mangaonline.blue) |
-| 🟢 | **Manga Livre** | `1.0.2` | matheusparnaiba | [mangalivre.to](https://mangalivre.to) |
+| 🟢 | **Manga Livre** | `1.0.3` | matheusparnaiba | [mangalivre.to](https://mangalivre.to) |
 
 ## 🚀 Como Instalar
 

@@ -106,8 +106,8 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
 
     if (section.id === "updates") {
       $(".manga-item, .page-item-detail").each((_, el) => {
-        const title = $(el).find("h3 a, .post-title a").text().trim();
-        const href = $(el).find("h3 a, .post-title a").attr("href");
+        const title = $(el).find(".manga-title, h3, .post-title").text().trim();
+        const href = $(el).find("a").first().attr("href");
         const img = $(el).find("img").attr("src")?.trim() ?? "";
         
         if (href) {
