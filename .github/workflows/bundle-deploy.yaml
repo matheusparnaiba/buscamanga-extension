@@ -34,11 +34,7 @@ jobs:
           node -e "
             const fs = require('fs');
             fs.copyFileSync('buscamanga.png', 'bundles/logo.png');
-            let html = fs.readFileSync('bundles/index.html', 'utf8');
-            html = html.replace(/<title>.*?<\/title>/, '<title>BuscaMangá</title>');
-            html = html.replace(/buscamanga-extension/g, 'BuscaMangá');
-            html = html.replace('https://paperback.moe/pb-logo.svg', 'logo.png');
-            fs.writeFileSync('bundles/index.html', html);
+            fs.copyFileSync('template.html', 'bundles/index.html');
             let json = fs.readFileSync('bundles/versioning.json', 'utf8');
             json = json.replace(/buscamanga-extension/g, 'BuscaMangá');
             fs.writeFileSync('bundles/versioning.json', json);

@@ -5,7 +5,7 @@ import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/typ
 
 export default {
   name: "Manga Online",
-  description: "Extensão do Manga Online.blue",
+  description: "Extensão do \"https://mangaonline.blue\"",
   version: "1.0.0",
   icon: "icon.png",
   language: "pt-br",
