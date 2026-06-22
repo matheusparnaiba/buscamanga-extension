@@ -9,7 +9,6 @@ Atualmente, nosso repositório conta com as seguintes fontes:
 | Ícone | Nome | Versão | Desenvolvedor | Site Oficial |
 |:---:|---|:---:|---|---|
 | 🔵 | **Manga Online** | `1.0.6` | matheusparnaiba | [mangaonline.blue](https://mangaonline.blue) |
-| 🔴 | **Hipertoon** | `1.0.5` | matheusparnaiba | [hipertoon.com](https://hipertoon.com) |
 
 ## 🚀 Como Instalar
 
