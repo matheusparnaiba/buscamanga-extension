@@ -48,7 +48,7 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
       {
         id: "latest",
         title: "Lançamentos",
-        type: DiscoverSectionType.simpleCarousel,
+        type: DiscoverSectionType.featured,
       },
     ];
   }
@@ -83,7 +83,7 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
           mangaId,
           title,
           imageUrl: img,
-          type: "simpleCarouselItem",
+          type: "featuredCarouselItem",
         });
       }
     });

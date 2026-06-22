@@ -1,0 +1,1 @@
+const cheerio = require('cheerio'); fetch('https://mangaonline.blue', {headers: {'User-Agent': 'Mozilla/5.0'}}).then(r => r.text()).then(t => { const $ = cheerio.load(t); console.log($('.es-upd-card').first().html()); })
