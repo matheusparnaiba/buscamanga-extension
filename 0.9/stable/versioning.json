@@ -1,11 +1,11 @@
 {
-  "buildTime": "2026-06-22T02:20:32.555Z",
+  "buildTime": "2026-06-22T02:26:36.880Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
   },
   "repository": {
-    "name": "buscamanga-extension",
+    "name": "BuscaMangá",
     "description": "Extensão BuscaMangá para o Paperback"
   },
   "sources": [
