@@ -95,9 +95,9 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
       if (populars.length === 0) populars = $('.popular-item-wrap');
 
       populars.each((_, el) => {
-        const title = $(el).find('h3 a, .post-title a, h5 a').text().trim();
-        const href = $(el).find('h3 a, .post-title a, h5 a').attr('href');
-        const img = getImageSrc($(el).find('img'));
+        const title = $(el).find(".widget-title a, h5 a, .post-title a").text().trim();
+        const href = $(el).find(".widget-title a, h5 a, .post-title a").attr("href");
+        const img = getImageSrc($(el).find("img"));
         
         if (href) {
           const idMatch = href.match(/\/manga\/([^/]+)/);
