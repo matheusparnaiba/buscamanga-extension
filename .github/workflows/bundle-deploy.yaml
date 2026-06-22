@@ -36,6 +36,8 @@ jobs:
             fs.copyFileSync('buscamanga.png', 'bundles/logo.png');
             fs.copyFileSync('buscamanga.ico', 'bundles/buscamanga.ico');
             fs.copyFileSync('template.html', 'bundles/index.html');
+            fs.copyFileSync('src/MangaOnline/icon.png', 'bundles/MangaOnline/static/icon.png');
+            fs.copyFileSync('src/Hipertoon/icon.png', 'bundles/Hipertoon/static/icon.png');
             let json = fs.readFileSync('bundles/versioning.json', 'utf8');
             json = json.replace(/buscamanga-extension/g, 'BuscaMangá');
             fs.writeFileSync('bundles/versioning.json', json);
