@@ -55,6 +55,8 @@ jobs:
           mkdir -p deploy_root/${{ github.ref_name }}
           cp -r bundles/* deploy_root/${{ github.ref_name }}/
           cp root-index.html deploy_root/index.html
+          cp -r assets deploy_root/assets
+          if [ -d "deprecated" ]; then cp -r deprecated/* deploy_root/; fi
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
