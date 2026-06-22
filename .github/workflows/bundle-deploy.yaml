@@ -38,10 +38,11 @@ jobs:
             fs.copyFileSync('template.html', 'bundles/index.html');
             const folders = fs.readdirSync('src', { withFileTypes: true }).filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);
             for (const folder of folders) {
-              if (fs.existsSync(`bundles/${folder}`)) {
-                if (fs.existsSync(`src/${folder}/icon.png`)) {
-                  fs.copyFileSync(`src/${folder}/icon.png`, `bundles/${folder}/icon.png`);
-                  fs.copyFileSync(`src/${folder}/icon.png`, `bundles/${folder}/static/icon.png`);
+              if (fs.existsSync('bundles/' + folder)) {
+                if (fs.existsSync('src/' + folder + '/icon.png')) {
+                  fs.copyFileSync('src/' + folder + '/icon.png', 'bundles/' + folder + '/icon.png');
+                  if (!fs.existsSync('bundles/' + folder + '/static')) fs.mkdirSync('bundles/' + folder + '/static', { recursive: true });
+                  fs.copyFileSync('src/' + folder + '/icon.png', 'bundles/' + folder + '/static/icon.png');
                 }
               }
             }
