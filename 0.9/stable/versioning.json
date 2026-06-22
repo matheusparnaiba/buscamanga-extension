@@ -1,0 +1,34 @@
+{
+  "buildTime": "2026-06-22T02:07:42.803Z",
+  "builtWith": {
+    "toolchain": "1.0.0-alpha.92",
+    "types": "1.0.0-alpha.92"
+  },
+  "repository": {
+    "name": "buscamanga-extension",
+    "description": "Extensão BuscaMangá para o Paperback"
+  },
+  "sources": [
+    {
+      "name": "BuscaMangá",
+      "description": "Extensão do BuscaMangá para o Paperback",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "MATURE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "Developer"
+        }
+      ],
+      "id": "BuscaManga"
+    }
+  ]
+}
