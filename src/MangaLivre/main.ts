@@ -25,6 +25,16 @@ import type ContentTemplateConfig from "./pbconfig";
 
 const BASE_URL = "https://mangalivre.to";
 
+function getImageSrc($img: cheerio.Cheerio<any>): string {
+  let src = $img.attr("data-src") || 
+            $img.attr("data-lazy-src") || 
+            $img.attr("srcset")?.split(" ")[0] || 
+            $img.attr("src") || 
+            $img.attr("data-cfsrc") || "";
+  src = src.trim().replace(/-\d+x\d+/g, "");
+  return src.startsWith("/") ? BASE_URL + src : src;
+}
+
 export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplateConfig> {
   mainRateLimiter = new BasicRateLimiter("main", {
     numberOfRequests: 10,
@@ -87,7 +97,7 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
       populars.each((_, el) => {
         const title = $(el).find('h3 a, .post-title a, h5 a').text().trim();
         const href = $(el).find('h3 a, .post-title a, h5 a').attr('href');
-        const img = $(el).find('img').attr('src')?.trim() ?? "";
+        const img = getImageSrc($(el).find('img'));
         
         if (href) {
           const idMatch = href.match(/\/manga\/([^/]+)/);
@@ -108,7 +118,7 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
       $(".manga-item, .page-item-detail").each((_, el) => {
         const title = $(el).find(".manga-title, h3, .post-title").text().trim();
         const href = $(el).find("a").first().attr("href");
-        const img = $(el).find("img").attr("src")?.trim() ?? "";
+        const img = getImageSrc($(el).find("img"));
         
         if (href) {
           const idMatch = href.match(/\/manga\/([^/]+)/);
@@ -155,7 +165,7 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
       const titleElement = $(el).find(".post-title h3 a");
       const title = titleElement.text().trim();
       const href = titleElement.attr("href");
-      const img = $(el).find(".tab-thumb a img").attr("src")?.trim() ?? "";
+      const img = getImageSrc($(el).find(".tab-thumb a img"));
 
       if (href) {
         const idMatch = href.match(/\/manga\/([^/]+)/);
@@ -183,7 +193,7 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
     const $ = cheerio.load(data);
 
     const title = $(".post-title h1").text().trim();
-    const image = $(".summary_image a img").attr("src")?.trim() ?? "";
+    const image = getImageSrc($(".summary_image img"));
     const synopsis = $(".description-summary .summary__content").text().trim();
     const author = $(".author-content a").text().trim();
     const statusText = $(".post-status .post-content_item .summary-content").last().text().trim().toLowerCase();
@@ -254,7 +264,7 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
 
     const pages: string[] = [];
     $(".page-break img, .reading-content img").each((_, el) => {
-      const src = $(el).attr("src")?.trim() ?? $(el).attr("data-src")?.trim();
+      const src = getImageSrc($(el));
       if (src) pages.push(src);
     });
 
