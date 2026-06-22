@@ -46,11 +46,17 @@ jobs:
             json = json.replace(/buscamanga-extension/g, 'BuscaMangá');
             fs.writeFileSync('bundles/versioning.json', json);
           "
+      - name: Prepare Root Deployment
+        run: |
+          mkdir -p deploy_root/${{ github.ref_name }}
+          cp -r bundles/* deploy_root/${{ github.ref_name }}/
+          cp root-index.html deploy_root/index.html
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: bundles
-          destination_dir: ${{ github.ref_name }}
+          publish_dir: deploy_root
+          destination_dir: .
+          keep_files: true
           user_name: "github-actions[bot]"
           user_email: "github-actions[bot]@users.noreply.github.com"
