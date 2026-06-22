@@ -1,11 +1,10 @@
 const cheerio = require('cheerio');
-fetch('https://hipertoon.com', {headers: {'User-Agent': 'Mozilla/5.0'}})
+fetch('https://mangaonline.blue', {headers: {'User-Agent': 'Mozilla/5.0'}})
   .then(r => r.text())
   .then(t => {
     const $ = cheerio.load(t);
-    console.log('HTML FETCHED, extracting first post container...');
-    const match = t.match(/class="([^"]*post[^"]*|[^"]*item[^"]*|[^"]*card[^"]*)"/g);
-    if (match) console.log(match.slice(0, 20));
-    
-    console.log('Title text check:', $('title').text());
+    $('.es-upd-card').slice(0, 5).each((_, el) => {
+      const imgTag = $(el).find(".es-upd-cover img");
+      console.log('img attrs:', imgTag.attr());
+    });
   });
