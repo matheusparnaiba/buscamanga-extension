@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-06-22T16:45:31.112Z",
+  "buildTime": "2026-06-22T17:09:41.744Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -12,7 +12,7 @@
     {
       "name": "Manga Livre",
       "description": "Extensão do \"https://mangalivre.to\"",
-      "version": "1.0.8",
+      "version": "1.0.9",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -30,6 +30,28 @@
         }
       ],
       "id": "MangaLivre"
+    },
+    {
+      "name": "MangaLivre Blog",
+      "description": "Extensão do \"https://mangalivre.blog\"",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "MangaLivreBlog"
     },
     {
       "name": "Manga Online",
@@ -51,6 +73,28 @@
         }
       ],
       "id": "MangaOnline"
+    },
+    {
+      "name": "Sakura Mangas",
+      "description": "Extensão do \"https://sakuramangas.org\"",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "SakuraMangas"
     }
   ]
 }
