@@ -34,6 +34,7 @@ jobs:
           node -e "
             const fs = require('fs');
             fs.copyFileSync('buscamanga.png', 'bundles/logo.png');
+            fs.copyFileSync('buscamanga.ico', 'bundles/buscamanga.ico');
             fs.copyFileSync('template.html', 'bundles/index.html');
             let json = fs.readFileSync('bundles/versioning.json', 'utf8');
             json = json.replace(/buscamanga-extension/g, 'BuscaMangá');
