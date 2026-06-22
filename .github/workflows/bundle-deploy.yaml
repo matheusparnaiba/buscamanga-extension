@@ -33,7 +33,7 @@ jobs:
         run: |
           node -e "
             const fs = require('fs');
-            fs.copyFileSync('src/MangaOnline/icon.png', 'bundles/logo.png');
+            fs.copyFileSync('buscamanga.png', 'bundles/logo.png');
             let html = fs.readFileSync('bundles/index.html', 'utf8');
             html = html.replace(/<title>.*?<\/title>/, '<title>BuscaMangá</title>');
             html = html.replace(/buscamanga-extension/g, 'BuscaMangá');
