@@ -1,0 +1,10 @@
+const cheerio = require("cheerio");
+const fs = require("fs");
+const html = fs.readFileSync("sakura.html", "utf8");
+const $ = cheerio.load(html);
+console.log("Items with .manga-item: " + $(".manga-item").length);
+console.log("Items with .page-item-detail: " + $(".page-item-detail").length);
+console.log("Items with .popular-item-wrap: " + $(".popular-item-wrap").length);
+console.log("Items with .c-tabs-item__content: " + $(".c-tabs-item__content").length);
+console.log("Items with .latest-updates: " + $(".latest-updates").length);
+console.log("Items with .post-title: " + $(".post-title").length);

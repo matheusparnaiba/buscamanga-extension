@@ -22,8 +22,11 @@ export class MainInterceptor extends PaperbackInterceptor {
     response: Response,
     data: ArrayBuffer,
   ): Promise<ArrayBuffer> {
-    void request;
-    void response;
+    if (response.status === 403 || response.status === 503) {
+      throw new Error(
+        `Cloudflare protection detected (${response.status}). Por favor, abra o site da fonte no WebView do Paperback clicando no ícone do globo no canto superior direito para resolver o captcha e aguarde carregar, depois tente novamente.`,
+      );
+    }
 
     return data;
   }
