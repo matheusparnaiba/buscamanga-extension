@@ -15,6 +15,8 @@ import {
   type SortingOption,
   type SourceManga,
   type Tag,
+  type Cookie,
+  type Request,
 } from "@paperback/types";
 import * as cheerio from "cheerio";
 
@@ -50,6 +52,11 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
   async initialise(): Promise<void> {
     this.mainRateLimiter.registerInterceptor();
     this.mainInterceptor.registerInterceptor();
+  }
+
+  async cloudflareBypassCompleted(request: Request, cookies: Cookie[], localStorage: Record<string, string>): Promise<void> {
+    // Paperback will automatically apply these cookies to its global cookie jar.
+    // The method simply needs to be implemented for the bridge to call it successfully.
   }
 
   async getSettingsForm(): Promise<Form> {
