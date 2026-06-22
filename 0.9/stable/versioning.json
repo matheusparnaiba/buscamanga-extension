@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-06-22T04:32:49.079Z",
+  "buildTime": "2026-06-22T04:37:31.453Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -12,7 +12,7 @@
     {
       "name": "Manga Livre",
       "description": "Extensão do \"https://mangalivre.to\"",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
