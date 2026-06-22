@@ -23,7 +23,7 @@ import type { ContentTemplateSearchMetadata } from "./models";
 import { MainInterceptor } from "./network";
 import type ContentTemplateConfig from "./pbconfig";
 
-const BASE_URL = "https://mangalivre.to";
+const BASE_URL = "https://mangalivre.blog";
 
 function getImageSrc($img: cheerio.Cheerio<any>): string {
   let src = $img.attr("data-src") || 
@@ -36,7 +36,7 @@ function getImageSrc($img: cheerio.Cheerio<any>): string {
   return src.startsWith("/") ? BASE_URL + src : src;
 }
 
-export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplateConfig> {
+export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemplateConfig> {
   mainRateLimiter = new BasicRateLimiter("main", {
     numberOfRequests: 10,
     bufferInterval: 5,
@@ -91,15 +91,15 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
     const items: DiscoverSectionItem[] = [];
 
     if (section.id === "popular") {
-      let populars = $('.popular-statuses .widget-content .popular-item-wrap, .widget-content .popular-item-wrap, .popular-item-wrap, .popular-manga');
+      let populars = $('.manga-card-modern');
       if (populars.length === 0) populars = $('.sidebar .popular-item-wrap');
       if (populars.length === 0) populars = $('.popular-item-wrap');
 
-      populars.each((_, el) => {
-        const title = $(el).find(".widget-title a, h5 a, .post-title a").text().trim();
-        const href = $(el).find(".widget-title a, h5 a, .post-title a").attr("href");
+      populars.toArray().forEach((el) => {
+        const title = $(el).find(".manga-title-modern, .manga-title").text().trim();
+        const subtitle = $(el).find(".chapter-item-modern a").first().text().trim();
         const img = getImageSrc($(el).find("img"));
-        const subtitle = $(el).find(".list-chapter .chapter-item .chapter a").first().text().trim();
+        const href = $(el).find("a.manga-cover-link").attr("href");
         
         if (href) {
           const idMatch = href.match(/\/manga\/([^/]+)/);
@@ -125,11 +125,11 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
     }
 
     if (section.id === "updates") {
-      $(".manga-item, .page-item-detail").each((_, el) => {
-        const title = $(el).find(".manga-title, h3, .post-title").text().trim();
-        const href = $(el).find("a").first().attr("href");
+      $(".manga-card-modern").each((_, el) => {
+        const title = $(el).find(".manga-title-modern, .manga-title").text().trim();
+        const href = $(el).find("a.manga-cover-link").attr("href");
         const img = getImageSrc($(el).find("img"));
-        const chapterEl = $(el).find(".chapter-list .chapter-button").first();
+        const chapterEl = $(el).find(".chapter-item-modern a").first();
         const chapterSubtitle = chapterEl.text().trim();
         const chapterHref = chapterEl.attr("href") || "unknown";
         
@@ -297,4 +297,4 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
     };
   }
 }
-export const MangaLivre = new MangaLivreExtension();
+export const MangaLivreBlog = new MangaLivreBlogExtension();

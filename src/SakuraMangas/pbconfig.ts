@@ -1,9 +1,9 @@
 import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/types";
 
 export default {
-  name: "Manga Livre",
-  description: "Extensão do \"https://mangalivre.to\"",
-  version: "1.0.9",
+  name: "Sakura Mangas",
+  description: "Extensão do \"https://sakuramangas.org\"",
+  version: "1.0.0",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

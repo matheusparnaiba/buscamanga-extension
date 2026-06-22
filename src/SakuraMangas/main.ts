@@ -23,7 +23,7 @@ import type { ContentTemplateSearchMetadata } from "./models";
 import { MainInterceptor } from "./network";
 import type ContentTemplateConfig from "./pbconfig";
 
-const BASE_URL = "https://mangalivre.to";
+const BASE_URL = "https://sakuramangas.org";
 
 function getImageSrc($img: cheerio.Cheerio<any>): string {
   let src = $img.attr("data-src") || 
@@ -36,7 +36,7 @@ function getImageSrc($img: cheerio.Cheerio<any>): string {
   return src.startsWith("/") ? BASE_URL + src : src;
 }
 
-export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplateConfig> {
+export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTemplateConfig> {
   mainRateLimiter = new BasicRateLimiter("main", {
     numberOfRequests: 10,
     bufferInterval: 5,
@@ -297,4 +297,4 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
     };
   }
 }
-export const MangaLivre = new MangaLivreExtension();
+export const SakuraMangas = new SakuraMangasExtension();
