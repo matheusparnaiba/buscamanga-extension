@@ -92,7 +92,7 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
       for (const manga of trending) {
         items.push({
           type: "simpleCarouselItem",
-          mangaId: `${manga.id}|${manga.slug}`,
+          mangaId: `${manga.id}:${manga.slug}`,
           title: manga.title,
           subtitle: manga.latestChapter ? "Capítulo " + manga.latestChapter.number : undefined,
           imageUrl:
@@ -110,14 +110,14 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
       for (const manga of latest) {
         items.push({
           type: "chapterUpdatesCarouselItem",
-          mangaId: `${manga.id}|${manga.slug}`,
-          chapterId: manga.latestChapter ? manga.latestChapter.number.toString() : manga.slug,
-          title: manga.title,
-          subtitle: manga.latestChapter ? "Capítulo " + manga.latestChapter.number : undefined,
+          mangaId: `${manga.seriesId}:${manga.seriesSlug}`,
+          chapterId: manga.chapters?.[0] ? manga.chapters[0].number.toString() : manga.seriesSlug,
+          title: manga.seriesTitle,
+          subtitle: manga.chapters?.[0] ? "Capítulo " + manga.chapters[0].number : undefined,
           imageUrl:
-            manga.coverUrl ||
+            manga.seriesCoverUrl ||
             "https://ui-avatars.com/api/?name=" +
-              encodeURIComponent(manga.title) +
+              encodeURIComponent(manga.seriesTitle) +
               "&background=random",
         });
       }
@@ -173,7 +173,7 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
 
     for (const manga of hits) {
       items.push({
-        mangaId: `${manga.id}|${manga.slug}`,
+        mangaId: `${manga.id}:${manga.slug}`,
         title: manga.title,
         imageUrl:
           manga.coverUrl ||
@@ -190,7 +190,7 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
   }
 
   async getMangaDetails(mangaId: string): Promise<SourceManga> {
-    const [id, slug] = mangaId.split("|");
+    const [id, slug] = mangaId.split(":");
     const actualSlug = slug || mangaId;
 
     const url = `https://hipertoon.com/api/trpc/series.bySlugWithGenres?batch=1&input=${encodeURIComponent(JSON.stringify({ "0": { json: { slug: actualSlug } } }))}`;
@@ -233,8 +233,8 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     };
   }
 
-  async getChapters(sourceManga: SourceManga, sinceDate?: Date): Promise<Chapter[]> {
-    const [id, slug] = sourceManga.mangaId.split("|");
+  async getChapters(sourceManga: SourceManga): Promise<Chapter[]> {
+    const [id, slug] = sourceManga.mangaId.split(":");
     const seriesId = id;
 
     if (!seriesId) throw new Error("Invalid mangaId format, missing seriesId");
@@ -264,7 +264,7 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
   }
 
   async getChapterDetails(chapter: Chapter): Promise<ChapterDetails> {
-    const [id, slug] = chapter.sourceManga.mangaId.split("|");
+    const [id, slug] = chapter.sourceManga.mangaId.split(":");
     const actualSlug = slug || chapter.sourceManga.mangaId;
 
     const url = `https://hipertoon.com/api/trpc/reader.chapterPages?batch=1&input=${encodeURIComponent(JSON.stringify({ "0": { json: { seriesSlug: actualSlug, chapterNumber: parseFloat(chapter.chapterId) } } }))}`;
