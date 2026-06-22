@@ -108,7 +108,7 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
             mangaId,
             title,
             subtitle: subtitle || undefined,
-            imageUrl: img,
+            imageUrl: img ? (img.includes('?') ? img + '&v=2' : img + '?v=2') : "",
             type: "simpleCarouselItem",
           });
         }
