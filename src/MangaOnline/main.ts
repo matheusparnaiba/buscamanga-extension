@@ -239,4 +239,4 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
   }
 }
 
-export const ContentTemplate = new BuscaMangaExtension();
+export const MangaOnline = new BuscaMangaExtension();

@@ -4,8 +4,8 @@
 import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/types";
 
 export default {
-  name: "BuscaMangá",
-  description: "Extensão do BuscaMangá para o Paperback",
+  name: "Manga Online",
+  description: "Extensão do Manga Online.blue",
   version: "1.0.0",
   icon: "icon.png",
   language: "pt-br",
