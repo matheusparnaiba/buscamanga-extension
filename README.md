@@ -2,6 +2,8 @@
 
 Bem-vindo ao repositório do **BuscaMangá Extension**, uma coleção de fontes para o aplicativo **Paperback** criada para facilitar a leitura de mangás em português.
 
+> ⚠️ **Aviso de Compatibilidade:** Este repositório e suas extensões foram desenvolvidos e testados **exclusivamente para a versão 0.9** do aplicativo Paperback. Certifique-se de estar utilizando a versão correta do app.
+
 ## 📦 Fontes Disponíveis
 
 Atualmente, nosso repositório conta com as seguintes fontes:
