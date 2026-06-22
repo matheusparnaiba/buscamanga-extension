@@ -4,9 +4,9 @@
 import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/types";
 
 export default {
-  name: "Manga Online",
-  description: "Extensão do \"https://mangaonline.blue\"",
-  version: "1.0.1",
+  name: "Hipertoon",
+  description: "Extensão do \"https://hipertoon.com\"",
+  version: "1.0.0",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.MATURE,
