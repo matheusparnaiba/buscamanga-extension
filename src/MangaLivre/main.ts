@@ -57,13 +57,13 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
     return [
       {
         id: "popular",
-        title: "POPULAR MANGAS",
-        type: DiscoverSectionType.featured,
+        title: "Populares",
+        type: DiscoverSectionType.simpleCarousel,
       },
       {
         id: "updates",
-        title: "Últimas Atualizações",
-        type: DiscoverSectionType.simpleCarousel,
+        title: "Atualizações",
+        type: DiscoverSectionType.chapterUpdates,
       },
     ];
   }
@@ -98,6 +98,7 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
         const title = $(el).find(".widget-title a, h5 a, .post-title a").text().trim();
         const href = $(el).find(".widget-title a, h5 a, .post-title a").attr("href");
         const img = getImageSrc($(el).find("img"));
+        const subtitle = $(el).find(".list-chapter .chapter-item .chapter a").first().text().trim();
         
         if (href) {
           const idMatch = href.match(/\/manga\/([^/]+)/);
@@ -106,8 +107,9 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
           items.push({
             mangaId,
             title,
+            subtitle: subtitle || undefined,
             imageUrl: img,
-            type: "featuredCarouselItem",
+            type: "simpleCarouselItem",
           });
         }
       });
@@ -119,6 +121,9 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
         const title = $(el).find(".manga-title, h3, .post-title").text().trim();
         const href = $(el).find("a").first().attr("href");
         const img = getImageSrc($(el).find("img"));
+        const chapterEl = $(el).find(".chapter-list .chapter-button").first();
+        const chapterSubtitle = chapterEl.text().trim();
+        const chapterHref = chapterEl.attr("href") || "";
         
         if (href) {
           const idMatch = href.match(/\/manga\/([^/]+)/);
@@ -126,9 +131,11 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
           
           items.push({
             mangaId,
+            chapterId: chapterHref,
             title,
+            subtitle: chapterSubtitle || undefined,
             imageUrl: img,
-            type: "simpleCarouselItem",
+            type: "chapterUpdatesCarouselItem",
           });
         }
       });
