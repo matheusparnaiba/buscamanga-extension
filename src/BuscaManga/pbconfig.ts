@@ -4,12 +4,12 @@
 import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/types";
 
 export default {
-  name: "Content Template",
-  description: "Template that shows the functionality of content providing extensions.",
-  version: "1.0.0-alpha.4",
+  name: "BuscaMangá",
+  description: "Extensão do BuscaMangá para o Paperback",
+  version: "1.0.0",
   icon: "icon.png",
-  language: "en",
-  contentRating: ContentRating.EVERYONE,
+  language: "pt-br",
+  contentRating: ContentRating.MATURE,
   capabilities: [
     SourceIntents.SETTINGS_FORM_PROVIDING,
     SourceIntents.DISCOVER_SECTION_PROVIDING,
@@ -19,9 +19,7 @@ export default {
   badges: [],
   developers: [
     {
-      name: "Celarye",
-      website: "https://celarye.dev",
-      github: "https://github.com/Celarye",
+      name: "Developer",
     },
   ],
 } satisfies ExtensionInfo;

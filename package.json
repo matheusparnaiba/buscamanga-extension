@@ -1,7 +1,7 @@
 {
-  "name": "Template Extensions (0.9)",
+  "name": "buscamanga-extension",
   "private": true,
-  "description": "Paperback extensions designed as templates to help developers get started quickly. Maintained by Inkdex.",
+  "description": "Extensão BuscaMangá para o Paperback",
   "type": "module",
   "scripts": {
     "tsc": "tsc",
@@ -25,5 +25,8 @@
     "oxlint": "^1.70.0",
     "oxlint-tsgolint": "^0.23.0",
     "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0"
   }
 }
