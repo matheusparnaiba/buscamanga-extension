@@ -247,7 +247,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
     const genres: Tag[] = [];
     $(".genres-content a").each((_, el) => {
       const g = $(el).text().trim();
-      genres.push({ id: g, title: g });
+      genres.push({ id: encodeURI(g), title: g });
     });
 
     return {
