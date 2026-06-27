@@ -1,2 +1,3 @@
-## Regras de Comunicação
-- Para cada alteração de código, forneça um título e uma descrição em português das mudanças feitas.
+## Regras de ComunicaÃ§Ã£o e Desenvolvimento
+- Para cada alteraÃ§Ã£o de cÃ³digo, forneÃ§a um tÃ­tulo e uma descriÃ§Ã£o em portuguÃªs das mudanÃ§as feitas.
+- Toda atualizaÃ§Ã£o em qualquer fonte (extensÃ£o) deve alterar o nÃºmero da versÃ£o dela (version bump) no respectivo `pbconfig.ts`, inclusive atualizando o nÃºmero da versÃ£o na tabela do `README.md`.
