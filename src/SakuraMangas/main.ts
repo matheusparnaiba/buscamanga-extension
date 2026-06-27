@@ -132,6 +132,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
             subtitle: subtitle || undefined,
             imageUrl: safeImg,
             type: "simpleCarouselItem",
+            contentRating: ContentRating.EVERYONE,
           });
         }
       });
@@ -168,6 +169,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
             subtitle: chapterSubtitle || undefined,
             imageUrl: safeImg,
             type: "chapterUpdatesCarouselItem",
+            contentRating: ContentRating.EVERYONE,
           });
         }
       });
@@ -214,6 +216,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
           mangaId,
           title,
           imageUrl: img,
+          contentRating: ContentRating.EVERYONE,
         });
       }
     });

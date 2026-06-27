@@ -106,6 +106,7 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
             title,
             imageUrl: img,
             type: "featuredCarouselItem",
+            contentRating: ContentRating.EVERYONE,
           });
         }
       });
@@ -143,6 +144,7 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
                 encodeURIComponent(title) +
                 "&background=random",
             type: "chapterUpdatesCarouselItem",
+            contentRating: ContentRating.EVERYONE,
           });
         }
       });
@@ -189,6 +191,7 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
           mangaId,
           title,
           imageUrl: img,
+          contentRating: ContentRating.EVERYONE,
         });
       }
     });

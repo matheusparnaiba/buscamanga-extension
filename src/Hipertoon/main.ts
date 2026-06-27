@@ -100,6 +100,7 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
             "https://ui-avatars.com/api/?name=" +
               encodeURIComponent(manga.title) +
               "&background=random",
+          contentRating: ContentRating.EVERYONE,
         });
       }
       return { items, metadata: undefined };
@@ -119,6 +120,7 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
             "https://ui-avatars.com/api/?name=" +
               encodeURIComponent(manga.seriesTitle) +
               "&background=random",
+          contentRating: ContentRating.EVERYONE,
         });
       }
       return { items, metadata: undefined };
@@ -180,6 +182,7 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
           "https://ui-avatars.com/api/?name=" +
             encodeURIComponent(manga.title) +
             "&background=random",
+        contentRating: ContentRating.EVERYONE,
       });
     }
 

@@ -123,6 +123,7 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
             subtitle: subtitle || undefined,
             imageUrl: safeImg,
             type: "simpleCarouselItem",
+            contentRating: ContentRating.EVERYONE,
           });
         }
       });
@@ -159,6 +160,7 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
             subtitle: chapterSubtitle || undefined,
             imageUrl: safeImg,
             type: "chapterUpdatesCarouselItem",
+            contentRating: ContentRating.EVERYONE,
           });
         }
       });
@@ -205,6 +207,7 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
           mangaId,
           title,
           imageUrl: img,
+          contentRating: ContentRating.EVERYONE,
         });
       }
     });
