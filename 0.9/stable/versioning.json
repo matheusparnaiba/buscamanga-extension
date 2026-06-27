@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-06-27T19:05:05.510Z",
+  "buildTime": "2026-06-27T19:14:10.562Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -12,7 +12,7 @@
     {
       "name": "Hipertoon",
       "description": "Extensão do \"https://hipertoon.com\"",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -34,7 +34,7 @@
     {
       "name": "Manga Livre",
       "description": "Extensão do \"https://mangalivre.to\"",
-      "version": "1.0.11",
+      "version": "1.0.12",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -56,7 +56,7 @@
     {
       "name": "MangaLivre Blog",
       "description": "Extensão do \"https://mangalivre.blog\"",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -78,7 +78,7 @@
     {
       "name": "Manga Online",
       "description": "Extensão do \"https://mangaonline.blue\"",
-      "version": "1.0.9",
+      "version": "1.0.10",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -99,7 +99,7 @@
     {
       "name": "Sakura Mangas",
       "description": "Extensão do \"https://sakuramangas.org\"",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
