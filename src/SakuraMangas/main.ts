@@ -323,13 +323,13 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
 
-    const title = $(".post-title h1").text().trim() || "Sem título";
-    const rawImage = getImageSrc($(".summary_image img"));
+    const title = $(".post-title h1, .manga-title h1, h1.entry-title, .manga-info h1").text().trim() || "Sem título";
+    const rawImage = getImageSrc($(".summary_image img, .manga-thumb img, .thumb img"));
     const image = rawImage && rawImage.startsWith("http") ? rawImage : undefined;
     const fallbackImage = "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
     const thumbnailUrl = image || fallbackImage;
 
-    const synopsis = $(".description-summary .summary__content").text().trim();
+    const synopsis = $(".description-summary .summary__content, .summary_content, .manga-excerpt, .entry-content p").text().trim();
     const author = $(".author-content a").text().trim() || "Desconhecido";
     const statusText = $(".post-status .post-content_item .summary-content")
       .last()
@@ -429,7 +429,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
     const $ = cheerio.load(data);
 
     const pages: string[] = [];
-    $(".page-break img, .reading-content img").each((_, el) => {
+    $(".page-break img, .reading-content img, .chapter-content img, .entry-content img, #readerarea img, .container-chapter-reader img").each((_, el) => {
       const src = getImageSrc($(el));
       if (src) pages.push(src);
     });
