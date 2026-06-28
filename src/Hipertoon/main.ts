@@ -285,7 +285,7 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
       if (!ch) continue;
       const num = ch.number != null ? ch.number : 0;
       chapters.push({
-        chapterId: ch.id != null ? String(ch.id) : String(num),
+        chapterId: String(num),
         sourceManga,
         title: ch.title || "Capítulo " + num,
         chapNum: Number(num) || 0,
