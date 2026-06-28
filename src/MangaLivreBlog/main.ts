@@ -176,23 +176,25 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
     }
 
     if (section.id === "recommended") {
-      $(".manga-card-modern, .sidebar .popular-item-wrap").slice(0, 15).each((_, el) => {
-        const title = $(el).find(".manga-title-modern, .manga-title, h3, a").text().trim();
-        const href = $(el).find("a.manga-cover-link, a").attr("href");
-        const img = getImageSrc($(el).find("img"));
+      $(".manga-card-modern, .sidebar .popular-item-wrap")
+        .slice(0, 15)
+        .each((_, el) => {
+          const title = $(el).find(".manga-title-modern, .manga-title, h3, a").text().trim();
+          const href = $(el).find("a.manga-cover-link, a").attr("href");
+          const img = getImageSrc($(el).find("img"));
 
-        if (href && title) {
-          const idMatch = href.match(/\/manga\/([^/]+)/);
-          const mangaId = idMatch ? (idMatch[1] as string) : href;
-          items.push({
-            mangaId,
-            title,
-            imageUrl: img || "https://ui-avatars.com/api/?name=" + encodeURIComponent(title),
-            type: "prominentCarouselItem",
-            contentRating: ContentRating.EVERYONE,
-          });
-        }
-      });
+          if (href && title) {
+            const idMatch = href.match(/\/manga\/([^/]+)/);
+            const mangaId = idMatch ? (idMatch[1] as string) : href;
+            items.push({
+              mangaId,
+              title,
+              imageUrl: img || "https://ui-avatars.com/api/?name=" + encodeURIComponent(title),
+              type: "prominentCarouselItem",
+              contentRating: ContentRating.EVERYONE,
+            });
+          }
+        });
       return { items, metadata: undefined };
     }
 
@@ -275,7 +277,11 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
       mangaInfo: {
         primaryTitle: title,
         secondaryTitles: [],
-        thumbnailUrl: image || "https://ui-avatars.com/api/?name=" + encodeURIComponent(title || "Manga") + "&background=random",
+        thumbnailUrl:
+          image ||
+          "https://ui-avatars.com/api/?name=" +
+            encodeURIComponent(title || "Manga") +
+            "&background=random",
         synopsis,
         contentRating: ContentRating.EVERYONE,
         status,

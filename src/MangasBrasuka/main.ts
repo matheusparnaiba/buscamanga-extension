@@ -90,24 +90,26 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     const items: DiscoverSectionItem[] = [];
 
     if (section.id === "popular") {
-      $(".manga-slider .slider__item, .widget-content .item-summary, .page-item-detail").slice(0, 15).each((_, el) => {
-        const titleEl = $(el).find(".post-title a, h3 a, h5 a, .manga-title").first();
-        const title = titleEl.text().trim();
-        const href = titleEl.attr("href") || $(el).find("a").first().attr("href");
-        const img = getImageSrc($(el).find("img"));
+      $(".manga-slider .slider__item, .widget-content .item-summary, .page-item-detail")
+        .slice(0, 15)
+        .each((_, el) => {
+          const titleEl = $(el).find(".post-title a, h3 a, h5 a, .manga-title").first();
+          const title = titleEl.text().trim();
+          const href = titleEl.attr("href") || $(el).find("a").first().attr("href");
+          const img = getImageSrc($(el).find("img"));
 
-        if (href && title) {
-          const idMatch = href.match(/\/manga\/([^/]+)/);
-          const mangaId = idMatch ? (idMatch[1] as string) : href;
-          items.push({
-            mangaId,
-            title,
-            imageUrl: img || "https://ui-avatars.com/api/?name=" + encodeURIComponent(title),
-            type: "prominentCarouselItem",
-            contentRating: ContentRating.EVERYONE,
-          });
-        }
-      });
+          if (href && title) {
+            const idMatch = href.match(/\/manga\/([^/]+)/);
+            const mangaId = idMatch ? (idMatch[1] as string) : href;
+            items.push({
+              mangaId,
+              title,
+              imageUrl: img || "https://ui-avatars.com/api/?name=" + encodeURIComponent(title),
+              type: "prominentCarouselItem",
+              contentRating: ContentRating.EVERYONE,
+            });
+          }
+        });
       return { items, metadata: undefined };
     }
 
@@ -199,7 +201,8 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     const title = $(".post-title h1").text().trim() || mangaId;
     const image = getImageSrc($(".summary_image img"));
     const author = $(".author-content a").text().trim() || "Desconhecido";
-    const synopsis = $(".description-summary p, .summary__content p").text().trim() || "Sem descrição.";
+    const synopsis =
+      $(".description-summary p, .summary__content p").text().trim() || "Sem descrição.";
 
     let status = "ONGOING";
     const statusText = $(".post-status .summary-content").text().toLowerCase();
@@ -274,7 +277,12 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     // Check if normal reader images exist directly
     $(".reading-content img").each((_, el) => {
       const src = getImageSrc($(el));
-      if (src && !src.includes("background-foto") && !src.includes("tutorial") && !src.includes("icons8")) {
+      if (
+        src &&
+        !src.includes("background-foto") &&
+        !src.includes("tutorial") &&
+        !src.includes("icons8")
+      ) {
         pages.push(src);
       }
     });

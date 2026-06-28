@@ -172,8 +172,12 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
               items.push({
                 mangaId,
                 title: item.title,
-                subtitle: item.views ? `${item.views.toLocaleString("pt-BR")} visualizações` : undefined,
-                imageUrl: item.cover || "https://ui-avatars.com/api/?name=" + encodeURIComponent(item.title),
+                subtitle: item.views
+                  ? `${item.views.toLocaleString("pt-BR")} visualizações`
+                  : undefined,
+                imageUrl:
+                  item.cover ||
+                  "https://ui-avatars.com/api/?name=" + encodeURIComponent(item.title),
                 type: "prominentCarouselItem",
                 contentRating: ContentRating.EVERYONE,
               });

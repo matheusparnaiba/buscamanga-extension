@@ -16,7 +16,7 @@ import {
   type SourceManga,
   type Tag,
 } from "@paperback/types";
-import * as cheerio from "cheerio";
+import type * as cheerio from "cheerio";
 
 import { ContentTemplateAdvancedSearchForm, SettingsForm } from "./forms";
 import type { ContentTemplateSearchMetadata } from "./models";

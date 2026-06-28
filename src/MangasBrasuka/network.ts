@@ -4,10 +4,8 @@ export class MainInterceptor extends PaperbackInterceptor {
   override async interceptRequest(request: Request): Promise<Request> {
     request.headers = {
       ...(request.headers ?? {}),
-      ...{
-        referer: "https://mangasbrasuka.com.br/",
-        "user-agent": await Application.getDefaultUserAgent(),
-      },
+      referer: "https://mangasbrasuka.com.br/",
+      "user-agent": await Application.getDefaultUserAgent(),
     };
     return request;
   }
