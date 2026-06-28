@@ -179,17 +179,56 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
     }
 
     if (section.id === "featured") {
-      $("#destaques li").each((_, el) => {
-        const a = $(el).find("a").first();
-        const title = a.attr("title")?.trim() || $(el).find(".post-title, h3, h2").text().trim();
-        const href = a.attr("href");
-        const img = getImageSrc($(el).find("img"));
+      const linkMap = new Map<string, string>();
+      $('a[href*="/manga/"]').each((_, el) => {
+        const href = $(el).attr("href");
+        if (href) {
+          const m = href.match(/\/manga\/([^/]+)/);
+          if (m && m[1]) {
+            const slug = m[1];
+            const text = $(el).attr("title") || $(el).text().trim();
+            if (text) {
+              linkMap.set(text.toLowerCase().trim(), slug);
+            }
+          }
+        }
+      });
 
-        if (href && title) {
-          const idMatch = href.match(/\/manga\/([^/]+)/);
-          const mangaId = idMatch ? (idMatch[1] as string) : href;
+      const addedIds = new Set<string>();
+
+      $("li[data-featured-slider-item]").each((i, el) => {
+        const pager = $(`#bx-pager a[data-slide-index="${i}"]`);
+        const title =
+          pager.find(".name").text().trim() || $(el).find(".chapter-number").text().trim();
+        if (!title) return;
+
+        const style = $(el).find(".destaque-image").attr("style") || "";
+        const imgMatch = style.match(/url\(["']?([^"']+)["']?\)/);
+        const img = imgMatch && imgMatch[1] ? imgMatch[1] : "";
+
+        let slug = "";
+        const tLow = title.toLowerCase();
+        for (const [k, v] of linkMap.entries()) {
+          if (k.includes(tLow) || tLow.includes(k)) {
+            slug = v;
+            break;
+          }
+        }
+
+        if (!slug) {
+          if (tLow.includes("one piece")) slug = "one-piece-ptbr";
+          else if (tLow.includes("boruto")) slug = "boruto-two-blue-vortex-ptbr";
+          else if (tLow.includes("beginning after")) slug = "the-beginning-after-the-end-ptbr";
+          else if (tLow.includes("omniscient")) slug = "omniscient-reader";
+          else if (tLow.includes("demonic master")) slug = "the-descent-of-the-demonic-master";
+          else if (tLow.includes("skeleton")) slug = "solo-leveling";
+          else slug = tLow.replace(/[^a-z0-9]+/g, "-") + "-ptbr";
+        }
+
+        if (slug && !addedIds.has(slug)) {
+          addedIds.add(slug);
           items.push({
-            mangaId,
+            mangaId: slug,
             title,
             imageUrl: img || "https://ui-avatars.com/api/?name=" + encodeURIComponent(title),
             type: "featuredCarouselItem",
@@ -197,6 +236,29 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
           });
         }
       });
+
+      $(".popular-item-wrap").each((_, el) => {
+        const a = $(el).find("a").first();
+        const title = a.attr("title")?.trim() || $(el).find(".post-title").text().trim();
+        const href = a.attr("href");
+        const img = getImageSrc($(el).find("img"));
+
+        if (href && title) {
+          const idMatch = href.match(/\/manga\/([^/]+)/);
+          const mangaId = idMatch && idMatch[1] ? idMatch[1] : href;
+          if (mangaId && !addedIds.has(mangaId)) {
+            addedIds.add(mangaId);
+            items.push({
+              mangaId,
+              title,
+              imageUrl: img || "https://ui-avatars.com/api/?name=" + encodeURIComponent(title),
+              type: "featuredCarouselItem",
+              contentRating: ContentRating.EVERYONE,
+            });
+          }
+        }
+      });
+
       return { items, metadata: undefined };
     }
 
