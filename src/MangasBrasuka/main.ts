@@ -330,28 +330,35 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     // Fallback: extract base CDN URL from jump links or raw data
     let firstPageUrl = "";
     const cleanData = data.replace(/\\\//g, "/");
-    const cdnMatch = cleanData.match(/https:\/\/cdn\.mugiverso\.com\/[^"'\s<>&]+\/(?:01|1)\.(?:webp|jpg|png)/i);
+    const cdnMatch = cleanData.match(/https:\/\/cdn\.mugiverso\.com\/[^"'\s<>&]+\/(?:001|01|1)\.(?:webp|jpg|png)/i);
     if (cdnMatch && cdnMatch[0]) {
       firstPageUrl = cdnMatch[0];
     } else {
-      const jumpLink = $("a.full-click-link, .page-break a, a[href*='jump']").attr("href") || "";
-      const aMatch = jumpLink.match(/[?&]a=([^&]+)/);
-      if (aMatch && aMatch[1]) {
-        firstPageUrl = decodeURIComponent(aMatch[1]);
+      const paramMatch = cleanData.match(/[?&](?:a|auth|u|url)=(https?%3A%2F%2F[^&"'\s<>]+|https?:\/\/[^&"'\s<>]+)/i);
+      if (paramMatch && paramMatch[1]) {
+        try {
+          const decoded = decodeURIComponent(paramMatch[1]);
+          const subMatch = decoded.match(/https:\/\/cdn\.mugiverso\.com\/[^"'\s<>&]+\/(?:001|01|1)\.(?:webp|jpg|png)/i);
+          if (subMatch && subMatch[0]) firstPageUrl = subMatch[0];
+          else firstPageUrl = decoded;
+        } catch {
+          firstPageUrl = paramMatch[1];
+        }
       }
     }
 
     if (firstPageUrl) {
-      const extMatch = firstPageUrl.match(/^(.*\/)(01|1)\.(webp|jpg|png)(?:\?.*)?$/i);
-      if (extMatch && extMatch[1] && extMatch[3]) {
+      const extMatch = firstPageUrl.match(/^(.*\/)(0*1)\.(webp|jpg|png)(?:\?.*)?$/i);
+      if (extMatch && extMatch[1] && extMatch[2] && extMatch[3]) {
         const baseUrl = extMatch[1];
+        const padLength = extMatch[2].length;
         const ext = extMatch[3];
+        const formatNum = (num: number): string => String(num).padStart(padLength, "0");
 
         const checkPage = async (num: number): Promise<boolean> => {
-          const str = num < 10 ? `0${num}` : `${num}`;
           try {
             const [res] = await Application.scheduleRequest({
-              url: `${baseUrl}${str}.${ext}`,
+              url: `${baseUrl}${formatNum(num)}.${ext}`,
               method: "HEAD",
             });
             return res.status === 200;
@@ -375,8 +382,7 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
         }
 
         for (let i = 1; i <= totalPages; i++) {
-          const str = i < 10 ? `0${i}` : `${i}`;
-          pages.push(`${baseUrl}${str}.${ext}`);
+          pages.push(`${baseUrl}${formatNum(i)}.${ext}`);
         }
       } else {
         pages.push(firstPageUrl);
