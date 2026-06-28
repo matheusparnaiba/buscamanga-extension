@@ -8,7 +8,8 @@ export class MainInterceptor extends PaperbackInterceptor {
   override async interceptRequest(request: Request): Promise<Request> {
     request.headers = {
       ...(request.headers ?? {}),
-      referer: "https://mangaonline.blue/",
+      referer: "https://hipertoon.com/",
+      origin: "https://hipertoon.com",
       "user-agent": await Application.getDefaultUserAgent(),
     };
     return request;

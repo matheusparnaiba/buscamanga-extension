@@ -3,7 +3,7 @@ import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/typ
 export default {
   name: "Hipertoon",
   description: 'Extensão do "https://hipertoon.com"',
-  version: "1.0.6",
+  version: "1.0.7",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,
