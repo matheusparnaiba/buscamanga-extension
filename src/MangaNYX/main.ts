@@ -32,6 +32,42 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
 
   mainInterceptor = new MainInterceptor("main");
 
+  private homePromise?: { promise: Promise<any>; timestamp: number };
+
+  private async getHomeData(): Promise<any> {
+    const now = Date.now();
+    if (this.homePromise && now - this.homePromise.timestamp < 60000) {
+      try {
+        return await this.homePromise.promise;
+      } catch {
+        this.homePromise = undefined;
+      }
+    }
+
+    const fetchPromise = (async () => {
+      const request = {
+        url: `${API_BASE}/home`,
+        method: "GET",
+      };
+      const [response, buffer] = await Application.scheduleRequest(request);
+      const data = Application.arrayBufferToUTF8String(buffer);
+      if (response.status !== 200 || data.trim().startsWith("<")) {
+        throw new Error(`Falha ao carregar destaques (HTTP ${response.status})`);
+      }
+      return JSON.parse(data);
+    })();
+
+    this.homePromise = { promise: fetchPromise, timestamp: now };
+
+    try {
+      const json = await fetchPromise;
+      return json.data || {};
+    } catch (e) {
+      this.homePromise = undefined;
+      throw e;
+    }
+  }
+
   async initialise(): Promise<void> {
     this.mainRateLimiter.registerInterceptor();
     this.mainInterceptor.registerInterceptor();
@@ -65,15 +101,11 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
     section: DiscoverSection,
     metadata: any,
   ): Promise<PagedResults<DiscoverSectionItem>> {
-    const request = {
-      url: `${API_BASE}/home`,
-      method: "GET",
-    };
+    if (metadata !== undefined) {
+      return { items: [], metadata: undefined };
+    }
 
-    const [response, buffer] = await Application.scheduleRequest(request);
-    const data = Application.arrayBufferToUTF8String(buffer);
-    const json = JSON.parse(data);
-    const homeData = json.data || {};
+    const homeData = await this.getHomeData();
     const items: DiscoverSectionItem[] = [];
 
     if (section.id === "highlights") {
@@ -159,6 +191,9 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
     const request = { url, method: "GET" };
     const [response, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
+    if (response.status !== 200 || data.trim().startsWith("<")) {
+      throw new Error(`Erro na busca (HTTP ${response.status})`);
+    }
     const json = JSON.parse(data);
 
     const items: SearchResultItem[] = [];
@@ -187,6 +222,9 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
 
     const [response, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
+    if (response.status !== 200 || data.trim().startsWith("<")) {
+      throw new Error(`Obra não encontrada (HTTP ${response.status})`);
+    }
     const json = JSON.parse(data);
     const manga = json.data;
 
@@ -240,6 +278,9 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
 
       const [response, buffer] = await Application.scheduleRequest(request);
       const data = Application.arrayBufferToUTF8String(buffer);
+      if (response.status !== 200 || data.trim().startsWith("<")) {
+        break;
+      }
       const json = JSON.parse(data);
 
       const list = json.data || [];
@@ -273,6 +314,9 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
 
     const [response, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
+    if (response.status !== 200 || data.trim().startsWith("<")) {
+      throw new Error(`Capítulo não encontrado (HTTP ${response.status})`);
+    }
     const json = JSON.parse(data);
 
     const rawPages = json.data?.pages || [];
