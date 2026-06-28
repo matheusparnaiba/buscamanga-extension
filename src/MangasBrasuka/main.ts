@@ -307,7 +307,7 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     const pages: string[] = [];
 
     // Check if normal reader images exist directly
-    $(".reading-content img").each((_, el) => {
+    $(".reading-content img, .page-break img, .blocks-gallery-item img").each((_, el) => {
       const src = getImageSrc($(el));
       if (
         src &&
@@ -330,27 +330,28 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     // Fallback: extract base CDN URL from jump links or raw data
     let firstPageUrl = "";
     const cleanData = data.replace(/\\\//g, "/");
-    const cdnMatch = cleanData.match(/https:\/\/cdn\.mugiverso\.com\/[^"'\s<>&]+\/(?:01|1)\.webp/i);
+    const cdnMatch = cleanData.match(/https:\/\/cdn\.mugiverso\.com\/[^"'\s<>&]+\/(?:01|1)\.(?:webp|jpg|png)/i);
     if (cdnMatch && cdnMatch[0]) {
       firstPageUrl = cdnMatch[0];
     } else {
-      const jumpLink = $("a.full-click-link, .page-break a").attr("href") || "";
+      const jumpLink = $("a.full-click-link, .page-break a, a[href*='jump']").attr("href") || "";
       const aMatch = jumpLink.match(/[?&]a=([^&]+)/);
       if (aMatch && aMatch[1]) {
         firstPageUrl = decodeURIComponent(aMatch[1]);
       }
     }
 
-    if (firstPageUrl && firstPageUrl.includes(".webp")) {
-      const baseUrlMatch = firstPageUrl.match(/^(.*\/)\d+\.webp(?:\?.*)?$/i);
-      if (baseUrlMatch && baseUrlMatch[1]) {
-        const baseUrl = baseUrlMatch[1];
+    if (firstPageUrl) {
+      const extMatch = firstPageUrl.match(/^(.*\/)(01|1)\.(webp|jpg|png)(?:\?.*)?$/i);
+      if (extMatch && extMatch[1] && extMatch[3]) {
+        const baseUrl = extMatch[1];
+        const ext = extMatch[3];
 
         const checkPage = async (num: number): Promise<boolean> => {
           const str = num < 10 ? `0${num}` : `${num}`;
           try {
             const [res] = await Application.scheduleRequest({
-              url: `${baseUrl}${str}.webp`,
+              url: `${baseUrl}${str}.${ext}`,
               method: "HEAD",
             });
             return res.status === 200;
@@ -359,32 +360,23 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
           }
         };
 
-        const round1Nums = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150];
-        const round1Results = await Promise.all(
-          round1Nums.map(async (num) => ({ num, ok: await checkPage(num) })),
-        );
-
-        let lastOk = 0;
-        for (const r of round1Results) {
-          if (r.ok) lastOk = r.num;
+        let lastOk = 1;
+        for (let step = 10; step <= 250; step += 10) {
+          const ok = await checkPage(step);
+          if (ok) lastOk = step;
           else break;
         }
 
         let totalPages = lastOk;
-        if (lastOk < 150) {
-          const round2Nums = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => lastOk + i);
-          const round2Results = await Promise.all(
-            round2Nums.map(async (num) => ({ num, ok: await checkPage(num) })),
-          );
-          for (const r of round2Results) {
-            if (r.ok) totalPages = r.num;
-            else break;
-          }
+        for (let i = lastOk + 1; i <= lastOk + 10; i++) {
+          const ok = await checkPage(i);
+          if (ok) totalPages = i;
+          else break;
         }
 
         for (let i = 1; i <= totalPages; i++) {
           const str = i < 10 ? `0${i}` : `${i}`;
-          pages.push(`${baseUrl}${str}.webp`);
+          pages.push(`${baseUrl}${str}.${ext}`);
         }
       } else {
         pages.push(firstPageUrl);
