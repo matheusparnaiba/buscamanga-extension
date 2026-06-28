@@ -6,11 +6,12 @@ import { PaperbackInterceptor, type Request, type Response, CloudflareError } fr
 // Intercepts all the requests and responses and allows you to make changes to them
 export class MainInterceptor extends PaperbackInterceptor {
   override async interceptRequest(request: Request): Promise<Request> {
+    const cfUserAgent = Application.getState("cf_user_agent") as string | undefined;
     request.headers = {
       ...(request.headers ?? {}),
       ...{
         referer: "https://sakuramangas.org/",
-        "user-agent": await Application.getDefaultUserAgent(),
+        "user-agent": cfUserAgent ?? await Application.getDefaultUserAgent(),
       },
     };
     return request;

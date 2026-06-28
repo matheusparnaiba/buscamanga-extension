@@ -1,5 +1,6 @@
 import {
   BasicRateLimiter,
+  CookieStorageInterceptor,
   ContentRating,
   DiscoverSectionType,
   type AdvancedSearchForm,
@@ -47,16 +48,32 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
     ignoreImages: true,
   });
 
+  cookieStorageInterceptor = new CookieStorageInterceptor({
+    storage: "stateManager",
+  });
+
   mainInterceptor = new MainInterceptor("main");
 
   async initialise(): Promise<void> {
     this.mainRateLimiter.registerInterceptor();
+    this.cookieStorageInterceptor.registerInterceptor();
     this.mainInterceptor.registerInterceptor();
   }
 
+  async saveCloudflareBypassCookies(cookies: Cookie[]): Promise<void> {
+    for (const cookie of cookies) {
+      this.cookieStorageInterceptor.setCookie(cookie);
+    }
+  }
+
   async cloudflareBypassCompleted(request: Request, cookies: Cookie[], localStorage: Record<string, string>): Promise<void> {
-    // Paperback will automatically apply these cookies to its global cookie jar.
-    // The method simply needs to be implemented for the bridge to call it successfully.
+    for (const cookie of cookies) {
+      this.cookieStorageInterceptor.setCookie(cookie);
+    }
+    const ua = request.headers?.["user-agent"] ?? request.headers?.["User-Agent"];
+    if (ua && typeof ua === "string") {
+      Application.setState(ua, "cf_user_agent");
+    }
   }
 
   async getSettingsForm(): Promise<Form> {
