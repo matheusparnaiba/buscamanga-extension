@@ -114,12 +114,13 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     if (section.id === "updates") {
       const latest = json[2]?.result?.data?.json || [];
       for (const manga of latest) {
+        const firstCh = manga.chapters?.[0];
         items.push({
           type: "chapterUpdatesCarouselItem",
           mangaId: `${manga.seriesId}:${manga.seriesSlug}`,
-          chapterId: manga.chapters?.[0] ? manga.chapters[0].number.toString() : manga.seriesSlug,
-          title: manga.seriesTitle,
-          subtitle: manga.chapters?.[0] ? "Capítulo " + manga.chapters[0].number : undefined,
+          chapterId: firstCh && firstCh.number != null ? String(firstCh.number) : String(manga.seriesSlug || manga.seriesId || "unknown"),
+          title: manga.seriesTitle || "Sem título",
+          subtitle: firstCh && firstCh.number != null ? "Capítulo " + firstCh.number : undefined,
           imageUrl:
             manga.seriesCoverUrl ||
             "https://ui-avatars.com/api/?name=" +
@@ -237,7 +238,9 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     };
 
     const genres: Tag[] =
-      manga.genres?.map((g: any) => ({ id: g.id.toString(), title: g.name })) || [];
+      manga.genres
+        ?.filter((g: any) => g && g.id != null && g.name != null)
+        .map((g: any) => ({ id: String(g.id), title: String(g.name) })) || [];
 
     const fallbackImage =
       "https://ui-avatars.com/api/?name=" +
@@ -279,11 +282,13 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     const chapters: Chapter[] = [];
 
     for (const ch of chaptersData) {
+      if (!ch) continue;
+      const num = ch.number != null ? ch.number : 0;
       chapters.push({
-        chapterId: ch.number.toString(),
+        chapterId: ch.id != null ? String(ch.id) : String(num),
         sourceManga,
-        title: ch.title || "Capítulo " + ch.number,
-        chapNum: ch.number,
+        title: ch.title || "Capítulo " + num,
+        chapNum: Number(num) || 0,
         langCode: "PT-BR",
         volume: 0,
       });
