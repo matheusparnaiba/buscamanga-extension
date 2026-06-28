@@ -234,7 +234,7 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
         items.push({
           mangaId,
           title,
-          imageUrl: img,
+          imageUrl: img || "https://ui-avatars.com/api/?name=" + encodeURIComponent(title || "Manga") + "&background=random",
           contentRating: ContentRating.EVERYONE,
         });
       }
@@ -253,41 +253,43 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
 
-    const title = $(".post-title h1").text().trim();
-    const image = getImageSrc($(".summary_image img"));
-    const synopsis = $(".description-summary .summary__content").text().trim();
-    const author = $(".author-content a").text().trim();
-    const statusText = $(".post-status .post-content_item .summary-content")
-      .last()
-      .text()
-      .trim()
-      .toLowerCase();
+    const title = $(".post-title h1, .manga-title, h1").map((_, el) => $(el).text().trim()).get().find(t => t.length > 0) || "";
+    const rawImage = getImageSrc($(".manga-cover img, .manga-cover-image, .summary_image img").first());
+    const image = rawImage && rawImage.startsWith("http") ? rawImage : undefined;
+    const fallbackImage = "https://ui-avatars.com/api/?name=" + encodeURIComponent(title || "Manga") + "&background=random";
+    const thumbnailUrl = image || fallbackImage;
+
+    const synopsis = $(".description-summary .summary__content, .manga-synopsis, .manga-description").first().text().trim();
+    let author = $(".author-content a").text().trim();
+    let statusText = $(".post-status .post-content_item .summary-content").last().text().trim().toLowerCase();
+
+    $(".manga-meta-item").each((_, el) => {
+      const txt = $(el).text().trim();
+      if (!author && txt.includes("Autor:")) author = txt.replace("Autor:", "").trim();
+      if (!statusText && txt.includes("Status:")) statusText = txt.replace("Status:", "").trim().toLowerCase();
+    });
 
     let status = "ONGOING";
     if (statusText.includes("completo") || statusText.includes("completed")) status = "COMPLETED";
 
     const genres: Tag[] = [];
-    $(".genres-content a").each((_, el) => {
+    $(".genres-content a, .manga-genres a, .genres a").each((_, el) => {
       const g = $(el).text().trim();
-      genres.push({ id: encodeURI(g), title: g });
+      if (g) genres.push({ id: encodeURI(g), title: g });
     });
 
     return {
       mangaId,
       mangaInfo: {
-        primaryTitle: title,
+        primaryTitle: title || "Sem título",
         secondaryTitles: [],
-        thumbnailUrl:
-          image ||
-          "https://ui-avatars.com/api/?name=" +
-            encodeURIComponent(title || "Manga") +
-            "&background=random",
-        synopsis,
+        thumbnailUrl,
+        synopsis: synopsis === "Sinopse" ? "" : synopsis,
         contentRating: ContentRating.EVERYONE,
         status,
-        author,
+        author: author || "Desconhecido",
         tagGroups: [{ id: "genres", title: "Genres", tags: genres }],
-        artworkUrls: [image],
+        artworkUrls: image ? [image] : [thumbnailUrl],
         shareUrl: url,
       },
     };

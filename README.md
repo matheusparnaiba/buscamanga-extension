@@ -10,12 +10,12 @@ Atualmente, nosso repositório conta com as seguintes fontes:
 
 | Ícone | Nome                |  Versão  | Desenvolvedor   | Site Oficial                                         |
 | :---: | ------------------- | :------: | --------------- | ---------------------------------------------------- |
-|  🌟   | **Manga Online**    | `1.0.11` | matheusparnaiba | [mangaonline.blue](https://mangaonline.blue)         |
-|  📖   | **Manga Livre**     | `1.0.14` | matheusparnaiba | [mangalivre.to](https://mangalivre.to)               |
-|  🌸   | **Sakura Mangas**   | `1.0.5`  | matheusparnaiba | [sakuramangas.org](https://sakuramangas.org)         |
-|  📓   | **MangaLivre Blog** | `1.0.3`  | matheusparnaiba | [mangalivre.blog](https://mangalivre.blog)           |
-|  💫   | **Hipertoon**       | `1.0.3`  | matheusparnaiba | [hipertoon.com](https://hipertoon.com)               |
-|  🇧🇷   | **Mangás Brasuka**  | `1.0.1`  | matheusparnaiba | [mangasbrasuka.com.br](https://mangasbrasuka.com.br) |
+|  🌟   | **Manga Online**    | `1.0.12` | matheusparnaiba | [mangaonline.blue](https://mangaonline.blue)         |
+|  📖   | **Manga Livre**     | `1.0.15` | matheusparnaiba | [mangalivre.to](https://mangalivre.to)               |
+|  🌸   | **Sakura Mangas**   | `1.0.6`  | matheusparnaiba | [sakuramangas.org](https://sakuramangas.org)         |
+|  📓   | **MangaLivre Blog** | `1.0.4`  | matheusparnaiba | [mangalivre.blog](https://mangalivre.blog)           |
+|  💫   | **Hipertoon**       | `1.0.4`  | matheusparnaiba | [hipertoon.com](https://hipertoon.com)               |
+|  🇧🇷   | **Mangás Brasuka**  | `1.0.2`  | matheusparnaiba | [mangasbrasuka.com.br](https://mangasbrasuka.com.br) |
 
 ## 🚀 Como Instalar
 

@@ -228,7 +228,10 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     const $ = cheerio.load(data);
 
     const title = $(".post-title h1").text().trim() || mangaId;
-    const image = getImageSrc($(".summary_image img"));
+    const rawImage = getImageSrc($(".summary_image img"));
+    const image = rawImage && rawImage.startsWith("http") ? rawImage : undefined;
+    const fallbackImage = "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
+    const thumbnailUrl = image || fallbackImage;
     const author = $(".author-content a").text().trim() || "Desconhecido";
     const synopsis =
       $(".description-summary p, .summary__content p").text().trim() || "Sem descrição.";
@@ -252,13 +255,13 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
       mangaInfo: {
         primaryTitle: title,
         secondaryTitles: [],
-        thumbnailUrl: image,
+        thumbnailUrl,
         synopsis,
         contentRating: ContentRating.EVERYONE,
         status,
         author,
         tagGroups,
-        artworkUrls: [image],
+        artworkUrls: image ? [image] : [thumbnailUrl],
         shareUrl: url,
       },
     };

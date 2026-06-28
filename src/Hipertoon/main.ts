@@ -239,22 +239,24 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     const genres: Tag[] =
       manga.genres?.map((g: any) => ({ id: g.id.toString(), title: g.name })) || [];
 
+    const fallbackImage =
+      "https://ui-avatars.com/api/?name=" +
+      encodeURIComponent(manga.title || "Manga") +
+      "&background=random";
+    const thumbnailUrl = manga.coverUrl || fallbackImage;
+
     return {
       mangaId,
       mangaInfo: {
-        primaryTitle: manga.title,
+        primaryTitle: manga.title || "Sem título",
         secondaryTitles: [],
-        thumbnailUrl:
-          manga.coverUrl ||
-          "https://ui-avatars.com/api/?name=" +
-            encodeURIComponent(manga.title) +
-            "&background=random",
+        thumbnailUrl,
         synopsis: manga.synopsis || "",
         contentRating: ContentRating.EVERYONE,
         status: statusMap[manga.status] || "UNKNOWN",
-        author: manga.authors?.[0] || "",
+        author: manga.authors?.[0] || "Desconhecido",
         tagGroups: [{ id: "genres", title: "Genres", tags: genres }],
-        artworkUrls: [manga.coverUrl || ""],
+        artworkUrls: manga.coverUrl ? [manga.coverUrl] : [thumbnailUrl],
         shareUrl: `https://hipertoon.com/manga/${actualSlug}`,
       },
     };

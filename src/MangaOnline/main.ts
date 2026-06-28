@@ -226,7 +226,7 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
         items.push({
           mangaId,
           title,
-          imageUrl: img,
+          imageUrl: img || "https://ui-avatars.com/api/?name=" + encodeURIComponent(title || "Manga") + "&background=random",
           contentRating: ContentRating.EVERYONE,
         });
       }
@@ -245,10 +245,14 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
 
-    const title = $(".post-title h1").text().trim();
-    const image = getImageSrc($(".summary_image a img"));
+    const title = $(".post-title h1").text().trim() || "Sem título";
+    const rawImage = getImageSrc($(".summary_image a img, .summary_image img"));
+    const image = rawImage && rawImage.startsWith("http") ? rawImage : undefined;
+    const fallbackImage = "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
+    const thumbnailUrl = image || fallbackImage;
+
     const synopsis = $(".description-summary .summary__content").text().trim();
-    const author = $(".author-content a").text().trim();
+    const author = $(".author-content a").text().trim() || "Desconhecido";
     const statusText = $(".post-status .post-content_item .summary-content")
       .last()
       .text()
@@ -261,7 +265,7 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
     const genres: Tag[] = [];
     $(".genres-content a").each((_, el) => {
       const g = $(el).text().trim();
-      genres.push({ id: encodeURI(g), title: g });
+      if (g) genres.push({ id: encodeURI(g), title: g });
     });
 
     return {
@@ -269,13 +273,13 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
       mangaInfo: {
         primaryTitle: title,
         secondaryTitles: [],
-        thumbnailUrl: image,
+        thumbnailUrl,
         synopsis,
         contentRating: ContentRating.EVERYONE,
         status,
         author,
         tagGroups: [{ id: "genres", title: "Genres", tags: genres }],
-        artworkUrls: [image],
+        artworkUrls: image ? [image] : [thumbnailUrl],
         shareUrl: url,
       },
     };
