@@ -15,7 +15,7 @@ Atualmente, nosso repositório conta com as seguintes fontes:
 |  🌸   | **Sakura Mangas**   | `1.0.5`  | matheusparnaiba | [sakuramangas.org](https://sakuramangas.org)         |
 |  📓   | **MangaLivre Blog** | `1.0.3`  | matheusparnaiba | [mangalivre.blog](https://mangalivre.blog)           |
 |  💫   | **Hipertoon**       | `1.0.3`  | matheusparnaiba | [hipertoon.com](https://hipertoon.com)               |
-|  🇧🇷   | **Mangás Brasuka**  | `1.0.0`  | matheusparnaiba | [mangasbrasuka.com.br](https://mangasbrasuka.com.br) |
+|  🇧🇷   | **Mangás Brasuka**  | `1.0.1`  | matheusparnaiba | [mangasbrasuka.com.br](https://mangasbrasuka.com.br) |
 
 ## 🚀 Como Instalar
 

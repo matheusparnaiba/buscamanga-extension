@@ -66,6 +66,26 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
         title: "Atualizações Recentes",
         type: DiscoverSectionType.chapterUpdates,
       },
+      {
+        id: "manhwa",
+        title: "Destaques Manhwa",
+        type: DiscoverSectionType.prominentCarousel,
+      },
+      {
+        id: "manhua",
+        title: "Destaques Manhua",
+        type: DiscoverSectionType.prominentCarousel,
+      },
+      {
+        id: "shonen",
+        title: "Mangás Shōnen",
+        type: DiscoverSectionType.prominentCarousel,
+      },
+      {
+        id: "seinen",
+        title: "Mangás Seinen",
+        type: DiscoverSectionType.prominentCarousel,
+      },
     ];
   }
 
@@ -76,11 +96,20 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     const page = metadata ?? 1;
     let url = `${BASE_URL}/page/${page}/`;
 
-    if (section.id === "popular" && page > 1) {
+    const tagSections = ["popular", "manhwa", "manhua", "shonen", "seinen"];
+    if (tagSections.includes(section.id) && page > 1) {
       return { items: [], metadata: undefined };
     }
     if (section.id === "popular") {
       url = BASE_URL;
+    } else if (section.id === "manhwa") {
+      url = `${BASE_URL}/manga-tag/manhwa/`;
+    } else if (section.id === "manhua") {
+      url = `${BASE_URL}/manga-tag/manhua/`;
+    } else if (section.id === "shonen") {
+      url = `${BASE_URL}/manga-tag/shonen/`;
+    } else if (section.id === "seinen") {
+      url = `${BASE_URL}/manga-tag/seinen/`;
     }
 
     const request = { url, method: "GET" };
@@ -89,11 +118,11 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     const $ = cheerio.load(data);
     const items: DiscoverSectionItem[] = [];
 
-    if (section.id === "popular") {
-      $(".manga-slider .slider__item, .widget-content .item-summary, .page-item-detail")
+    if (tagSections.includes(section.id)) {
+      $(".manga-slider .slider__item, .widget-content .item-summary, .page-item-detail, .c-tabs-item__content")
         .slice(0, 15)
         .each((_, el) => {
-          const titleEl = $(el).find(".post-title a, h3 a, h5 a, .manga-title").first();
+          const titleEl = $(el).find(".post-title a, h3 a, h4 a, h5 a, .manga-title").first();
           const title = titleEl.text().trim();
           const href = titleEl.attr("href") || $(el).find("a").first().attr("href");
           const img = getImageSrc($(el).find("img"));
@@ -366,3 +395,4 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     };
   }
 }
+export const MangasBrasuka = new MangasBrasukaExtension();
