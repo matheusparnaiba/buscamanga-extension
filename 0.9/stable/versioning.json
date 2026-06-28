@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-06-28T05:59:04.620Z",
+  "buildTime": "2026-06-28T06:05:29.930Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -78,7 +78,7 @@
     {
       "name": "MangaNYX",
       "description": "Extensão do \"https://manganyx.com\"",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
