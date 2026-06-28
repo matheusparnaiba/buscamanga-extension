@@ -5,6 +5,7 @@ export class MainInterceptor extends PaperbackInterceptor {
     request.headers = {
       ...(request.headers ?? {}),
       referer: "https://mangasbrasuka.com.br/",
+      origin: "https://mangasbrasuka.com.br",
       "user-agent": await Application.getDefaultUserAgent(),
     };
     return request;

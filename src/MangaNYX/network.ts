@@ -8,6 +8,7 @@ export class MainInterceptor extends PaperbackInterceptor {
     request.headers = {
       ...(request.headers ?? {}),
       referer: "https://manganyx.com/",
+      origin: "https://manganyx.com",
       "user-agent": await Application.getDefaultUserAgent(),
     };
     return request;
