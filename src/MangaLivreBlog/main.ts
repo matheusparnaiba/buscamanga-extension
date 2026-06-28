@@ -296,20 +296,27 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
   }
 
   async getChapters(sourceManga: SourceManga, sinceDate?: Date): Promise<Chapter[]> {
-    const url = `${BASE_URL}/manga/${sourceManga.mangaId}/ajax/chapters/`;
+    const url = `${BASE_URL}/manga/${sourceManga.mangaId}/`;
     const request = {
       url,
-      method: "POST",
+      method: "GET",
     };
     const [response, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
     const chapters: Chapter[] = [];
+    const addedUrls = new Set<string>();
 
-    $(".wp-manga-chapter").each((_, el) => {
-      const a = $(el).find("a");
-      const href = a.attr("href")?.trim() ?? "";
-      const name = a.text().trim();
+    $("li.chapter-item, .chapter-item, .wp-manga-chapter").each((_, el) => {
+      const a = $(el).find("a.chapter-link").first();
+      const fallbackA = $(el).find("a").first();
+      const href = a.attr("href")?.trim() || fallbackA.attr("href")?.trim() || "";
+      if (!href || addedUrls.has(href)) return;
+      addedUrls.add(href);
+
+      let name = a.find(".chapter-number").text().trim() || a.text().trim() || fallbackA.text().trim();
+      name = name.replace(/\s+/g, " ").trim();
+
       const numMatch = name.match(/[\d.]+/);
       const chapNum = numMatch ? parseFloat(numMatch[0]) : 0;
 
@@ -334,9 +341,9 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
     const $ = cheerio.load(data);
 
     const pages: string[] = [];
-    $(".page-break img, .reading-content img").each((_, el) => {
+    $(".page-break img, .reading-content img, .chapter-image img, .chapter-images img, #chapter-container img, article img").each((_, el) => {
       const src = getImageSrc($(el));
-      if (src) pages.push(src);
+      if (src && !pages.includes(src)) pages.push(src);
     });
 
     return {
