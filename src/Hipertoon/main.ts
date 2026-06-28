@@ -67,6 +67,11 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
         title: "Atualizações",
         type: DiscoverSectionType.chapterUpdates,
       },
+      {
+        id: "new",
+        title: "Recém Adicionados",
+        type: DiscoverSectionType.prominentCarousel,
+      },
     ];
   }
 
@@ -119,6 +124,25 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
             manga.seriesCoverUrl ||
             "https://ui-avatars.com/api/?name=" +
               encodeURIComponent(manga.seriesTitle) +
+              "&background=random",
+          contentRating: ContentRating.EVERYONE,
+        });
+      }
+      return { items, metadata: undefined };
+    }
+
+    if (section.id === "new") {
+      const newlyAdded = json[3]?.result?.data?.json || [];
+      for (const manga of newlyAdded) {
+        items.push({
+          type: "prominentCarouselItem",
+          mangaId: `${manga.id}:${manga.slug}`,
+          title: manga.title,
+          subtitle: manga.latestChapter ? "Capítulo " + manga.latestChapter.number : undefined,
+          imageUrl:
+            manga.coverUrl ||
+            "https://ui-avatars.com/api/?name=" +
+              encodeURIComponent(manga.title) +
               "&background=random",
           contentRating: ContentRating.EVERYONE,
         });

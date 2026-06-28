@@ -67,6 +67,11 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
         title: "Últimas Atualizações",
         type: DiscoverSectionType.chapterUpdates,
       },
+      {
+        id: "ranking",
+        title: "Ranking Geral",
+        type: DiscoverSectionType.prominentCarousel,
+      },
     ];
   }
 
@@ -77,7 +82,7 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
     const page = metadata ?? 1;
     let url = `${BASE_URL}/page/${page}/`;
 
-    if (section.id === "latest" && page > 1) {
+    if ((section.id === "latest" || section.id === "ranking") && page > 1) {
       return { items: [], metadata: undefined };
     }
 
@@ -152,6 +157,33 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
         items,
         metadata: items.length > 0 ? page + 1 : undefined,
       };
+    }
+
+    if (section.id === "ranking") {
+      const match = data.match(/var esRankData = ({.*?});/);
+      if (match && match[1]) {
+        try {
+          const rankJson = JSON.parse(match[1]);
+          const rankList = rankJson.all || rankJson.month || [];
+          for (const item of rankList) {
+            if (item.url) {
+              const idMatch = item.url.match(/\/manga\/([^/]+)/);
+              const mangaId = idMatch ? (idMatch[1] as string) : item.url;
+              items.push({
+                mangaId,
+                title: item.title,
+                subtitle: item.views ? `${item.views.toLocaleString("pt-BR")} visualizações` : undefined,
+                imageUrl: item.cover || "https://ui-avatars.com/api/?name=" + encodeURIComponent(item.title),
+                type: "prominentCarouselItem",
+                contentRating: ContentRating.EVERYONE,
+              });
+            }
+          }
+        } catch (e) {
+          console.error("Erro ao fazer parse do ranking", e);
+        }
+      }
+      return { items, metadata: undefined };
     }
 
     return { items: [], metadata: undefined };

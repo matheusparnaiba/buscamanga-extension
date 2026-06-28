@@ -75,6 +75,11 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
         title: "Atualizações",
         type: DiscoverSectionType.chapterUpdates,
       },
+      {
+        id: "projects",
+        title: "Projetos em Destaque",
+        type: DiscoverSectionType.prominentCarousel,
+      },
     ];
   }
 
@@ -85,7 +90,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
     const page = metadata ?? 1;
     let url = `${BASE_URL}/page/${page}/`;
 
-    if (section.id === "popular" && page > 1) {
+    if ((section.id === "popular" || section.id === "projects") && page > 1) {
       return { items: [], metadata: undefined };
     }
 
@@ -177,6 +182,27 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
         items,
         metadata: items.length > 0 ? page + 1 : undefined,
       };
+    }
+
+    if (section.id === "projects") {
+      $(".manga-slider .slider__item, .page-item-detail").slice(0, 15).each((_, el) => {
+        const title = $(el).find(".post-title a, h3 a, h5 a").text().trim();
+        const href = $(el).find(".post-title a, h3 a, h5 a").attr("href");
+        const img = getImageSrc($(el).find("img"));
+
+        if (href && title) {
+          const idMatch = href.match(/\/manga\/([^/]+)/);
+          const mangaId = idMatch ? (idMatch[1] as string) : href;
+          items.push({
+            mangaId,
+            title,
+            imageUrl: img || "https://ui-avatars.com/api/?name=" + encodeURIComponent(title),
+            type: "prominentCarouselItem",
+            contentRating: ContentRating.EVERYONE,
+          });
+        }
+      });
+      return { items, metadata: undefined };
     }
 
     return { items: [], metadata: undefined };

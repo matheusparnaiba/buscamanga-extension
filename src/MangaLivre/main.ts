@@ -68,6 +68,11 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
         title: "Atualizações",
         type: DiscoverSectionType.chapterUpdates,
       },
+      {
+        id: "featured",
+        title: "Destaques",
+        type: DiscoverSectionType.featured,
+      },
     ];
   }
 
@@ -78,7 +83,7 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
     const page = metadata ?? 1;
     let url = `${BASE_URL}/page/${page}/`;
 
-    if (section.id === "popular" && page > 1) {
+    if ((section.id === "popular" || section.id === "featured") && page > 1) {
       return { items: [], metadata: undefined };
     }
 
@@ -171,6 +176,28 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
         items,
         metadata: items.length > 0 ? page + 1 : undefined,
       };
+    }
+
+    if (section.id === "featured") {
+      $("#destaques li").each((_, el) => {
+        const a = $(el).find("a").first();
+        const title = a.attr("title")?.trim() || $(el).find(".post-title, h3, h2").text().trim();
+        const href = a.attr("href");
+        const img = getImageSrc($(el).find("img"));
+
+        if (href && title) {
+          const idMatch = href.match(/\/manga\/([^/]+)/);
+          const mangaId = idMatch ? (idMatch[1] as string) : href;
+          items.push({
+            mangaId,
+            title,
+            imageUrl: img || "https://ui-avatars.com/api/?name=" + encodeURIComponent(title),
+            type: "featuredCarouselItem",
+            contentRating: ContentRating.EVERYONE,
+          });
+        }
+      });
+      return { items, metadata: undefined };
     }
 
     return { items: [], metadata: undefined };
