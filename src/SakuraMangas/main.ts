@@ -424,7 +424,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
       data = Application.arrayBufferToUTF8String(buffer);
       $ = cheerio.load(data);
 
-      $(".wp-manga-chapter, .chapter-item, li.chapter").each((_, el) => {
+      $(".wp-manga-chapter, .chapter-item, .chapter-item.parent, li.chapter, .listing-chapters_wrap li").each((_, el) => {
         const a = $(el).find("a");
         const href = a.attr("href")?.trim() ?? "";
         const name = a.text().trim();
@@ -451,13 +451,27 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
     const request = { url, method: "GET" };
     const [response, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
+    if (
+      response.status === 403 ||
+      response.status === 503 ||
+      data.includes("Just a moment...") ||
+      data.includes("_cf_chl_opt") ||
+      data.includes("challenges.cloudflare.com")
+    ) {
+      throw new CloudflareError(request, "Proteção Cloudflare ativa! Toque para resolver.");
+    }
+
     const $ = cheerio.load(data);
 
     const pages: string[] = [];
-    $(".page-break img, .reading-content img, .chapter-content img, .entry-content img, #readerarea img, .container-chapter-reader img").each((_, el) => {
+    $("[id^='pges_'] img, [id*='pges'] img, .page-break img, .reading-content img, .chapter-content img, .entry-content img, #readerarea img, .container-chapter-reader img").each((_, el) => {
       const src = getImageSrc($(el));
       if (src) pages.push(src);
     });
+
+    if (pages.length === 0) {
+      throw new Error("Não foi possível carregar as imagens do capítulo. Proteção Cloudflare ou formato não suportado.");
+    }
 
     return {
       id: chapter.chapterId,
