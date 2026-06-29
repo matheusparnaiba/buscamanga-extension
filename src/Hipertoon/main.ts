@@ -90,6 +90,9 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     const [response, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const json = JSON.parse(data);
+    if (json && json.error) {
+      throw new Error(`Erro na API do Hipertoon: ${json.error}`);
+    }
     const items: DiscoverSectionItem[] = [];
 
     if (section.id === "popular") {

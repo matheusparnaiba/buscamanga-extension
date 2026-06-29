@@ -11,6 +11,7 @@ export class MainInterceptor extends PaperbackInterceptor {
       referer: "https://hipertoon.com/",
       origin: "https://hipertoon.com",
       "user-agent": await Application.getDefaultUserAgent(),
+      "x-api-key": "e7e69d92016d5a6a8c7711aa13080f69de00d4c4e3d3557f5ac307c24a081397",
     };
     return request;
   }
