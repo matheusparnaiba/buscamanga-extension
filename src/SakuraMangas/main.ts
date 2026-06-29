@@ -174,7 +174,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
         const subtitle = $(el).find(".list-chapter .chapter-item .chapter a").first().text().trim();
 
         if (href && title) {
-          const idMatch = href.match(/\/manga\/([^/]+)/);
+          const idMatch = href.match(/\/(?:manga|obras)\/([^/]+)/);
           const mangaId = idMatch ? (idMatch[1] as string) : href;
 
           let safeImg = img;
@@ -219,7 +219,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
         const chapterHref = chapterEl.attr("href") || href || "unknown";
 
         if (href && title) {
-          const idMatch = href.match(/\/manga\/([^/]+)/);
+          const idMatch = href.match(/\/(?:manga|obras)\/([^/]+)/);
           const mangaId = idMatch ? (idMatch[1] as string) : href;
 
           let safeImg = img;
@@ -251,7 +251,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
     }
 
     if (section.id === "projects") {
-      let sliders = $(".hero-poster-col, .hero-poster-box, .manga-slider .slider__item, .slider__content, .popular-item-wrap");
+      let sliders = $(".swiper-slide, .hero-poster-col, .hero-poster-box, .manga-slider .slider__item, .slider__content, .popular-item-wrap");
       if (sliders.length === 0) sliders = $(".page-item-detail, .manga-item, .added-card").slice(0, 15);
 
       sliders.each((_, el) => {
@@ -266,7 +266,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
         const img = getImageSrc($(el).find("img.hero-poster-img, img"));
 
         if (href && title) {
-          const idMatch = href.match(/\/manga\/([^/]+)/);
+          const idMatch = href.match(/\/(?:manga|obras)\/([^/]+)/);
           const mangaId = idMatch ? (idMatch[1] as string) : href;
           items.push({
             mangaId,
@@ -322,7 +322,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
       const img = getImageSrc($(el).find(".tab-thumb a img, img.added-thumb, img.rank-thumb-img, img.update-thumb, img"));
 
       if (href && title) {
-        const idMatch = href.match(/\/manga\/([^/]+)/);
+        const idMatch = href.match(/\/(?:manga|obras)\/([^/]+)/);
         const mangaId = idMatch ? (idMatch[1] as string) : href;
 
         items.push({
@@ -341,7 +341,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
   }
 
   async getMangaDetails(mangaId: string): Promise<SourceManga> {
-    const url = `${BASE_URL}/manga/${mangaId}/`;
+    const url = mangaId.startsWith("http") ? mangaId : `${BASE_URL}/obras/${mangaId}/`;
     const request = { url, method: "GET" };
     const [response, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
@@ -388,7 +388,8 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
   }
 
   async getChapters(sourceManga: SourceManga, sinceDate?: Date): Promise<Chapter[]> {
-    const url = `${BASE_URL}/manga/${sourceManga.mangaId}/ajax/chapters/`;
+    const baseUrlManga = sourceManga.mangaId.startsWith("http") ? sourceManga.mangaId : `${BASE_URL}/obras/${sourceManga.mangaId}`;
+    const url = `${baseUrlManga}/ajax/chapters/`;
     const request = {
       url,
       method: "POST",
@@ -417,7 +418,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
     });
 
     if (chapters.length === 0) {
-      const getUrl = `${BASE_URL}/manga/${sourceManga.mangaId}/`;
+      const getUrl = sourceManga.mangaId.startsWith("http") ? sourceManga.mangaId : `${BASE_URL}/obras/${sourceManga.mangaId}/`;
       const getReq = { url: getUrl, method: "GET" };
       [response, buffer] = await Application.scheduleRequest(getReq);
       data = Application.arrayBufferToUTF8String(buffer);
