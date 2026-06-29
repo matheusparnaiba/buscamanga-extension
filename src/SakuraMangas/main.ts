@@ -159,9 +159,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
           const mangaId = idMatch ? (idMatch[1] as string) : href;
 
           let safeImg = img;
-          if (safeImg && safeImg.startsWith("http")) {
-            safeImg = safeImg.includes("?") ? safeImg + "&v=4" : safeImg + "?v=4";
-          } else {
+          if (!safeImg || !safeImg.startsWith("http")) {
             safeImg =
               "https://ui-avatars.com/api/?name=" +
               encodeURIComponent(title) +
@@ -203,9 +201,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
           const mangaId = idMatch ? (idMatch[1] as string) : href;
 
           let safeImg = img;
-          if (safeImg && safeImg.startsWith("http")) {
-            safeImg = safeImg.includes("?") ? safeImg + "&v=4" : safeImg + "?v=4";
-          } else {
+          if (!safeImg || !safeImg.startsWith("http")) {
             safeImg =
               "https://ui-avatars.com/api/?name=" +
               encodeURIComponent(title) +

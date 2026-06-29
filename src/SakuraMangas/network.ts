@@ -26,7 +26,13 @@ export class MainInterceptor extends PaperbackInterceptor {
     data: ArrayBuffer,
   ): Promise<ArrayBuffer> {
     if (response.status === 403 || response.status === 503) {
-      throw new CloudflareError(request, "Cloudflare detected, bypass it to continue!");
+      const isImage =
+        /\.(jpg|jpeg|png|webp|gif|ico|avif)((\?|#).*)?$/i.test(request.url) ||
+        request.url.includes("/uploads/") ||
+        request.url.includes("img.");
+      if (!isImage) {
+        throw new CloudflareError(request, "Cloudflare detected, bypass it to continue!");
+      }
     }
 
     return data;

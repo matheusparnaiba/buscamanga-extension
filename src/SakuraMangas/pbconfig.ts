@@ -3,7 +3,7 @@ import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/typ
 export default {
   name: "Sakura Mangas",
   description: 'Extensão do "https://sakuramangas.org"',
-  version: "1.0.7",
+  version: "1.0.8",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,
