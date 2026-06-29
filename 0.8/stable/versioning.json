@@ -76,35 +76,6 @@
       "id": "MangaLivreBlog"
     },
     {
-      "name": "MangaNYX",
-      "description": "Extensão do \"https://manganyx.com\"",
-      "version": "1.0.4",
-      "icon": "icon.png",
-      "language": "pt-br",
-      "contentRating": "SAFE",
-      "capabilities": [
-        32,
-        4,
-        64,
-        1,
-        16
-      ],
-      "badges": [
-        {
-          "label": "Cloudflare",
-          "textColor": "#000000",
-          "backgroundColor": "#ffc107"
-        }
-      ],
-      "developers": [
-        {
-          "name": "matheusparnaiba",
-          "github": "https://github.com/matheusparnaiba"
-        }
-      ],
-      "id": "MangaNYX"
-    },
-    {
       "name": "Manga Online",
       "description": "Extensão do \"https://mangaonline.blue\"",
       "version": "1.0.12",
@@ -146,35 +117,6 @@
         }
       ],
       "id": "MangasBrasuka"
-    },
-    {
-      "name": "Sakura Mangas",
-      "description": "Extensão do \"https://sakuramangas.org\"",
-      "version": "1.0.12",
-      "icon": "icon.png",
-      "language": "pt-br",
-      "contentRating": "SAFE",
-      "capabilities": [
-        32,
-        4,
-        64,
-        1,
-        16
-      ],
-      "badges": [
-        {
-          "label": "Cloudflare",
-          "textColor": "#000000",
-          "backgroundColor": "#ffc107"
-        }
-      ],
-      "developers": [
-        {
-          "name": "matheusparnaiba",
-          "github": "https://github.com/matheusparnaiba"
-        }
-      ],
-      "id": "SakuraMangas"
     }
   ]
 }
