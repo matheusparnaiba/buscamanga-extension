@@ -3,7 +3,7 @@ import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/typ
 export default {
   name: "MangaNYX",
   description: 'Extensão do "https://manganyx.com"',
-  version: "1.0.2",
+  version: "1.0.3",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,
@@ -12,8 +12,9 @@ export default {
     SourceIntents.DISCOVER_SECTION_PROVIDING,
     SourceIntents.SEARCH_RESULT_PROVIDING,
     SourceIntents.CHAPTER_PROVIDING,
+    SourceIntents.CLOUDFLARE_BYPASS_PROVIDING,
   ],
-  badges: [],
+  badges: [{ label: "Cloudflare", textColor: "#000000", backgroundColor: "#ffc107" }],
   developers: [
     {
       name: "matheusparnaiba",

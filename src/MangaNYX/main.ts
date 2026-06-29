@@ -1,5 +1,6 @@
 import {
   BasicRateLimiter,
+  CookieStorageInterceptor,
   ContentRating,
   DiscoverSectionType,
   type Chapter,
@@ -14,6 +15,8 @@ import {
   type SortingOption,
   type SourceManga,
   type Tag,
+  type Cookie,
+  type Request,
 } from "@paperback/types";
 
 import { ContentTemplateAdvancedSearchForm, SettingsForm } from "./forms";
@@ -28,6 +31,10 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
     numberOfRequests: 15,
     bufferInterval: 5,
     ignoreImages: true,
+  });
+
+  cookieStorageInterceptor = new CookieStorageInterceptor({
+    storage: "stateManager",
   });
 
   mainInterceptor = new MainInterceptor("main");
@@ -70,7 +77,36 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
 
   async initialise(): Promise<void> {
     this.mainRateLimiter.registerInterceptor();
+    this.cookieStorageInterceptor.registerInterceptor();
     this.mainInterceptor.registerInterceptor();
+  }
+
+  async saveCloudflareBypassCookies(cookies: Cookie[]): Promise<void> {
+    for (const cookie of cookies) {
+      this.cookieStorageInterceptor.setCookie(cookie);
+    }
+  }
+
+  async cloudflareBypassCompleted(
+    request: Request,
+    cookies: Cookie[],
+    localStorage: Record<string, string>,
+  ): Promise<void> {
+    for (const cookie of cookies) {
+      this.cookieStorageInterceptor.setCookie(cookie);
+    }
+    let ua: string | undefined = undefined;
+    if (request.headers) {
+      for (const key of Object.keys(request.headers)) {
+        if (key.toLowerCase() === "user-agent") {
+          ua = request.headers[key];
+          break;
+        }
+      }
+    }
+    if (ua && typeof ua === "string") {
+      Application.setState(ua, "cf_user_agent");
+    }
   }
 
   async getSettingsForm(): Promise<Form> {
