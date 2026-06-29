@@ -196,7 +196,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
         }
       });
       if (items.length === 0 && page === 1) {
-        throw new Error("Nenhum mangá carregado no Sakura Mangas. Toque para atualizar ou verifique o Cloudflare.");
+        throw new CloudflareError(request, "Falha ao carregar mangás. Toque aqui para verificar o Cloudflare no navegador.");
       }
       return { items, metadata: undefined };
     }
@@ -242,7 +242,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
         }
       });
       if (items.length === 0 && page === 1) {
-        throw new Error("Nenhum mangá carregado no Sakura Mangas. Toque para atualizar ou verifique o Cloudflare.");
+        throw new CloudflareError(request, "Falha ao carregar mangás. Toque aqui para verificar o Cloudflare no navegador.");
       }
       return {
         items,
@@ -278,7 +278,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
         }
       });
       if (items.length === 0 && page === 1) {
-        throw new Error("Nenhum mangá carregado no Sakura Mangas. Toque para atualizar ou verifique o Cloudflare.");
+        throw new CloudflareError(request, "Falha ao carregar mangás. Toque aqui para verificar o Cloudflare no navegador.");
       }
       return { items, metadata: undefined };
     }
