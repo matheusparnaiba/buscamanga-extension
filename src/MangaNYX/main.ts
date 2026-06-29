@@ -61,14 +61,14 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
       if (response.status !== 200 || data.trim().startsWith("<")) {
         throw new Error(`Falha ao carregar destaques (HTTP ${response.status})`);
       }
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      return parsed.data || parsed || {};
     })();
 
     this.homePromise = { promise: fetchPromise, timestamp: now };
 
     try {
-      const json = await fetchPromise;
-      return json.data || {};
+      return await fetchPromise;
     } catch (e) {
       this.homePromise = undefined;
       throw e;
@@ -137,7 +137,7 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
     section: DiscoverSection,
     metadata: any,
   ): Promise<PagedResults<DiscoverSectionItem>> {
-    if (metadata !== undefined) {
+    if (metadata && (metadata.page > 1 || typeof metadata === "number" && metadata > 1)) {
       return { items: [], metadata: undefined };
     }
 
