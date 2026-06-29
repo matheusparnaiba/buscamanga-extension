@@ -18,6 +18,7 @@ import {
   type Tag,
   type Cookie,
   type Request,
+  CloudflareError,
 } from "@paperback/types";
 import * as cheerio from "cheerio";
 
@@ -114,9 +115,17 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
 
   async getDiscoverSectionItems(
     section: DiscoverSection,
-    metadata: number | undefined,
+    metadata: any,
   ): Promise<PagedResults<DiscoverSectionItem>> {
-    const page = metadata ?? 1;
+    let page = 1;
+    if (typeof metadata === "number" && metadata > 0) {
+      page = metadata;
+    } else if (metadata && typeof metadata === "object" && metadata.page) {
+      page = Number(metadata.page) || 1;
+    } else if (typeof metadata === "string") {
+      page = Number(metadata) || 1;
+    }
+
     let url = page > 1 ? `${BASE_URL}/page/${page}/` : `${BASE_URL}/`;
 
     if ((section.id === "popular" || section.id === "projects") && page > 1) {
@@ -130,6 +139,16 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
 
     const [response, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
+    if (
+      response.status === 403 ||
+      response.status === 503 ||
+      data.includes("Just a moment...") ||
+      data.includes("_cf_chl_opt") ||
+      data.includes("challenges.cloudflare.com")
+    ) {
+      throw new CloudflareError(request, "Proteção Cloudflare ativa! Toque para resolver.");
+    }
+
     const $ = cheerio.load(data);
     const items: DiscoverSectionItem[] = [];
 
@@ -176,6 +195,9 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
           });
         }
       });
+      if (items.length === 0 && page === 1) {
+        throw new Error("Nenhum mangá carregado no Sakura Mangas. Toque para atualizar ou verifique o Cloudflare.");
+      }
       return { items, metadata: undefined };
     }
 
@@ -219,6 +241,9 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
           });
         }
       });
+      if (items.length === 0 && page === 1) {
+        throw new Error("Nenhum mangá carregado no Sakura Mangas. Toque para atualizar ou verifique o Cloudflare.");
+      }
       return {
         items,
         metadata: items.length > 0 ? page + 1 : undefined,
@@ -252,6 +277,9 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
           });
         }
       });
+      if (items.length === 0 && page === 1) {
+        throw new Error("Nenhum mangá carregado no Sakura Mangas. Toque para atualizar ou verifique o Cloudflare.");
+      }
       return { items, metadata: undefined };
     }
 
