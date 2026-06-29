@@ -56,7 +56,21 @@ jobs:
           cp -r bundles/* deploy_root/${{ github.ref_name }}/
           cp root-index.html deploy_root/index.html
           cp -r assets deploy_root/assets
-          if [ -d "deprecated" ]; then cp -r deprecated/* deploy_root/; fi
+          mkdir -p deploy_root/0.8/stable
+          cp bundles/index.html deploy_root/0.8/stable/index.html
+          cp bundles/logo.png deploy_root/0.8/stable/logo.png
+          cp bundles/buscamanga.ico deploy_root/0.8/stable/buscamanga.ico
+          if [ -f "bundles/tests.json" ]; then cp bundles/tests.json deploy_root/0.8/stable/tests.json; fi
+          for ext in Hipertoon MangaLivre MangaLivreBlog MangaOnline MangasBrasuka; do
+            if [ -d "bundles/$ext" ]; then cp -r "bundles/$ext" deploy_root/0.8/stable/; fi
+          done
+          node -e "
+            const fs = require('fs');
+            const v = JSON.parse(fs.readFileSync('bundles/versioning.json', 'utf8'));
+            const compatible = ['Hipertoon', 'MangaLivre', 'MangaLivreBlog', 'MangaOnline', 'MangasBrasuka'];
+            v.sources = v.sources.filter(s => compatible.includes(s.id) || compatible.includes(s.name));
+            fs.writeFileSync('deploy_root/0.8/stable/versioning.json', JSON.stringify(v, null, 2));
+          "
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
