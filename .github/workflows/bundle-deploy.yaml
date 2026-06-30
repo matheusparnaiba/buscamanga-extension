@@ -46,9 +46,20 @@ jobs:
                 }
               }
             }
-            let json = fs.readFileSync('bundles/versioning.json', 'utf8');
-            json = json.replace(/buscamanga-extension/g, 'BuscaMangá');
-            fs.writeFileSync('bundles/versioning.json', json);
+            const fs = require('fs');
+            const v = JSON.parse(fs.readFileSync('bundles/versioning.json', 'utf8'));
+            if (v.repository) {
+              v.repository.name = 'BuscaMangá';
+              v.repository.author = 'matheusparnaiba';
+              v.repository.website = 'https://github.com/matheusparnaiba';
+            }
+            v.sources = v.sources.map(s => {
+              s.author = (s.developers && s.developers[0]) ? s.developers[0].name : 'matheusparnaiba';
+              s.desc = s.description || '';
+              s.website = (s.developers && s.developers[0]) ? s.developers[0].github : 'https://github.com/matheusparnaiba';
+              return s;
+            });
+            fs.writeFileSync('bundles/versioning.json', JSON.stringify(v, null, 2));
           "
       - name: Prepare Root Deployment
         run: |
@@ -67,8 +78,19 @@ jobs:
           node -e "
             const fs = require('fs');
             const v = JSON.parse(fs.readFileSync('bundles/versioning.json', 'utf8'));
+            if (v.repository) {
+              v.repository.author = 'matheusparnaiba';
+              v.repository.website = 'https://github.com/matheusparnaiba';
+            }
             const compatible = ['Hipertoon', 'MangaLivre', 'MangaLivreBlog', 'MangaOnline', 'MangasBrasuka'];
-            v.sources = v.sources.filter(s => compatible.includes(s.id) || compatible.includes(s.name));
+            v.sources = v.sources
+              .filter(s => compatible.includes(s.id) || compatible.includes(s.name))
+              .map(s => {
+                s.author = (s.developers && s.developers[0]) ? s.developers[0].name : 'matheusparnaiba';
+                s.desc = s.description || '';
+                s.website = (s.developers && s.developers[0]) ? s.developers[0].github : 'https://github.com/matheusparnaiba';
+                return s;
+              });
             fs.writeFileSync('deploy_root/0.8/stable/versioning.json', JSON.stringify(v, null, 2));
           "
       - name: Deploy to GitHub Pages
