@@ -72,22 +72,35 @@ jobs:
           cp bundles/buscamanga.ico deploy_root/0.8/stable/buscamanga.ico
           if [ -f "bundles/tests.json" ]; then cp bundles/tests.json deploy_root/0.8/stable/tests.json; fi
           for ext in Hipertoon MangaLivre MangaLivreBlog MangaOnline MangasBrasuka; do
-            if [ -d "bundles/$ext" ]; then cp -r "bundles/$ext" deploy_root/0.8/stable/; fi
+            if [ -d "bundles/$ext" ]; then
+              cp -r "bundles/$ext" deploy_root/0.8/stable/
+              if [ -f "deploy_root/0.8/stable/$ext/index.js" ]; then
+                cp "deploy_root/0.8/stable/$ext/index.js" "deploy_root/0.8/stable/$ext/source.js"
+              fi
+              if [ -f "deploy_root/0.8/stable/$ext/icon.png" ]; then
+                mkdir -p "deploy_root/0.8/stable/$ext/includes"
+                cp "deploy_root/0.8/stable/$ext/icon.png" "deploy_root/0.8/stable/$ext/includes/icon.png"
+              fi
+            fi
           done
           node -e "
             const fs = require('fs');
             const v = JSON.parse(fs.readFileSync('bundles/versioning.json', 'utf8'));
             if (v.repository) {
               v.repository.author = 'matheusparnaiba';
-              v.repository.website = 'https://github.com/matheusparnaiba';
+              v.repository.website = 'https://github.com/matheusparnaiba/buscamanga-extension';
             }
             const compatible = ['Hipertoon', 'MangaLivre', 'MangaLivreBlog', 'MangaOnline', 'MangasBrasuka'];
             v.sources = v.sources
               .filter(s => compatible.includes(s.id) || compatible.includes(s.name))
               .map(s => {
-                s.author = (s.developers && s.developers[0]) ? s.developers[0].name : 'matheusparnaiba';
-                s.desc = s.description || '';
-                s.website = (s.developers && s.developers[0]) ? s.developers[0].github : 'https://github.com/matheusparnaiba';
+                s.author = (s.developers && s.developers[0] && s.developers[0].name) ? s.developers[0].name : 'matheusparnaiba';
+                s.desc = s.desc || s.description || '';
+                s.website = (s.developers && s.developers[0] && s.developers[0].github) ? s.developers[0].github : 'https://github.com/matheusparnaiba/buscamanga-extension';
+                s.tags = Array.isArray(s.tags) ? s.tags : [];
+                s.intents = 21;
+                const urlMatch = (s.description || '').match(/https?:\/\/[^\s\"]+/);
+                s.websiteBaseURL = s.websiteBaseURL || (urlMatch ? urlMatch[0] : '');
                 return s;
               });
             fs.writeFileSync('deploy_root/0.8/stable/versioning.json', JSON.stringify(v, null, 2));
