@@ -1,12 +1,14 @@
 {
-  "buildTime": "2026-06-30T01:19:16.132Z",
+  "buildTime": "2026-06-30T01:42:41.658Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
   },
   "repository": {
     "name": "BuscaMangá",
-    "description": "Extensão BuscaMangá para o Paperback"
+    "description": "Extensão BuscaMangá para o Paperback",
+    "author": "matheusparnaiba",
+    "website": "https://github.com/matheusparnaiba"
   },
   "sources": [
     {
@@ -29,7 +31,10 @@
           "github": "https://github.com/matheusparnaiba"
         }
       ],
-      "id": "Hipertoon"
+      "id": "Hipertoon",
+      "author": "matheusparnaiba",
+      "desc": "Extensão do \"https://hipertoon.com\"",
+      "website": "https://github.com/matheusparnaiba"
     },
     {
       "name": "Manga Livre",
@@ -51,7 +56,10 @@
           "github": "https://github.com/matheusparnaiba"
         }
       ],
-      "id": "MangaLivre"
+      "id": "MangaLivre",
+      "author": "matheusparnaiba",
+      "desc": "Extensão do \"https://mangalivre.to\"",
+      "website": "https://github.com/matheusparnaiba"
     },
     {
       "name": "MangaLivre Blog",
@@ -73,7 +81,10 @@
           "github": "https://github.com/matheusparnaiba"
         }
       ],
-      "id": "MangaLivreBlog"
+      "id": "MangaLivreBlog",
+      "author": "matheusparnaiba",
+      "desc": "Extensão do \"https://mangalivre.blog\"",
+      "website": "https://github.com/matheusparnaiba"
     },
     {
       "name": "Manga Online",
@@ -94,7 +105,9 @@
           "name": "matheusparnaiba"
         }
       ],
-      "id": "MangaOnline"
+      "id": "MangaOnline",
+      "author": "matheusparnaiba",
+      "desc": "Extensão do \"https://mangaonline.blue\""
     },
     {
       "name": "Mangás Brasuka",
@@ -116,7 +129,10 @@
           "github": "https://github.com/matheusparnaiba"
         }
       ],
-      "id": "MangasBrasuka"
+      "id": "MangasBrasuka",
+      "author": "matheusparnaiba",
+      "desc": "Extensão do \"https://mangasbrasuka.com.br\"",
+      "website": "https://github.com/matheusparnaiba"
     }
   ]
 }
