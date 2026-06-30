@@ -51,10 +51,20 @@ class SourceUIPlaygroundForm extends Form {
         ToggleRow("toggleVisible", {
           title: "Toggle Visibility",
           value: this.rowsVisible,
-          onValueChange: Application.Selector(this as SourceUIPlaygroundForm, "handleRowsVisibleChange"),
+          onValueChange: Application.Selector(
+            this as SourceUIPlaygroundForm,
+            "handleRowsVisibleChange",
+          ),
         }),
       ]),
-      ...(this.rowsVisible ? [Section("dynamicRows", this.items.map((item, index) => LabelRow(`item_${index}`, { title: item })))] : []),
+      ...(this.rowsVisible
+        ? [
+            Section(
+              "dynamicRows",
+              this.items.map((item, index) => LabelRow(`item_${index}`, { title: item })),
+            ),
+          ]
+        : []),
     ];
   }
 

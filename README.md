@@ -10,13 +10,13 @@ Atualmente, nosso repositório conta com as seguintes fontes:
 
 | Ícone | Nome                |  Versão  | Desenvolvedor   | Compatibilidade | Site Oficial                                         |
 | :---: | ------------------- | :------: | --------------- | :-------------: | ---------------------------------------------------- |
-|  🌟   | **Manga Online**    | `1.0.12` | matheusparnaiba |  v0.8 & v0.9    | [mangaonline.blue](https://mangaonline.blue)         |
-|  📖   | **Manga Livre**     | `1.0.15` | matheusparnaiba |  v0.8 & v0.9    | [mangalivre.to](https://mangalivre.to)               |
-|  🌸   | **Sakura Mangas**   | `1.0.12` | matheusparnaiba |   v0.9 apenas   | [sakuramangas.org](https://sakuramangas.org)         |
-|  📓   | **MangaLivre Blog** | `1.0.5`  | matheusparnaiba |  v0.8 & v0.9    | [mangalivre.blog](https://mangalivre.blog)           |
-|  💫   | **Hipertoon**       | `1.0.8`  | matheusparnaiba |  v0.8 & v0.9    | [hipertoon.com](https://hipertoon.com)               |
-|  🇧🇷   | **Mangás Brasuka**  | `1.0.5`  | matheusparnaiba |  v0.8 & v0.9    | [mangasbrasuka.com.br](https://mangasbrasuka.com.br) |
-|  🌙   | **MangaNYX**        | `1.0.4`  | matheusparnaiba |   v0.9 apenas   | [manganyx.com](https://manganyx.com)                 |
+|  🌟   | **Manga Online**    | `1.0.13` | matheusparnaiba |   v0.8 & v0.9   | [mangaonline.blue](https://mangaonline.blue)         |
+|  📖   | **Manga Livre**     | `1.0.16` | matheusparnaiba |   v0.8 & v0.9   | [mangalivre.to](https://mangalivre.to)               |
+|  🌸   | **Sakura Mangas**   | `1.0.13` | matheusparnaiba |   v0.9 apenas   | [sakuramangas.org](https://sakuramangas.org)         |
+|  📓   | **MangaLivre Blog** | `1.0.6`  | matheusparnaiba |   v0.8 & v0.9   | [mangalivre.blog](https://mangalivre.blog)           |
+|  💫   | **Hipertoon**       | `1.0.9`  | matheusparnaiba |   v0.8 & v0.9   | [hipertoon.com](https://hipertoon.com)               |
+|  🇧🇷   | **Mangás Brasuka**  | `1.0.6`  | matheusparnaiba |   v0.8 & v0.9   | [mangasbrasuka.com.br](https://mangasbrasuka.com.br) |
+|  🌙   | **MangaNYX**        | `1.0.5`  | matheusparnaiba |   v0.9 apenas   | [manganyx.com](https://manganyx.com)                 |
 
 ## 🚀 Como Instalar
 

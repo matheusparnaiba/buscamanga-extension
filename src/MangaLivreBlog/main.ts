@@ -92,7 +92,7 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
       method: "GET",
     };
 
-    const [response, buffer] = await Application.scheduleRequest(request);
+    const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
     const items: DiscoverSectionItem[] = [];
@@ -210,13 +210,13 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
   async getSearchResults(
     query: SearchQuery<ContentTemplateSearchMetadata>,
     metadata?: number,
-    sortingOption?: SortingOption,
+    _sortingOption?: SortingOption,
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata ?? 1;
     const searchUrl = `${BASE_URL}/page/${page}/?s=${encodeURIComponent(query.title)}&post_type=wp-manga`;
 
     const request = { url: searchUrl, method: "GET" };
-    const [response, buffer] = await Application.scheduleRequest(request);
+    const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
     const items: SearchResultItem[] = [];
@@ -234,7 +234,11 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
         items.push({
           mangaId,
           title,
-          imageUrl: img || "https://ui-avatars.com/api/?name=" + encodeURIComponent(title || "Manga") + "&background=random",
+          imageUrl:
+            img ||
+            "https://ui-avatars.com/api/?name=" +
+              encodeURIComponent(title || "Manga") +
+              "&background=random",
           contentRating: ContentRating.EVERYONE,
         });
       }
@@ -249,24 +253,43 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
   async getMangaDetails(mangaId: string): Promise<SourceManga> {
     const url = `${BASE_URL}/manga/${mangaId}/`;
     const request = { url, method: "GET" };
-    const [response, buffer] = await Application.scheduleRequest(request);
+    const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
 
-    const title = $(".post-title h1, .manga-title, h1").map((_, el) => $(el).text().trim()).get().find(t => t.length > 0) || "";
-    const rawImage = getImageSrc($(".manga-cover img, .manga-cover-image, .summary_image img").first());
+    const title =
+      $(".post-title h1, .manga-title, h1")
+        .map((_, el) => $(el).text().trim())
+        .get()
+        .find((t) => t.length > 0) || "";
+    const rawImage = getImageSrc(
+      $(".manga-cover img, .manga-cover-image, .summary_image img").first(),
+    );
     const image = rawImage && rawImage.startsWith("http") ? rawImage : undefined;
-    const fallbackImage = "https://ui-avatars.com/api/?name=" + encodeURIComponent(title || "Manga") + "&background=random";
+    const fallbackImage =
+      "https://ui-avatars.com/api/?name=" +
+      encodeURIComponent(title || "Manga") +
+      "&background=random";
     const thumbnailUrl = image || fallbackImage;
 
-    const synopsis = $(".description-summary .summary__content, .manga-synopsis, .manga-description").first().text().trim();
+    const synopsis = $(
+      ".description-summary .summary__content, .manga-synopsis, .manga-description",
+    )
+      .first()
+      .text()
+      .trim();
     let author = $(".author-content a").text().trim();
-    let statusText = $(".post-status .post-content_item .summary-content").last().text().trim().toLowerCase();
+    let statusText = $(".post-status .post-content_item .summary-content")
+      .last()
+      .text()
+      .trim()
+      .toLowerCase();
 
     $(".manga-meta-item").each((_, el) => {
       const txt = $(el).text().trim();
       if (!author && txt.includes("Autor:")) author = txt.replace("Autor:", "").trim();
-      if (!statusText && txt.includes("Status:")) statusText = txt.replace("Status:", "").trim().toLowerCase();
+      if (!statusText && txt.includes("Status:"))
+        statusText = txt.replace("Status:", "").trim().toLowerCase();
     });
 
     let status = "ONGOING";
@@ -295,13 +318,13 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
     };
   }
 
-  async getChapters(sourceManga: SourceManga, sinceDate?: Date): Promise<Chapter[]> {
+  async getChapters(sourceManga: SourceManga, _sinceDate?: Date): Promise<Chapter[]> {
     const url = `${BASE_URL}/manga/${sourceManga.mangaId}/`;
     const request = {
       url,
       method: "GET",
     };
-    const [response, buffer] = await Application.scheduleRequest(request);
+    const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
     const chapters: Chapter[] = [];
@@ -314,7 +337,8 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
       if (!href || addedUrls.has(href)) return;
       addedUrls.add(href);
 
-      let name = a.find(".chapter-number").text().trim() || a.text().trim() || fallbackA.text().trim();
+      let name =
+        a.find(".chapter-number").text().trim() || a.text().trim() || fallbackA.text().trim();
       name = name.replace(/\s+/g, " ").trim();
 
       const numMatch = name.match(/[\d.]+/);
@@ -336,12 +360,14 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
   async getChapterDetails(chapter: Chapter): Promise<ChapterDetails> {
     const url = chapter.chapterId;
     const request = { url, method: "GET" };
-    const [response, buffer] = await Application.scheduleRequest(request);
+    const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
 
     const pages: string[] = [];
-    $(".page-break img, .reading-content img, .chapter-image img, .chapter-images img, #chapter-container img, article img").each((_, el) => {
+    $(
+      ".page-break img, .reading-content img, .chapter-image img, .chapter-images img, #chapter-container img, article img",
+    ).each((_, el) => {
       const src = getImageSrc($(el));
       if (src && !pages.includes(src)) pages.push(src);
     });

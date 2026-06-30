@@ -13,7 +13,7 @@ export class MainInterceptor extends PaperbackInterceptor {
   override async interceptRequest(request: Request): Promise<Request> {
     const cfUserAgent = Application.getState("cf_user_agent") as string | undefined;
     request.headers = {
-      ...(request.headers ?? {}),
+      ...request.headers,
       referer: "https://sakuramangas.org/",
       "user-agent": cfUserAgent ?? (await Application.getDefaultUserAgent()),
     };

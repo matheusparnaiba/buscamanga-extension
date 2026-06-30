@@ -19,7 +19,7 @@ import {
   type Request,
 } from "@paperback/types";
 
-import { ContentTemplateAdvancedSearchForm, SettingsForm } from "./forms";
+import { SettingsForm } from "./forms";
 import type { ContentTemplateSearchMetadata } from "./models";
 import { MainInterceptor } from "./network";
 import type ContentTemplateConfig from "./pbconfig";
@@ -90,7 +90,7 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
   async cloudflareBypassCompleted(
     request: Request,
     cookies: Cookie[],
-    localStorage: Record<string, string>,
+    _localStorage: Record<string, string>,
   ): Promise<void> {
     for (const cookie of cookies) {
       this.cookieStorageInterceptor.setCookie(cookie);
@@ -137,7 +137,7 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
     section: DiscoverSection,
     metadata: any,
   ): Promise<PagedResults<DiscoverSectionItem>> {
-    if (metadata && (metadata.page > 1 || typeof metadata === "number" && metadata > 1)) {
+    if (metadata && (metadata.page > 1 || (typeof metadata === "number" && metadata > 1))) {
       return { items: [], metadata: undefined };
     }
 
@@ -168,9 +168,7 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
       for (const manga of list) {
         if (!manga?.slug) continue;
         const firstCh = manga.recentChapters?.[0];
-        const chapterId = firstCh
-          ? String(firstCh.id || firstCh.number || "")
-          : String(manga.slug);
+        const chapterId = firstCh ? String(firstCh.id || firstCh.number || "") : String(manga.slug);
 
         items.push({
           type: "chapterUpdatesCarouselItem",
@@ -214,8 +212,8 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
 
   async getSearchResults(
     query: SearchQuery<ContentTemplateSearchMetadata>,
-    metadata?: any,
-    sortingOption?: SortingOption,
+    _metadata?: any,
+    _sortingOption?: SortingOption,
   ): Promise<PagedResults<SearchResultItem>> {
     const searchTerm = query.title?.trim() || "";
     let url = `${API_BASE}/search?q=${encodeURIComponent(searchTerm)}`;

@@ -113,13 +113,15 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     }
 
     const request = { url, method: "GET" };
-    const [response, buffer] = await Application.scheduleRequest(request);
+    const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
     const items: DiscoverSectionItem[] = [];
 
     if (tagSections.includes(section.id)) {
-      $(".manga-slider .slider__item, .widget-content .item-summary, .page-item-detail, .c-tabs-item__content")
+      $(
+        ".manga-slider .slider__item, .widget-content .item-summary, .page-item-detail, .c-tabs-item__content",
+      )
         .slice(0, 15)
         .each((_, el) => {
           const titleEl = $(el).find(".post-title a, h3 a, h4 a, h5 a, .manga-title").first();
@@ -191,7 +193,7 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     const url = `${BASE_URL}/page/${page}/?s=${encodeURIComponent(searchTerm)}&post_type=wp-manga`;
 
     const request = { url, method: "GET" };
-    const [response, buffer] = await Application.scheduleRequest(request);
+    const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
     const items: SearchResultItem[] = [];
@@ -223,14 +225,15 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
   async getMangaDetails(mangaId: string): Promise<SourceManga> {
     const url = `${BASE_URL}/manga/${mangaId}/`;
     const request = { url, method: "GET" };
-    const [response, buffer] = await Application.scheduleRequest(request);
+    const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
 
     const title = $(".post-title h1").text().trim() || mangaId;
     const rawImage = getImageSrc($(".summary_image img"));
     const image = rawImage && rawImage.startsWith("http") ? rawImage : undefined;
-    const fallbackImage = "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
+    const fallbackImage =
+      "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
     const thumbnailUrl = image || fallbackImage;
     const author = $(".author-content a").text().trim() || "Desconhecido";
     const synopsis =
@@ -267,10 +270,10 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     };
   }
 
-  async getChapters(sourceManga: SourceManga, sinceDate?: Date): Promise<Chapter[]> {
+  async getChapters(sourceManga: SourceManga, _sinceDate?: Date): Promise<Chapter[]> {
     const url = `${BASE_URL}/manga/${sourceManga.mangaId}/ajax/chapters/`;
     const request = { url, method: "POST" };
-    const [response, buffer] = await Application.scheduleRequest(request);
+    const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
     const chapters: Chapter[] = [];
@@ -300,7 +303,7 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
   async getChapterDetails(chapter: Chapter): Promise<ChapterDetails> {
     const url = chapter.chapterId;
     const request = { url, method: "GET" };
-    const [response, buffer] = await Application.scheduleRequest(request);
+    const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
 
@@ -330,15 +333,21 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     // Fallback: extract base CDN URL from jump links or raw data
     let firstPageUrl = "";
     const cleanData = data.replace(/\\\//g, "/");
-    const cdnMatch = cleanData.match(/https:\/\/cdn\.mugiverso\.com\/[^"'\s<>&]+\/(?:001|01|1)\.(?:webp|jpg|png)/i);
+    const cdnMatch = cleanData.match(
+      /https:\/\/cdn\.mugiverso\.com\/[^"'\s<>&]+\/(?:001|01|1)\.(?:webp|jpg|png)/i,
+    );
     if (cdnMatch && cdnMatch[0]) {
       firstPageUrl = cdnMatch[0];
     } else {
-      const paramMatch = cleanData.match(/[?&](?:a|auth|u|url)=(https?%3A%2F%2F[^&"'\s<>]+|https?:\/\/[^&"'\s<>]+)/i);
+      const paramMatch = cleanData.match(
+        /[?&](?:a|auth|u|url)=(https?%3A%2F%2F[^&"'\s<>]+|https?:\/\/[^&"'\s<>]+)/i,
+      );
       if (paramMatch && paramMatch[1]) {
         try {
           const decoded = decodeURIComponent(paramMatch[1]);
-          const subMatch = decoded.match(/https:\/\/cdn\.mugiverso\.com\/[^"'\s<>&]+\/(?:001|01|1)\.(?:webp|jpg|png)/i);
+          const subMatch = decoded.match(
+            /https:\/\/cdn\.mugiverso\.com\/[^"'\s<>&]+\/(?:001|01|1)\.(?:webp|jpg|png)/i,
+          );
           if (subMatch && subMatch[0]) firstPageUrl = subMatch[0];
           else firstPageUrl = decoded;
         } catch {

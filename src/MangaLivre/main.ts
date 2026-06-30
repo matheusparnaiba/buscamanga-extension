@@ -92,7 +92,7 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
       method: "GET",
     };
 
-    const [response, buffer] = await Application.scheduleRequest(request);
+    const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
     const items: DiscoverSectionItem[] = [];
@@ -274,13 +274,13 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
   async getSearchResults(
     query: SearchQuery<ContentTemplateSearchMetadata>,
     metadata?: number,
-    sortingOption?: SortingOption,
+    _sortingOption?: SortingOption,
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata ?? 1;
     const searchUrl = `${BASE_URL}/page/${page}/?s=${encodeURIComponent(query.title)}&post_type=wp-manga`;
 
     const request = { url: searchUrl, method: "GET" };
-    const [response, buffer] = await Application.scheduleRequest(request);
+    const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
     const items: SearchResultItem[] = [];
@@ -298,7 +298,11 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
         items.push({
           mangaId,
           title,
-          imageUrl: img || "https://ui-avatars.com/api/?name=" + encodeURIComponent(title || "Manga") + "&background=random",
+          imageUrl:
+            img ||
+            "https://ui-avatars.com/api/?name=" +
+              encodeURIComponent(title || "Manga") +
+              "&background=random",
           contentRating: ContentRating.EVERYONE,
         });
       }
@@ -313,14 +317,15 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
   async getMangaDetails(mangaId: string): Promise<SourceManga> {
     const url = `${BASE_URL}/manga/${mangaId}/`;
     const request = { url, method: "GET" };
-    const [response, buffer] = await Application.scheduleRequest(request);
+    const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
 
     const title = $(".post-title h1").text().trim() || "Sem título";
     const rawImage = getImageSrc($(".summary_image img"));
     const image = rawImage && rawImage.startsWith("http") ? rawImage : undefined;
-    const fallbackImage = "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
+    const fallbackImage =
+      "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
     const thumbnailUrl = image || fallbackImage;
 
     const synopsis = $(".description-summary .summary__content").text().trim();
@@ -357,13 +362,13 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
     };
   }
 
-  async getChapters(sourceManga: SourceManga, sinceDate?: Date): Promise<Chapter[]> {
+  async getChapters(sourceManga: SourceManga, _sinceDate?: Date): Promise<Chapter[]> {
     const url = `${BASE_URL}/manga/${sourceManga.mangaId}/ajax/chapters/`;
     const request = {
       url,
       method: "POST",
     };
-    const [response, buffer] = await Application.scheduleRequest(request);
+    const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
     const chapters: Chapter[] = [];
@@ -391,7 +396,7 @@ export class MangaLivreExtension implements ExtensionImpl<typeof ContentTemplate
   async getChapterDetails(chapter: Chapter): Promise<ChapterDetails> {
     const url = chapter.chapterId;
     const request = { url, method: "GET" };
-    const [response, buffer] = await Application.scheduleRequest(request);
+    const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
 

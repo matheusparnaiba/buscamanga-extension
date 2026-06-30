@@ -3,7 +3,7 @@ import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/typ
 export default {
   name: "MangaLivre Blog",
   description: 'Extensão do "https://mangalivre.blog"',
-  version: "1.0.5",
+  version: "1.0.6",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

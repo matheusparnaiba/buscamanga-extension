@@ -3,7 +3,7 @@ import { PaperbackInterceptor, type Request, type Response } from "@paperback/ty
 export class MainInterceptor extends PaperbackInterceptor {
   override async interceptRequest(request: Request): Promise<Request> {
     request.headers = {
-      ...(request.headers ?? {}),
+      ...request.headers,
       referer: "https://mangasbrasuka.com.br/",
       origin: "https://mangasbrasuka.com.br",
       "user-agent": await Application.getDefaultUserAgent(),

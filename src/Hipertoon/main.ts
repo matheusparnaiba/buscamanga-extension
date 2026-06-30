@@ -2,7 +2,6 @@ import {
   BasicRateLimiter,
   ContentRating,
   DiscoverSectionType,
-  type AdvancedSearchForm,
   type Chapter,
   type ChapterDetails,
   type DiscoverSection,
@@ -16,26 +15,11 @@ import {
   type SourceManga,
   type Tag,
 } from "@paperback/types";
-import type * as cheerio from "cheerio";
 
-import { ContentTemplateAdvancedSearchForm, SettingsForm } from "./forms";
+import { SettingsForm } from "./forms";
 import type { ContentTemplateSearchMetadata } from "./models";
 import { MainInterceptor } from "./network";
 import type ContentTemplateConfig from "./pbconfig";
-const BASE_URL = "https://hipertoon.com";
-
-function getImageSrc($img: cheerio.Cheerio<any>): string {
-  let src =
-    $img.attr("data-src") ||
-    $img.attr("data-lazy-src") ||
-    $img.attr("data-original") ||
-    $img.attr("srcset")?.split(" ")[0] ||
-    $img.attr("src") ||
-    $img.attr("data-cfsrc") ||
-    "";
-  src = src.trim().replace(/-\d+x\d+/g, "");
-  return src.startsWith("/") ? BASE_URL + src : src;
-}
 
 export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateConfig> {
   mainRateLimiter = new BasicRateLimiter("main", {
@@ -77,7 +61,7 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
 
   async getDiscoverSectionItems(
     section: DiscoverSection,
-    metadata: any,
+    _metadata: any,
   ): Promise<PagedResults<DiscoverSectionItem>> {
     const url =
       "https://hipertoon.com/api/trpc/auth.me,recommendations.trending,recommendations.latestChapters,recommendations.newlyAdded?batch=1&input=%7B%220%22%3A%7B%22json%22%3Anull%2C%22meta%22%3A%7B%22values%22%3A%5B%22undefined%22%5D%7D%7D%2C%221%22%3A%7B%22json%22%3A%7B%22limit%22%3A20%7D%7D%2C%222%22%3A%7B%22json%22%3A%7B%22limit%22%3A20%7D%7D%2C%223%22%3A%7B%22json%22%3A%7B%22limit%22%3A10%7D%7D%7D";
@@ -87,7 +71,7 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
       method: "GET",
     };
 
-    const [response, buffer] = await Application.scheduleRequest(request);
+    const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const json = JSON.parse(data);
     if (json && json.error) {
@@ -121,7 +105,10 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
         items.push({
           type: "chapterUpdatesCarouselItem",
           mangaId: `${manga.seriesId}:${manga.seriesSlug}`,
-          chapterId: firstCh && firstCh.number != null ? String(firstCh.number) : String(manga.seriesSlug || manga.seriesId || "unknown"),
+          chapterId:
+            firstCh && firstCh.number != null
+              ? String(firstCh.number)
+              : String(manga.seriesSlug || manga.seriesId || "unknown"),
           title: manga.seriesTitle || "Sem título",
           subtitle: firstCh && firstCh.number != null ? "Capítulo " + firstCh.number : undefined,
           imageUrl:
@@ -160,7 +147,7 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
   async getSearchResults(
     query: SearchQuery<ContentTemplateSearchMetadata>,
     metadata?: number,
-    sortingOption?: SortingOption,
+    _sortingOption?: SortingOption,
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata ?? 0;
     const limit = 30;
@@ -194,7 +181,7 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     const searchUrl = `https://hipertoon.com/api/trpc/search.query?batch=1&input=${encodeURIComponent(JSON.stringify(input))}`;
     const request = { url: searchUrl, method: "GET" };
 
-    const [response, buffer] = await Application.scheduleRequest(request);
+    const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const json = JSON.parse(data);
 
@@ -221,13 +208,13 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
   }
 
   async getMangaDetails(mangaId: string): Promise<SourceManga> {
-    const [id, slug] = mangaId.split(":");
+    const [_id, slug] = mangaId.split(":");
     const actualSlug = slug || mangaId;
 
     const url = `https://hipertoon.com/api/trpc/series.bySlugWithGenres?batch=1&input=${encodeURIComponent(JSON.stringify({ "0": { json: { slug: actualSlug } } }))}`;
     const request = { url, method: "GET" };
 
-    const [response, buffer] = await Application.scheduleRequest(request);
+    const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const json = JSON.parse(data);
 
@@ -269,7 +256,7 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
   }
 
   async getChapters(sourceManga: SourceManga): Promise<Chapter[]> {
-    const [id, slug] = sourceManga.mangaId.split(":");
+    const [id, _slug] = sourceManga.mangaId.split(":");
     const seriesId = id;
 
     if (!seriesId) throw new Error("Invalid mangaId format, missing seriesId");
@@ -277,7 +264,7 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     const url = `https://hipertoon.com/api/trpc/series.chapters?batch=1&input=${encodeURIComponent(JSON.stringify({ "0": { json: { seriesId: parseInt(seriesId) } } }))}`;
     const request = { url, method: "GET" };
 
-    const [response, buffer] = await Application.scheduleRequest(request);
+    const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const json = JSON.parse(data);
 
@@ -301,13 +288,13 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
   }
 
   async getChapterDetails(chapter: Chapter): Promise<ChapterDetails> {
-    const [id, slug] = chapter.sourceManga.mangaId.split(":");
+    const [_id, slug] = chapter.sourceManga.mangaId.split(":");
     const actualSlug = slug || chapter.sourceManga.mangaId;
 
     const url = `https://hipertoon.com/api/trpc/reader.chapterPages?batch=1&input=${encodeURIComponent(JSON.stringify({ "0": { json: { seriesSlug: actualSlug, chapterNumber: parseFloat(chapter.chapterId) } } }))}`;
     const request = { url, method: "GET" };
 
-    const [response, buffer] = await Application.scheduleRequest(request);
+    const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const json = JSON.parse(data);
 
