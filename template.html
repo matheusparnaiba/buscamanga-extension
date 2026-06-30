@@ -61,9 +61,9 @@
         </a>
         <div
           x-show="repository"
-          class="mt-4 p-3 bg-yellow-100 text-yellow-800 text-sm font-semibold rounded-lg border border-yellow-300 max-w-sm"
+          class="mt-4 p-3 bg-blue-50 text-blue-800 text-sm font-semibold rounded-lg border border-blue-200 max-w-sm"
         >
-          ⚠️ Compatível exclusivamente com o aplicativo Paperback versão 0.9.
+          <span x-text="window.location.pathname.includes('0.8') ? 'ℹ️ Repositório compatível com o aplicativo Paperback v0.8.' : 'ℹ️ Repositório compatível com o aplicativo Paperback v0.9.'"></span>
         </div>
       </header>
 
