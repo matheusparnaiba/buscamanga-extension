@@ -46,7 +46,6 @@ jobs:
                 }
               }
             }
-            const fs = require('fs');
             const v = JSON.parse(fs.readFileSync('bundles/versioning.json', 'utf8'));
             if (v.repository) {
               v.repository.name = 'BuscaMangá';
