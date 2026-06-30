@@ -8,15 +8,15 @@ Bem-vindo ao repositório do **BuscaMangá Extension**, uma coleção de fontes 
 
 Atualmente, nosso repositório conta com as seguintes fontes:
 
-| Ícone | Nome                |  Versão  | Desenvolvedor   | Compatibilidade | Site Oficial                                         |
-| :---: | ------------------- | :------: | --------------- | :-------------: | ---------------------------------------------------- |
-|  🌟   | **Manga Online**    | `1.0.13` | matheusparnaiba |   v0.8 & v0.9   | [mangaonline.blue](https://mangaonline.blue)         |
-|  📖   | **Manga Livre**     | `1.0.16` | matheusparnaiba |   v0.8 & v0.9   | [mangalivre.to](https://mangalivre.to)               |
-|  🌸   | **Sakura Mangas**   | `1.0.13` | matheusparnaiba |   v0.9 apenas   | [sakuramangas.org](https://sakuramangas.org)         |
-|  📓   | **MangaLivre Blog** | `1.0.6`  | matheusparnaiba |   v0.8 & v0.9   | [mangalivre.blog](https://mangalivre.blog)           |
-|  💫   | **Hipertoon**       | `1.0.9`  | matheusparnaiba |   v0.8 & v0.9   | [hipertoon.com](https://hipertoon.com)               |
-|  🇧🇷   | **Mangás Brasuka**  | `1.0.6`  | matheusparnaiba |   v0.8 & v0.9   | [mangasbrasuka.com.br](https://mangasbrasuka.com.br) |
-|  🌙   | **MangaNYX**        | `1.0.5`  | matheusparnaiba |   v0.9 apenas   | [manganyx.com](https://manganyx.com)                 |
+| Ícone | Nome                |  Versão  | Desenvolvedor   | v0.8 | v0.9 | Site Oficial                                         |
+| :---: | ------------------- | :------: | --------------- | :--: | :--: | ---------------------------------------------------- |
+|  🌟   | **Manga Online**    | `1.0.13` | matheusparnaiba |  ✅  |  ✅  | [mangaonline.blue](https://mangaonline.blue)         |
+|  📖   | **Manga Livre**     | `1.0.16` | matheusparnaiba |  ✅  |  ✅  | [mangalivre.to](https://mangalivre.to)               |
+|  🌸   | **Sakura Mangas**   | `1.0.13` | matheusparnaiba |  ❌  |  ✅  | [sakuramangas.org](https://sakuramangas.org)         |
+|  📓   | **MangaLivre Blog** | `1.0.6`  | matheusparnaiba |  ✅  |  ✅  | [mangalivre.blog](https://mangalivre.blog)           |
+|  💫   | **Hipertoon**       | `1.0.9`  | matheusparnaiba |  ✅  |  ✅  | [hipertoon.com](https://hipertoon.com)               |
+|  🇧🇷   | **Mangás Brasuka**  | `1.0.6`  | matheusparnaiba |  ✅  |  ✅  | [mangasbrasuka.com.br](https://mangasbrasuka.com.br) |
+|  🌙   | **MangaNYX**        | `1.0.5`  | matheusparnaiba |  ❌  |  ✅  | [manganyx.com](https://manganyx.com)                 |
 
 ## 🚀 Como Instalar
 
