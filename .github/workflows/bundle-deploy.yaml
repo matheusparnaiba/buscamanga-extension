@@ -63,6 +63,7 @@ jobs:
       - name: Prepare Root Deployment
         run: |
           mkdir -p deploy_root/${{ github.ref_name }}
+          touch deploy_root/.nojekyll
           cp -r bundles/* deploy_root/${{ github.ref_name }}/
           cp root-index.html deploy_root/index.html
           cp -r assets deploy_root/assets
