@@ -76,6 +76,7 @@ jobs:
               cp -r "bundles/$ext" deploy_root/0.8/stable/
               if [ -f "deploy_root/0.8/stable/$ext/index.js" ]; then
                 cp "deploy_root/0.8/stable/$ext/index.js" "deploy_root/0.8/stable/$ext/source.js"
+                node -e "const fs=require('fs');const p='deploy_root/0.8/stable/'+'$ext'+'/source.js';let code=fs.readFileSync(p,'utf8');const extId='$ext';const wrap='\n;(function(){var mod=typeof source!==\"undefined\"?source:{};var cls=mod.'+extId+'Extension||mod.BuscaMangaExtension||mod.HipertoonExtension||mod.MangaLivreExtension||mod.MangaLivreBlogExtension||mod.MangasBrasukaExtension||Object.values(mod).find(v=>typeof v===\"function\");if(cls){globalThis.Sources=globalThis.Sources||{};globalThis.Sources['+JSON.stringify(extId)+']=cls;if(typeof this!==\"undefined\")this.Sources=globalThis.Sources;if(typeof module!==\"undefined\"&&module.exports)module.exports.Sources=globalThis.Sources;}})();\n';fs.writeFileSync(p,code+wrap);"
               fi
               if [ -f "deploy_root/0.8/stable/$ext/icon.png" ]; then
                 mkdir -p "deploy_root/0.8/stable/$ext/includes"

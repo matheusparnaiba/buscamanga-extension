@@ -24,6 +24,11 @@ import type ContentTemplateConfig from "./pbconfig";
 declare const App: any;
 
 export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateConfig> {
+  constructor(public cheerioInstance?: any) {
+    this.getHomePageSections = this.getHomePageSections.bind(this);
+    this.getViewMoreItems = this.getViewMoreItems.bind(this);
+  }
+
   mainRateLimiter = new BasicRateLimiter("main", {
     numberOfRequests: 10,
     bufferInterval: 5,
