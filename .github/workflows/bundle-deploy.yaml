@@ -113,6 +113,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: deploy_root
           destination_dir: .
-          keep_files: true
+          keep_files: false
           user_name: "github-actions[bot]"
           user_email: "github-actions[bot]@users.noreply.github.com"
