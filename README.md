@@ -14,7 +14,7 @@ Atualmente, nosso repositório conta com as seguintes fontes:
 |  📖   | **Manga Livre**     | `1.0.18` | matheusparnaiba |  ✅  |  ✅  | [mangalivre.to](https://mangalivre.to)               |
 |  🌸   | **Sakura Mangas**   | `1.0.13` | matheusparnaiba |  ❌  |  ✅  | [sakuramangas.org](https://sakuramangas.org)         |
 |  📓   | **MangaLivre Blog** | `1.0.8`  | matheusparnaiba |  ✅  |  ✅  | [mangalivre.blog](https://mangalivre.blog)           |
-|  💫   | **Hipertoon**       | `1.0.11` | matheusparnaiba |  ✅  |  ✅  | [hipertoon.com](https://hipertoon.com)               |
+|  💫   | **Hipertoon**       | `1.0.12` | matheusparnaiba |  ✅  |  ✅  | [hipertoon.com](https://hipertoon.com)               |
 |  🇧🇷   | **Mangás Brasuka**  | `1.0.8`  | matheusparnaiba |  ✅  |  ✅  | [mangasbrasuka.com.br](https://mangasbrasuka.com.br) |
 |  🌙   | **MangaNYX**        | `1.0.5`  | matheusparnaiba |  ❌  |  ✅  | [manganyx.com](https://manganyx.com)                 |
 
