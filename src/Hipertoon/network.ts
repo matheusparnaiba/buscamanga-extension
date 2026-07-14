@@ -5,14 +5,28 @@ import { PaperbackInterceptor, type Request, type Response } from "@paperback/ty
 
 // Intercepts all the requests and responses and allows you to make changes to them
 export class MainInterceptor extends PaperbackInterceptor {
+  private homepageFetched = false;
+
   override async interceptRequest(request: Request): Promise<Request> {
     request.headers = {
       ...request.headers,
       referer: "https://hipertoon.com/",
       origin: "https://hipertoon.com",
       "user-agent": await Application.getDefaultUserAgent(),
-      "x-api-key": "e7e69d92016d5a6a8c7711aa13080f69de00d4c4e3d3557f5ac307c24a081397",
     };
+
+    if (request.url.includes("/api/trpc/") && !this.homepageFetched) {
+      this.homepageFetched = true;
+      try {
+        await Application.scheduleRequest({
+          url: "https://hipertoon.com/",
+          method: "GET",
+        });
+      } catch (e) {
+        this.homepageFetched = false;
+      }
+    }
+
     return request;
   }
 
