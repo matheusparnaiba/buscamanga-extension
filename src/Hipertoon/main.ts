@@ -1,5 +1,6 @@
 import {
   BasicRateLimiter,
+  CookieStorageInterceptor,
   ContentRating,
   DiscoverSectionType,
   type Chapter,
@@ -35,10 +36,15 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     ignoreImages: true,
   });
 
+  cookieStorageInterceptor = new CookieStorageInterceptor({
+    storage: "stateManager",
+  });
+
   mainInterceptor = new MainInterceptor("main");
 
   async initialise(): Promise<void> {
     this.mainRateLimiter.registerInterceptor();
+    this.cookieStorageInterceptor.registerInterceptor();
     this.mainInterceptor.registerInterceptor();
   }
 
