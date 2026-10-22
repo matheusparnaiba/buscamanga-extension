@@ -114,6 +114,130 @@ function extractPostId($: cheerio.CheerioAPI, htmlText: string): string | undefi
   return undefined;
 }
 
+function extractMangaCardsFrom$(
+  $doc: cheerio.CheerioAPI,
+  type: "simpleCarouselItem" | "chapterUpdatesCarouselItem" | "prominentCarouselItem",
+): DiscoverSectionItem[] {
+  const items: DiscoverSectionItem[] = [];
+  const seenIds = new Set<string>();
+
+  let elements = $doc(
+    ".page-item-detail, .manga-item, .added-card, .rank-card-universal, .popular-item-wrap, .popular-manga, .manga-slider .slider__item, .slider__content, .updates-column, .update-info-box, .manga-update-card, .c-tabs-item__content, .item-summary, .badge-pos-1, article.badge-pos-1, .swiper-slide, .hero-poster-col, .hero-poster-box, .col-6.col-md-3, .col-6.col-md-2, .bs, .bsx, div.card, div.manga, div.manga-card",
+  );
+
+  if (elements.length === 0) {
+    elements = $doc("a[href*='/obras/'], a[href*='/manga/']");
+  }
+
+  elements.each((_, el) => {
+    const $el = $doc(el);
+
+    const a = $el.is("a")
+      ? $el
+      : $el
+          .find(
+            ".post-title a, h3 a, h4 a, h5 a, .manga-title a, .rank-manga-title a, a[href*='/obras/'], a[href*='/manga/'], a",
+          )
+          .first();
+    let href = a.attr("href")?.trim() || $el.attr("href")?.trim() || "";
+
+    if (!href || href === "#" || href.startsWith("javascript:")) return;
+    if (href.startsWith("//")) href = "https:" + href;
+    if (href.startsWith("/")) href = BASE_URL + href;
+
+    if (
+      href.includes("/categoria/") ||
+      href.includes("/genero/") ||
+      href.includes("/autor/") ||
+      href.includes("/tag/") ||
+      href.includes("/page/") ||
+      href.endsWith("/obras/") ||
+      href.endsWith("/manga/")
+    ) {
+      return;
+    }
+
+    const titleEl = $el
+      .find(
+        ".post-title a, h3 a, h4 a, h5 a, .manga-title a, .rank-manga-title, .widget-title a, h3, h4, h5, .hero-title, a[title]",
+      )
+      .first();
+    let title =
+      titleEl.text().trim() ||
+      titleEl.attr("title")?.trim() ||
+      a.attr("title")?.trim() ||
+      a.text().trim() ||
+      "";
+    title = title.replace(/\s+/g, " ").trim();
+
+    const idMatch = href.match(/\/(?:manga|obras|series)\/([^/]+)/);
+    let mangaId = idMatch
+      ? idMatch[1]
+      : href
+          .replace(/^https?:\/\/[^/]+\//, "")
+          .replace(/\/$/, "")
+          .split("/")
+          .pop();
+    if (!mangaId) return;
+
+    if (!title) {
+      title = mangaId.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+
+    if (seenIds.has(mangaId)) return;
+    seenIds.add(mangaId);
+
+    const imgEl = $el
+      .find(
+        "img.rank-thumb-img, img.update-thumb, img.added-thumb, img.hero-poster-img, .tab-thumb img, .item-thumb img, img",
+      )
+      .first();
+    let img = getImageSrc(imgEl) || getImageSrc($el);
+    if (!img || !img.startsWith("http")) {
+      img = "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
+    }
+
+    const chapEl = $el
+      .find(
+        ".chapter-list .chapter-button, .chapter-item .chapter a, .list-chapter a, .chapter a, .chapter-name",
+      )
+      .first();
+    const chapterSubtitle = chapEl.text().trim() || "Recente";
+    const chapterHref = chapEl.attr("href") || href;
+
+    if (type === "chapterUpdatesCarouselItem") {
+      items.push({
+        mangaId,
+        chapterId: chapterHref,
+        title,
+        subtitle: chapterSubtitle,
+        imageUrl: img,
+        type: "chapterUpdatesCarouselItem",
+        contentRating: ContentRating.EVERYONE,
+      });
+    } else if (type === "prominentCarouselItem") {
+      items.push({
+        mangaId,
+        title,
+        imageUrl: img,
+        type: "prominentCarouselItem",
+        contentRating: ContentRating.EVERYONE,
+      });
+    } else {
+      items.push({
+        mangaId,
+        title,
+        subtitle: chapterSubtitle !== "Recente" ? chapterSubtitle : undefined,
+        imageUrl: img,
+        type: "simpleCarouselItem",
+        contentRating: ContentRating.EVERYONE,
+      });
+    }
+  });
+
+  return items;
+}
+
 export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTemplateConfig> {
   mainRateLimiter = new BasicRateLimiter("main", {
     numberOfRequests: 10,
@@ -126,6 +250,8 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
   });
 
   mainInterceptor = new MainInterceptor("main");
+
+  private homePageCache?: { html: string; timestamp: number };
 
   async initialise(): Promise<void> {
     this.mainRateLimiter.registerInterceptor();
@@ -250,6 +376,18 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
   }
 
   async getDiscoverSections(): Promise<DiscoverSection[]> {
+    try {
+      const probeReq: Request = { url: `${BASE_URL}/`, method: "GET" };
+      const [res, buffer] = await Application.scheduleRequest(probeReq);
+      const data = Application.arrayBufferToUTF8String(buffer);
+      await this.checkCloudflare(res, data);
+      this.homePageCache = { html: data, timestamp: Date.now() };
+    } catch (e) {
+      if (e instanceof CloudflareError) {
+        throw e;
+      }
+    }
+
     return [
       {
         id: "popular",
@@ -286,86 +424,26 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
       return { items: [], metadata: undefined };
     }
 
-    let url = `${BASE_URL}/`;
-    if (section.id === "popular") {
-      url = `${BASE_URL}/`;
-    } else if (section.id === "updates") {
-      url = page > 1 ? `${BASE_URL}/obras/page/${page}/?m_orderby=latest` : `${BASE_URL}/`;
+    let data = "";
+    if (page === 1 && this.homePageCache && Date.now() - this.homePageCache.timestamp < 30000) {
+      data = this.homePageCache.html;
+    } else {
+      let url = `${BASE_URL}/`;
+      if (section.id === "updates" && page > 1) {
+        url = `${BASE_URL}/obras/page/${page}/?m_orderby=latest`;
+      }
+
+      const request: Request = { url, method: "GET" };
+      const [response, buffer] = await Application.scheduleRequest(request);
+      data = Application.arrayBufferToUTF8String(buffer);
+      await this.checkCloudflare(response, data);
     }
 
-    const request: Request = { url, method: "GET" };
-    const [response, buffer] = await Application.scheduleRequest(request);
-    const data = Application.arrayBufferToUTF8String(buffer);
-
-    await this.checkCloudflare(response, data);
-
     const $ = cheerio.load(data);
-    const items: DiscoverSectionItem[] = [];
+    let items: DiscoverSectionItem[] = [];
 
     if (section.id === "popular") {
-      const parsePopular = ($doc: cheerio.CheerioAPI): void => {
-        let popularElements = $doc(
-          ".rank-card-universal, .popular-statuses .widget-content .popular-item-wrap, .widget-content .popular-item-wrap, .popular-item-wrap, .popular-manga, .manga-slider .slider__item, .page-item-detail, .manga-item, .added-card, .badge-pos-1, article.badge-pos-1",
-        );
-        if (popularElements.length === 0) popularElements = $doc(".sidebar .popular-item-wrap");
-
-        popularElements.each((_, el) => {
-          const titleEl = $doc(el)
-            .find(
-              ".rank-manga-title, .widget-title a, h5 a, h3 a, h4 a, .post-title a, .manga-title a, h3, h4, h5",
-            )
-            .first();
-          const title =
-            titleEl.text().trim() ||
-            $doc(el).find(".rank-manga-title").text().trim() ||
-            $doc(el).find("a").first().attr("title") ||
-            $doc(el).find("a").first().text().trim() ||
-            "";
-          const href =
-            $doc(el)
-              .find(".post-title a, h3 a, h4 a, h5 a, .manga-title a, a")
-              .first()
-              .attr("href") ||
-            $doc(el).attr("href") ||
-            titleEl.attr("href");
-          const img = getImageSrc(
-            $doc(el).find("img.rank-thumb-img, .tab-thumb img, .item-thumb img, img"),
-          );
-          const subtitle = $doc(el)
-            .find(".list-chapter .chapter-item .chapter a, .chapter a, .chapter-name")
-            .first()
-            .text()
-            .trim();
-
-          if (href && title) {
-            const idMatch = href.match(/\/(?:manga|obras|series)\/([^/]+)/);
-            const mangaId = idMatch
-              ? (idMatch[1] as string)
-              : href.replace(/^https?:\/\/[^/]+\//, "").replace(/\/$/, "");
-
-            let safeImg = img;
-            if (!safeImg || !safeImg.startsWith("http")) {
-              safeImg =
-                "https://ui-avatars.com/api/?name=" +
-                encodeURIComponent(title) +
-                "&background=random";
-            }
-
-            if (!items.some((it) => "mangaId" in it && it.mangaId === mangaId)) {
-              items.push({
-                mangaId,
-                title,
-                subtitle: subtitle || undefined,
-                imageUrl: safeImg,
-                type: "simpleCarouselItem",
-                contentRating: ContentRating.EVERYONE,
-              });
-            }
-          }
-        });
-      };
-
-      parsePopular($);
+      items = extractMangaCardsFrom$($, "simpleCarouselItem");
 
       // Fallback: If 0 items found on homepage, try /obras/?m_orderby=views
       if (items.length === 0) {
@@ -374,8 +452,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
           const [fRes, fBuf] = await Application.scheduleRequest(fallbackReq);
           const fData = Application.arrayBufferToUTF8String(fBuf);
           await this.checkCloudflare(fRes, fData);
-          const $fallback = cheerio.load(fData);
-          parsePopular($fallback);
+          items = extractMangaCardsFrom$(cheerio.load(fData), "simpleCarouselItem");
         } catch (e) {
           if (e instanceof CloudflareError) throw e;
         }
@@ -385,69 +462,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
     }
 
     if (section.id === "updates") {
-      const parseUpdates = ($doc: cheerio.CheerioAPI): void => {
-        $doc(
-          ".updates-column, .update-info-box, .manga-update-card, .added-card, .manga-item, .page-item-detail, .c-tabs-item__content, .item-summary, .badge-pos-1, article.badge-pos-1, .col-6.col-md-3, .col-6.col-md-2, .listupd .bs, .bsx",
-        ).each((_, el) => {
-          const titleEl = $doc(el)
-            .find(".update-title, .added-title, .manga-title a, h3 a, h4 a, .post-title a, h3, h4")
-            .first();
-          const title =
-            titleEl.text().trim() ||
-            $doc(el).find(".update-title, .added-title").text().trim() ||
-            $doc(el).find("a").first().attr("title") ||
-            $doc(el).find("a").first().text().trim() ||
-            "";
-          const href =
-            $doc(el)
-              .find("a.update-thumb-box, a.added-card, .post-title a, h3 a, h4 a, a")
-              .first()
-              .attr("href") ||
-            $doc(el).attr("href") ||
-            titleEl.attr("href");
-          const img = getImageSrc(
-            $doc(el).find(
-              "img.update-thumb, img.added-thumb, .tab-thumb img, .item-thumb img, img",
-            ),
-          );
-          const chapterEl = $doc(el)
-            .find(
-              ".chapter-list .chapter-button, .chapter-item .chapter a, .list-chapter a, .chapter a, .chapter-name",
-            )
-            .first();
-          const chapterSubtitle = chapterEl.text().trim() || "Recente";
-          const chapterHref = chapterEl.attr("href") || href || "unknown";
-
-          if (href && title) {
-            const idMatch = href.match(/\/(?:manga|obras|series)\/([^/]+)/);
-            const mangaId = idMatch
-              ? (idMatch[1] as string)
-              : href.replace(/^https?:\/\/[^/]+\//, "").replace(/\/$/, "");
-
-            let safeImg = img;
-            if (!safeImg || !safeImg.startsWith("http")) {
-              safeImg =
-                "https://ui-avatars.com/api/?name=" +
-                encodeURIComponent(title) +
-                "&background=random";
-            }
-
-            if (!items.some((it) => "mangaId" in it && it.mangaId === mangaId)) {
-              items.push({
-                mangaId,
-                chapterId: chapterHref,
-                title,
-                subtitle: chapterSubtitle || undefined,
-                imageUrl: safeImg,
-                type: "chapterUpdatesCarouselItem",
-                contentRating: ContentRating.EVERYONE,
-              });
-            }
-          }
-        });
-      };
-
-      parseUpdates($);
+      items = extractMangaCardsFrom$($, "chapterUpdatesCarouselItem");
 
       // Fallback: If 0 items found on page 1 homepage, try /obras/?m_orderby=latest
       if (items.length === 0 && page === 1) {
@@ -459,8 +474,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
           const [fRes, fBuf] = await Application.scheduleRequest(fallbackReq);
           const fData = Application.arrayBufferToUTF8String(fBuf);
           await this.checkCloudflare(fRes, fData);
-          const $fallback = cheerio.load(fData);
-          parseUpdates($fallback);
+          items = extractMangaCardsFrom$(cheerio.load(fData), "chapterUpdatesCarouselItem");
         } catch (e) {
           if (e instanceof CloudflareError) throw e;
         }
@@ -473,48 +487,23 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
     }
 
     if (section.id === "projects") {
-      let sliders = $(
-        ".swiper-slide, .hero-poster-col, .hero-poster-box, .manga-slider .slider__item, .slider__content, .popular-item-wrap, .page-item-detail, .manga-item, .added-card",
-      );
+      items = extractMangaCardsFrom$($, "prominentCarouselItem");
 
-      sliders.each((_, el) => {
-        const titleEl = $(el)
-          .find(".hero-title, .post-title a, h3 a, h4 a, h5 a, .manga-title a, h3, h4")
-          .first();
-        const title =
-          titleEl.text().trim() ||
-          $(el).find(".hero-title").text().trim() ||
-          $(el).find("a").first().attr("title") ||
-          $(el).find("a").first().text().trim() ||
-          "";
-        const href =
-          $(el)
-            .find("a.hero-poster-box, .post-title a, h3 a, h4 a, h5 a, a")
-            .first()
-            .attr("href") ||
-          $(el).attr("href") ||
-          titleEl.attr("href");
-        const img = getImageSrc(
-          $(el).find("img.hero-poster-img, .tab-thumb img, .item-thumb img, img"),
-        );
-
-        if (href && title) {
-          const idMatch = href.match(/\/(?:manga|obras|series)\/([^/]+)/);
-          const mangaId = idMatch
-            ? (idMatch[1] as string)
-            : href.replace(/^https?:\/\/[^/]+\//, "").replace(/\/$/, "");
-
-          if (!items.some((it) => "mangaId" in it && it.mangaId === mangaId)) {
-            items.push({
-              mangaId,
-              title,
-              imageUrl: img || "https://ui-avatars.com/api/?name=" + encodeURIComponent(title),
-              type: "prominentCarouselItem",
-              contentRating: ContentRating.EVERYONE,
-            });
-          }
+      // Fallback: If 0 items found on homepage, try /obras/?m_orderby=trending
+      if (items.length === 0) {
+        try {
+          const fallbackReq: Request = {
+            url: `${BASE_URL}/obras/?m_orderby=trending`,
+            method: "GET",
+          };
+          const [fRes, fBuf] = await Application.scheduleRequest(fallbackReq);
+          const fData = Application.arrayBufferToUTF8String(fBuf);
+          await this.checkCloudflare(fRes, fData);
+          items = extractMangaCardsFrom$(cheerio.load(fData), "prominentCarouselItem");
+        } catch (e) {
+          if (e instanceof CloudflareError) throw e;
         }
-      });
+      }
 
       return { items, metadata: undefined };
     }
@@ -550,46 +539,17 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
     const items: SearchResultItem[] = [];
 
     const parseResults = ($doc: cheerio.CheerioAPI): void => {
-      $doc(
-        ".c-tabs-item__content, .page-item-detail, .manga-item, .added-card, .rank-card-universal, .update-info-box, .badge-pos-1, article.badge-pos-1, .col-6.col-md-3",
-      ).each((_, el) => {
-        const titleElement = $doc(el)
-          .find(
-            ".added-title, .rank-manga-title, .update-title, .post-title a, h3 a, h4 a, .manga-title a, h3, h4",
-          )
-          .first();
-        const title =
-          titleElement.text().trim() ||
-          $doc(el).find(".added-title, .rank-manga-title, .update-title").text().trim() ||
-          $doc(el).find("a").first().attr("title") ||
-          $doc(el).find("a").first().text().trim() ||
-          "";
-        const href =
-          $doc(el).find(".post-title a, h3 a, h4 a, a").first().attr("href") ||
-          $doc(el).attr("href") ||
-          titleElement.attr("href");
-        const img = getImageSrc(
-          $doc(el).find(
-            ".tab-thumb a img, img.added-thumb, img.rank-thumb-img, img.update-thumb, .item-thumb img, img",
-          ),
-        );
-
-        if (href && title) {
-          const idMatch = href.match(/\/(?:manga|obras|series)\/([^/]+)/);
-          const mangaId = idMatch
-            ? (idMatch[1] as string)
-            : href.replace(/^https?:\/\/[^/]+\//, "").replace(/\/$/, "");
-
-          if (!items.some((it) => (it as any).mangaId === mangaId)) {
-            items.push({
-              mangaId,
-              title,
-              imageUrl: img || "https://ui-avatars.com/api/?name=" + encodeURIComponent(title),
-              contentRating: ContentRating.EVERYONE,
-            });
-          }
+      const cards = extractMangaCardsFrom$($doc, "simpleCarouselItem");
+      for (const card of cards) {
+        if ("mangaId" in card && !items.some((it) => (it as any).mangaId === card.mangaId)) {
+          items.push({
+            mangaId: card.mangaId,
+            title: card.title,
+            imageUrl: card.imageUrl,
+            contentRating: ContentRating.EVERYONE,
+          });
         }
-      });
+      }
     };
 
     parseResults($);
