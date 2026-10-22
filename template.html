@@ -474,7 +474,7 @@
             x-show="availableBadges.length"
           >
             <span class="text-xs font-bold uppercase tracking-wider text-zinc-400 mr-2"
-              >Filtros:</span
+              >Categorias & Recursos:</span
             >
             <template x-for="badge in availableBadges" :key="badge.label">
               <button
@@ -484,6 +484,11 @@
                   ? 'bg-orange-500 text-white border-orange-500 shadow-sm shadow-orange-500/30'
                   : 'bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-300 border-zinc-200/80 dark:border-white/10 hover:border-orange-500/40'"
               >
+                <span
+                  class="w-2 h-2 rounded-full shrink-0"
+                  :style="`background-color: ${badge.backgroundColor}`"
+                  x-show="!selectedBadges.some(b => b.label === badge.label)"
+                ></span>
                 <span x-text="badge.label"></span>
               </button>
             </template>
@@ -821,7 +826,7 @@
 
               const matchesBadges =
                 this.selectedBadges.length === 0 ||
-                this.selectedBadges.every((selectedBadge) =>
+                this.selectedBadges.some((selectedBadge) =>
                   source.badges?.some((badge) => badge.label === selectedBadge.label),
                 );
 
@@ -880,8 +885,53 @@
                 description: "Repositório de extensões para Paperback",
               };
 
+              const CATEGORIES = {
+                Fliptru: [
+                  {
+                    label: "Quadrinhos Nacionais",
+                    textColor: "#ffffff",
+                    backgroundColor: "#10b981",
+                  },
+                ],
+                Hipertoon: [
+                  { label: "Manhwas", textColor: "#ffffff", backgroundColor: "#8b5cf6" },
+                  { label: "Cloudflare", textColor: "#000000", backgroundColor: "#f59e0b" },
+                ],
+                HQNow: [
+                  { label: "HQs & Comics", textColor: "#ffffff", backgroundColor: "#ef4444" },
+                ],
+                LeituraManga: [
+                  { label: "Mangás & Manhuas", textColor: "#ffffff", backgroundColor: "#3b82f6" },
+                ],
+                MangaLivreBlog: [
+                  { label: "Mangás Diversos", textColor: "#ffffff", backgroundColor: "#3b82f6" },
+                ],
+                MangaLivreTo: [
+                  { label: "Mangás Populares", textColor: "#ffffff", backgroundColor: "#3b82f6" },
+                ],
+                MangaNYX: [
+                  { label: "Catálogo Geral", textColor: "#ffffff", backgroundColor: "#6366f1" },
+                  { label: "Cloudflare", textColor: "#000000", backgroundColor: "#f59e0b" },
+                ],
+                MangaOnline: [
+                  { label: "Mangás & Manhwas", textColor: "#ffffff", backgroundColor: "#3b82f6" },
+                ],
+                MangasBrasuka: [
+                  { label: "Mangás & Scans", textColor: "#ffffff", backgroundColor: "#06b6d4" },
+                  { label: "Cloudflare", textColor: "#000000", backgroundColor: "#f59e0b" },
+                ],
+                Manhastro: [
+                  { label: "Manhwas & Ação", textColor: "#ffffff", backgroundColor: "#8b5cf6" },
+                ],
+                NebulosaScan: [
+                  { label: "Scans Exclusivas", textColor: "#ffffff", backgroundColor: "#ec4899" },
+                ],
+              };
+
               this.sources = (json.sources || []).map((source) => {
+                const predefined = CATEGORIES[source.id] || [];
                 const combinedBadges = [
+                  ...predefined,
                   ...this.getCapabilityBadges(source.capabilities || []),
                   ...(source.badges || []),
                 ];
@@ -904,7 +954,7 @@
 
               document.title = `${this.repository.name} • Catálogo de Extensões`;
 
-              // Popula badges disponíveis para filtragem
+              // Popula badges disponíveis para filtragem na ordem ideal
               const badgeMap = new Map();
               this.sources.forEach((source) => {
                 source.badges?.forEach((badge) => {
@@ -913,7 +963,27 @@
                   }
                 });
               });
-              this.availableBadges = Array.from(badgeMap.values());
+
+              const badgeOrder = [
+                "Cloudflare",
+                "Mangás & Manhwas",
+                "Mangás Populares",
+                "Mangás Diversos",
+                "Mangás & Manhuas",
+                "Mangás & Scans",
+                "Manhwas",
+                "Manhwas & Ação",
+                "Quadrinhos Nacionais",
+                "HQs & Comics",
+                "Scans Exclusivas",
+                "Catálogo Geral",
+              ];
+
+              this.availableBadges = Array.from(badgeMap.values()).sort((a, b) => {
+                const idxA = badgeOrder.indexOf(a.label);
+                const idxB = badgeOrder.indexOf(b.label);
+                return (idxA === -1 ? 99 : idxA) - (idxB === -1 ? 99 : idxB);
+              });
             } catch (err) {
               console.error("Erro na inicialização:", err);
               this.error = err.message || "Falha ao carregar repositório";

@@ -56,10 +56,35 @@ jobs:
               v.repository.author = 'matheusparnaiba';
               v.repository.website = 'https://github.com/matheusparnaiba';
             }
+            const CATEGORIES = {
+              Fliptru: [{ label: 'Quadrinhos Nacionais', textColor: '#ffffff', backgroundColor: '#10b981' }],
+              Hipertoon: [
+                { label: 'Manhwas', textColor: '#ffffff', backgroundColor: '#8b5cf6' },
+                { label: 'Cloudflare', textColor: '#000000', backgroundColor: '#f59e0b' }
+              ],
+              HQNow: [{ label: 'HQs & Comics', textColor: '#ffffff', backgroundColor: '#ef4444' }],
+              LeituraManga: [{ label: 'Mangás & Manhuas', textColor: '#ffffff', backgroundColor: '#3b82f6' }],
+              MangaLivreBlog: [{ label: 'Mangás Diversos', textColor: '#ffffff', backgroundColor: '#3b82f6' }],
+              MangaLivreTo: [{ label: 'Mangás Populares', textColor: '#ffffff', backgroundColor: '#3b82f6' }],
+              MangaNYX: [
+                { label: 'Catálogo Geral', textColor: '#ffffff', backgroundColor: '#6366f1' },
+                { label: 'Cloudflare', textColor: '#000000', backgroundColor: '#f59e0b' }
+              ],
+              MangaOnline: [{ label: 'Mangás & Manhwas', textColor: '#ffffff', backgroundColor: '#3b82f6' }],
+              MangasBrasuka: [
+                { label: 'Mangás & Scans', textColor: '#ffffff', backgroundColor: '#06b6d4' },
+                { label: 'Cloudflare', textColor: '#000000', backgroundColor: '#f59e0b' }
+              ],
+              Manhastro: [{ label: 'Manhwas & Ação', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
+              NebulosaScan: [{ label: 'Scans Exclusivas', textColor: '#ffffff', backgroundColor: '#ec4899' }]
+            };
             v.sources = v.sources.map(s => {
               s.author = (s.developers && s.developers[0]) ? s.developers[0].name : 'matheusparnaiba';
               s.desc = s.description || '';
               s.website = (s.developers && s.developers[0]) ? s.developers[0].github : 'https://github.com/matheusparnaiba';
+              if (CATEGORIES[s.id]) {
+                s.badges = CATEGORIES[s.id];
+              }
               return s;
             });
             fs.writeFileSync('bundles/versioning.json', JSON.stringify(v, null, 2));
