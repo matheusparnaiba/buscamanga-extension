@@ -20,6 +20,8 @@ import * as cheerio from "cheerio";
 import { MainInterceptor } from "./network";
 import type HentaiHQConfig from "./pbconfig";
 
+declare const App: any;
+
 const BASE_URL = "https://hentaihq.net";
 const IMAGE_FILTER = "";
 const STRIP_THUMB_SUFFIX = false;
@@ -101,9 +103,14 @@ function parseCards($: cheerio.CheerioAPI): SearchResultItem[] {
   };
 
   $(".thumb-conteudo").each((_, el) => {
-    const a = $(el).find("a").first();
+    const a = $(el).find("a[href]").first();
     const img = $(el).find("img").first();
-    push(a.attr("href"), a.attr("title") || img.attr("alt"), img);
+    const rawTitle =
+      $(el).find(".thumb-titulo a, .thumb-titulo").first().text() ||
+      a.attr("title") ||
+      img.attr("alt") ||
+      "";
+    push(a.attr("href"), rawTitle, img);
   });
 
   return items;
@@ -114,6 +121,11 @@ function pageUrl(path: string, page: number): string {
 }
 
 export class HentaiHQExtension implements ExtensionImpl<typeof HentaiHQConfig> {
+  constructor(public cheerioInstance?: any) {
+    this.getHomePageSections = this.getHomePageSections.bind(this);
+    this.getViewMoreItems = this.getViewMoreItems.bind(this);
+  }
+
   mainRateLimiter = new BasicRateLimiter("main", {
     numberOfRequests: 8,
     bufferInterval: 5,
@@ -233,6 +245,89 @@ export class HentaiHQExtension implements ExtensionImpl<typeof HentaiHQConfig> {
     }
 
     return { id: chapter.chapterId, mangaId: chapter.sourceManga.mangaId, pages };
+  }
+
+  async getHomePageSections(sectionCallback: (section: any) => void): Promise<void> {
+    const sections = await this.getDiscoverSections();
+    const appGlobal = (typeof App !== "undefined" ? App : undefined) as any;
+    for (const sec of sections) {
+      const homeSection =
+        appGlobal && appGlobal.createHomeSection
+          ? appGlobal.createHomeSection({
+              id: sec.id,
+              title: sec.title,
+              containsMoreItems: true,
+              type: "singleRowNormal",
+            })
+          : {
+              id: sec.id,
+              title: sec.title,
+              containsMoreItems: true,
+              type: "singleRowNormal",
+              items: [],
+            };
+
+      sectionCallback(homeSection);
+
+      try {
+        const paged = await this.getDiscoverSectionItems(sec, undefined);
+        const mangaItems: any[] = [];
+        for (const item of paged.items) {
+          const rawItem = item as any;
+          const m =
+            appGlobal && appGlobal.createPartialSourceManga
+              ? appGlobal.createPartialSourceManga({
+                  mangaId: rawItem.mangaId || "",
+                  image: rawItem.imageUrl || "",
+                  title: rawItem.title || "",
+                  subtitle: rawItem.subtitle,
+                })
+              : {
+                  mangaId: rawItem.mangaId || "",
+                  image: rawItem.imageUrl || "",
+                  title: rawItem.title || "",
+                  subtitle: rawItem.subtitle,
+                };
+          mangaItems.push(m);
+        }
+        homeSection.items = mangaItems;
+        sectionCallback(homeSection);
+      } catch (e) {
+        console.error(`Erro ao carregar seção ${sec.title}:`, e);
+      }
+    }
+  }
+
+  async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<any> {
+    const sections = await this.getDiscoverSections();
+    const sec = sections.find((s) => s.id === homepageSectionId) || {
+      id: homepageSectionId,
+      title: homepageSectionId,
+    };
+    const paged = await this.getDiscoverSectionItems(sec as any, metadata);
+    const appGlobal = (typeof App !== "undefined" ? App : undefined) as any;
+    const results: any[] = [];
+    for (const item of paged.items) {
+      const rawItem = item as any;
+      const m =
+        appGlobal && appGlobal.createPartialSourceManga
+          ? appGlobal.createPartialSourceManga({
+              mangaId: rawItem.mangaId || "",
+              image: rawItem.imageUrl || "",
+              title: rawItem.title || "",
+              subtitle: rawItem.subtitle,
+            })
+          : {
+              mangaId: rawItem.mangaId || "",
+              image: rawItem.imageUrl || "",
+              title: rawItem.title || "",
+              subtitle: rawItem.subtitle,
+            };
+      results.push(m);
+    }
+    return appGlobal && appGlobal.createPagedResults
+      ? appGlobal.createPagedResults({ results, metadata: paged.metadata })
+      : { results, metadata: paged.metadata };
   }
 }
 

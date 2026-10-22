@@ -3,6 +3,10 @@ import { PaperbackInterceptor, type Request, type Response } from "@paperback/ty
 // Intercepta todas as requisições e respostas da extensão
 export class MainInterceptor extends PaperbackInterceptor {
   override async interceptRequest(request: Request): Promise<Request> {
+    if (request.url.startsWith("http://")) {
+      request.url = request.url.replace(/^http:\/\//i, "https://");
+    }
+
     request.headers = {
       ...request.headers,
       referer: "https://www.muitohentai.com/",

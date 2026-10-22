@@ -20,6 +20,8 @@ import * as cheerio from "cheerio";
 import { MainInterceptor } from "./network";
 import type MuitoHentaiConfig from "./pbconfig";
 
+declare const App: any;
+
 const BASE_URL = "https://www.muitohentai.com";
 
 /** `page` é a página atual (1-based); o site pagina com `/<path>/N`. */
@@ -65,11 +67,15 @@ function parseCards($: cheerio.CheerioAPI): SearchResultItem[] {
     if (!mangaId || !title || seen.has(mangaId)) return;
     seen.add(mangaId);
 
-    const img = $(el).closest(".data").prev(".poster").find("img").first().attr("src");
+    let img = $(el).closest(".data").prev(".poster").find("img").first().attr("src");
+    if (!img) img = `https://mangaz.muitohentai.club/posters/${mangaId}.jpg`;
+    if (img.startsWith("//")) img = "https:" + img;
+    else if (img.startsWith("http://")) img = img.replace(/^http:\/\//i, "https://");
+
     items.push({
       mangaId,
       title,
-      imageUrl: img ?? `https://mangaz.muitohentai.club/posters/${mangaId}.jpg`,
+      imageUrl: img,
       contentRating: ContentRating.ADULT,
     });
   });
@@ -82,6 +88,11 @@ function pageUrl(path: string, page: number): string {
 }
 
 export class MuitoHentaiExtension implements ExtensionImpl<typeof MuitoHentaiConfig> {
+  constructor(public cheerioInstance?: any) {
+    this.getHomePageSections = this.getHomePageSections.bind(this);
+    this.getViewMoreItems = this.getViewMoreItems.bind(this);
+  }
+
   mainRateLimiter = new BasicRateLimiter("main", {
     numberOfRequests: 8,
     bufferInterval: 5,
@@ -148,9 +159,11 @@ export class MuitoHentaiExtension implements ExtensionImpl<typeof MuitoHentaiCon
     const $ = await fetchHtml(url);
 
     const title = $("h1.titlebars").first().text().trim() || $("h1").first().text().trim();
-    const cover =
+    let cover =
       $("#capaAnime img").first().attr("src") ||
       `https://mangaz.muitohentai.club/posters/${mangaId}.jpg`;
+    if (cover.startsWith("//")) cover = "https:" + cover;
+    else if (cover.startsWith("http://")) cover = cover.replace(/^http:\/\//i, "https://");
 
     const genres: Tag[] = [];
     $("a.genero_btn").each((_, a) => {
@@ -224,16 +237,101 @@ export class MuitoHentaiExtension implements ExtensionImpl<typeof MuitoHentaiCon
     // A primeira página fica no <img> do leitor e as demais em `var arr = [...]`;
     // ambos apontam para <slug>/<capítulo>/<n>.<ext>, então basta extrair e ordenar.
     const found = new Map<number, string>();
-    const regex = /https?:\/\/[^"'\s\\]+\/(\d+)\.(?:jpe?g|png|webp)/gi;
+    const regex = /(?:https?:)?\/\/[^"'\s\\]+\/(\d+)\.(?:jpe?g|png|webp)(?:\?[^"'\s\\]*)?/gi;
     for (const match of html.matchAll(regex)) {
-      const url = match[0];
+      let url = match[0];
       if (!url.includes("/mangas/")) continue;
+      if (url.startsWith("//")) url = "https:" + url;
+      else if (url.startsWith("http://")) url = url.replace(/^http:\/\//i, "https://");
       const index = parseInt(match[1] ?? "", 10);
       if (!found.has(index)) found.set(index, url);
     }
 
     const pages = [...found.entries()].sort((a, b) => a[0] - b[0]).map(([, url]) => url);
     return { id: chapter.chapterId, mangaId: chapter.sourceManga.mangaId, pages };
+  }
+
+  async getHomePageSections(sectionCallback: (section: any) => void): Promise<void> {
+    const sections = await this.getDiscoverSections();
+    const appGlobal = (typeof App !== "undefined" ? App : undefined) as any;
+    for (const sec of sections) {
+      const homeSection =
+        appGlobal && appGlobal.createHomeSection
+          ? appGlobal.createHomeSection({
+              id: sec.id,
+              title: sec.title,
+              containsMoreItems: true,
+              type: "singleRowNormal",
+            })
+          : {
+              id: sec.id,
+              title: sec.title,
+              containsMoreItems: true,
+              type: "singleRowNormal",
+              items: [],
+            };
+
+      sectionCallback(homeSection);
+
+      try {
+        const paged = await this.getDiscoverSectionItems(sec, undefined);
+        const mangaItems: any[] = [];
+        for (const item of paged.items) {
+          const rawItem = item as any;
+          const m =
+            appGlobal && appGlobal.createPartialSourceManga
+              ? appGlobal.createPartialSourceManga({
+                  mangaId: rawItem.mangaId || "",
+                  image: rawItem.imageUrl || "",
+                  title: rawItem.title || "",
+                  subtitle: rawItem.subtitle,
+                })
+              : {
+                  mangaId: rawItem.mangaId || "",
+                  image: rawItem.imageUrl || "",
+                  title: rawItem.title || "",
+                  subtitle: rawItem.subtitle,
+                };
+          mangaItems.push(m);
+        }
+        homeSection.items = mangaItems;
+        sectionCallback(homeSection);
+      } catch (e) {
+        console.error(`Erro ao carregar seção ${sec.title}:`, e);
+      }
+    }
+  }
+
+  async getViewMoreItems(homepageSectionId: string, metadata: any): Promise<any> {
+    const sections = await this.getDiscoverSections();
+    const sec = sections.find((s) => s.id === homepageSectionId) || {
+      id: homepageSectionId,
+      title: homepageSectionId,
+    };
+    const paged = await this.getDiscoverSectionItems(sec as any, metadata);
+    const appGlobal = (typeof App !== "undefined" ? App : undefined) as any;
+    const results: any[] = [];
+    for (const item of paged.items) {
+      const rawItem = item as any;
+      const m =
+        appGlobal && appGlobal.createPartialSourceManga
+          ? appGlobal.createPartialSourceManga({
+              mangaId: rawItem.mangaId || "",
+              image: rawItem.imageUrl || "",
+              title: rawItem.title || "",
+              subtitle: rawItem.subtitle,
+            })
+          : {
+              mangaId: rawItem.mangaId || "",
+              image: rawItem.imageUrl || "",
+              title: rawItem.title || "",
+              subtitle: rawItem.subtitle,
+            };
+      results.push(m);
+    }
+    return appGlobal && appGlobal.createPagedResults
+      ? appGlobal.createPagedResults({ results, metadata: paged.metadata })
+      : { results, metadata: paged.metadata };
   }
 }
 

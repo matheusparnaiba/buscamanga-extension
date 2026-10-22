@@ -33,10 +33,28 @@ function getImageSrc($img: cheerio.Cheerio<any>): string {
     $img.attr("data-src") ||
     $img.attr("data-lazy-src") ||
     $img.attr("data-original") ||
-    $img.attr("srcset")?.split(",")[0]?.trim()?.split(" ")[0]?.trim() ||
-    $img.attr("src") ||
-    $img.attr("data-cfsrc") ||
     "";
+
+  if (!src) {
+    const srcset = $img.attr("data-lzl-srcset") || $img.attr("srcset");
+    if (srcset) {
+      src = srcset.split(",")[0]?.trim()?.split(" ")[0]?.trim() || "";
+    }
+  }
+
+  if (!src || src.startsWith("data:")) {
+    const rawSrc = $img.attr("src") || $img.attr("data-cfsrc") || "";
+    if (rawSrc && !rawSrc.startsWith("data:")) {
+      src = rawSrc;
+    }
+  }
+
+  if (!src || src.startsWith("data:")) {
+    const noscript = $img.parent().find("noscript").text();
+    const match = noscript.match(/src=["']([^"']+)["']/i);
+    if (match?.[1]) src = match[1];
+  }
+
   src = src.trim().replace(/-\d+x\d+(\.[a-zA-Z0-9]+)$/, "$1");
   if (src.startsWith("//")) src = "https:" + src;
   else if (src.startsWith("/")) src = BASE_URL + src;
@@ -124,49 +142,65 @@ export class ArthurScanExtension implements ExtensionImpl<typeof ContentTemplate
     const seenIds = new Set<string>();
 
     if (section.id === "popular") {
-      $(".c-tabs-item__content, .page-item-detail, .manga-item").each((_, el) => {
-        const titleEl = $(el).find(".post-title a, .manga-title, h3 a, h3, h5 a").first();
-        const title = titleEl.text().trim();
-        const linkEl = $(el).find(".post-title a, a[href*='/manga/'], a").first();
-        const href = linkEl.attr("href");
-        const img = getImageSrc($(el).find("img").first());
+      $(".manga__item, .page-item-detail, .c-tabs-item__content, .slider__item, .manga-item").each(
+        (_, el) => {
+          const titleEl = $(el)
+            .find(
+              ".post-title h2 a, .post-title h3 a, .post-title a, .slider__content h4 a, h2 a, h3 a, h4 a, h5 a",
+            )
+            .first();
+          const title = titleEl.text().replace(/\s+/g, " ").trim();
+          const linkEl = $(el)
+            .find(".post-title h2 a, .post-title a, a[href*='/manga/'], a")
+            .first();
+          const href = linkEl.attr("href");
+          const img = getImageSrc($(el).find("img").first());
 
-        if (href && title) {
-          const idMatch = href.match(/\/manga\/([^/]+)/);
-          const mangaId = idMatch ? (idMatch[1] as string) : href;
+          if (href && title) {
+            const idMatch = href.match(/\/manga\/([^/]+)/);
+            const mangaId = idMatch ? (idMatch[1] as string) : href;
 
-          if (!seenIds.has(mangaId)) {
-            seenIds.add(mangaId);
-            items.push({
-              mangaId,
-              title,
-              imageUrl:
-                img ||
-                "https://ui-avatars.com/api/?name=" +
-                  encodeURIComponent(title) +
-                  "&background=random",
-              type: "prominentCarouselItem",
-              contentRating: ContentRating.EVERYONE,
-            });
+            if (!seenIds.has(mangaId)) {
+              seenIds.add(mangaId);
+              items.push({
+                mangaId,
+                title,
+                imageUrl:
+                  img ||
+                  "https://ui-avatars.com/api/?name=" +
+                    encodeURIComponent(title) +
+                    "&background=random",
+                type: "prominentCarouselItem",
+                contentRating: ContentRating.EVERYONE,
+              });
+            }
           }
-        }
-      });
+        },
+      );
       return { items, metadata: undefined };
     }
 
     if (section.id === "updates") {
       $(
-        ".page-item-detail, .c-tabs-item__content, .manga-item, .col-6.col-md-2, .col-12.col-md-6",
+        ".manga__item, .page-item-detail, .c-tabs-item__content, .manga-item, .col-6.col-md-2, .col-12.col-md-6",
       ).each((_, el) => {
-        const titleEl = $(el).find(".post-title a, .item-title a, h3 a, h5 a, h3").first();
-        const title = titleEl.text().trim();
-        const linkEl = $(el).find(".post-title a, a[href*='/manga/'], a").first();
+        const titleEl = $(el)
+          .find(
+            ".post-title h2 a, .post-title h3 a, .post-title a, .item-title a, h2 a, h3 a, h4 a, h5 a",
+          )
+          .first();
+        const title = titleEl.text().replace(/\s+/g, " ").trim();
+        const linkEl = $(el).find(".post-title h2 a, .post-title a, a[href*='/manga/'], a").first();
         const href = linkEl.attr("href");
         const img = getImageSrc($(el).find("img").first());
 
-        const chapEl = $(el).find(".chapter-item a, .list-chapter a, .chapter a").first();
-        const chapHref = chapEl.attr("href");
-        const chapName = chapEl.text().trim();
+        const chapEl = $(el)
+          .find(
+            ".list-chapter .chapter-item .chapter, .chapter-item a, .list-chapter a, .chapter a",
+          )
+          .first();
+        const chapHref = chapEl.closest("a").attr("href") || chapEl.attr("href");
+        const chapName = chapEl.text().replace(/\s+/g, " ").trim();
 
         if (href && title) {
           const idMatch = href.match(/\/manga\/([^/]+)/);
@@ -237,10 +271,14 @@ export class ArthurScanExtension implements ExtensionImpl<typeof ContentTemplate
     const items: SearchResultItem[] = [];
     const seenIds = new Set<string>();
 
-    $(".c-tabs-item__content, .page-item-detail, .search-wrap .row, .manga-item").each((_, el) => {
-      const titleEl = $(el).find(".post-title a, h3 a, h5 a, h3").first();
-      const mangaTitle = titleEl.text().trim();
-      const linkEl = $(el).find(".post-title a, a[href*='/manga/'], a").first();
+    $(
+      ".manga__item, .c-tabs-item__content, .page-item-detail, .search-wrap .row, .manga-item",
+    ).each((_, el) => {
+      const titleEl = $(el)
+        .find(".post-title h2 a, .post-title h3 a, .post-title a, h2 a, h3 a, h4 a, h5 a, h3")
+        .first();
+      const mangaTitle = titleEl.text().replace(/\s+/g, " ").trim();
+      const linkEl = $(el).find(".post-title h2 a, .post-title a, a[href*='/manga/'], a").first();
       const href = linkEl.attr("href");
       const img = getImageSrc($(el).find("img").first());
 
