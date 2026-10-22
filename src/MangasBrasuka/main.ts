@@ -85,35 +85,56 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     }
   }
 
-  private async getKey(payload: string): Promise<string | undefined> {
-    const { v, e } = getParams(payload);
-    const cacheKey = `${v}:${e}`;
+  private async getKey(v: number, e: number): Promise<string> {
+    const cacheKey = `atfield_key_${v}_${e}`;
+
     if (this.keyCache.has(cacheKey)) {
-      return this.keyCache.get(cacheKey);
+      return this.keyCache.get(cacheKey)!;
     }
 
-    const keyUrls = [
-      `https://mangasbrasuka.org/api/atfield/key?v=${v}&e=${e}`,
-      `https://mangasbrasuka.com.br/api/atfield/key?v=${v}&e=${e}`,
-    ];
+    const savedKey = Application.getState(cacheKey) as string | undefined;
+    if (savedKey && typeof savedKey === "string" && savedKey.length > 0) {
+      this.keyCache.set(cacheKey, savedKey);
+      return savedKey;
+    }
 
-    for (const url of keyUrls) {
+    const domains = ["https://mangasbrasuka.com.br", "https://mangasbrasuka.org"];
+    let lastError: unknown = null;
+
+    for (const domain of domains) {
       try {
-        const [response, buffer] = await Application.scheduleRequest({
+        const url = `${domain}/api/atfield/key?v=${v}&e=${e}`;
+        const request: Request = {
           url,
           method: "GET",
           headers: {
-            "Sec-Fetch-Dest": "empty",
-            "Sec-Fetch-Mode": "cors",
-            "Sec-Fetch-Site": "same-origin",
-            Accept: "*/*",
+            accept: "application/json, text/plain, */*",
+            referer: `${domain}/`,
+            rsc: "1",
           },
-        });
-        if (response.status === 200) {
-          const text = Application.arrayBufferToUTF8String(buffer);
-          const json = JSON.parse(text);
-          if (json?.k) {
+        };
+
+        const [response, buffer] = await Application.scheduleRequest(request);
+        const data = Application.arrayBufferToUTF8String(buffer);
+
+        if (
+          response.status === 403 ||
+          response.status === 503 ||
+          data.includes("Just a moment...") ||
+          data.includes("_cf_chl_opt") ||
+          data.includes("challenges.cloudflare.com")
+        ) {
+          throw new CloudflareError(
+            { url: "https://mangasbrasuka.com.br/", method: "GET" },
+            "Proteção Cloudflare ativa no Mangás Brasuka! Toque para resolver.",
+          );
+        }
+
+        if (response.status === 200 && !data.trim().startsWith("<")) {
+          const json = JSON.parse(data);
+          if (json.k && typeof json.k === "string") {
             this.keyCache.set(cacheKey, json.k);
+            Application.setState(json.k, cacheKey);
             return json.k;
           }
         }
@@ -121,10 +142,14 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
         if (err instanceof CloudflareError) {
           throw err;
         }
-        // Fallback to next URL
+        lastError = err;
       }
     }
-    return undefined;
+
+    throw (
+      lastError ||
+      new Error("Falha ao obter chave de descriptografia das páginas do Mangás Brasuka")
+    );
   }
 
   async initialise(): Promise<void> {
@@ -434,34 +459,51 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     rawPages.sort((a: any, b: any) => (a.index || 0) - (b.index || 0));
 
     const pages: string[] = [];
-    let chapterKey: string | undefined = undefined;
+    let key: string | null = null;
+    let keyFetchFailed = false;
+
+    const firstEncrypted = rawPages.find((p: any) => {
+      const u = p?.imageUrl || p?.url;
+      return typeof u === "string" && !u.startsWith("http://") && !u.startsWith("https://");
+    });
+
+    if (firstEncrypted) {
+      const rawUrl = firstEncrypted.imageUrl || firstEncrypted.url;
+      try {
+        const { v, e } = getParams(rawUrl);
+        key = await this.getKey(v, e);
+      } catch (err) {
+        keyFetchFailed = true;
+        if (err instanceof CloudflareError) {
+          throw err;
+        }
+      }
+    }
 
     for (const p of rawPages) {
       const rawUrl = p.imageUrl || p.url;
-      if (!rawUrl) continue;
+      if (!rawUrl || typeof rawUrl !== "string") continue;
 
       if (rawUrl.startsWith("http://") || rawUrl.startsWith("https://")) {
         pages.push(rawUrl);
-      } else {
-        try {
-          if (!chapterKey) {
-            chapterKey = await this.getKey(rawUrl);
-          }
-          if (chapterKey) {
-            const decryptedUrl = decrypt(rawUrl, chapterKey);
-            if (
-              decryptedUrl &&
-              (decryptedUrl.startsWith("http://") || decryptedUrl.startsWith("https://"))
-            ) {
-              pages.push(decryptedUrl);
-              continue;
-            }
-          }
-        } catch (err) {
-          if (err instanceof CloudflareError) {
-            throw err;
-          }
+        continue;
+      }
+
+      if (keyFetchFailed || !key) continue;
+
+      try {
+        let decrypted = decrypt(rawUrl, key);
+        if (decrypted.startsWith("//")) {
+          decrypted = "https:" + decrypted;
+        } else if (decrypted.startsWith("/")) {
+          decrypted = "https://mangasbrasuka.com.br" + decrypted;
         }
+
+        if (decrypted.startsWith("http://") || decrypted.startsWith("https://")) {
+          pages.push(decrypted);
+        }
+      } catch {
+        // Ignora falha de descriptografia em página corrompida individual
       }
     }
 

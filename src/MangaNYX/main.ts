@@ -83,7 +83,10 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
           data.includes("_cf_chl_opt") ||
           data.includes("challenges.cloudflare.com")
         ) {
-          throw new CloudflareError(request, "Proteção Cloudflare ativa! Toque para resolver.");
+          throw new CloudflareError(
+            { url: "https://manganyx.com/", method: "GET" },
+            "Proteção Cloudflare ativa no MangaNYX! Toque para resolver.",
+          );
         }
 
         if (response.status === 200 && !data.trim().startsWith("<")) {
@@ -422,6 +425,26 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
 
     const pages: string[] = [];
     let key: string | null = null;
+    let keyFetchFailed = false;
+
+    const firstEncrypted = rawPages.find((p: any) => {
+      const u = p?.imageUrl || p?.url;
+      return typeof u === "string" && !u.startsWith("http://") && !u.startsWith("https://");
+    });
+
+    if (firstEncrypted) {
+      const rawUrl = firstEncrypted.imageUrl || firstEncrypted.url;
+      try {
+        const { v, e } = getParams(rawUrl);
+        key = await this.getKey(v, e);
+      } catch (err) {
+        keyFetchFailed = true;
+        if (err instanceof CloudflareError) {
+          throw err;
+        }
+        throw err;
+      }
+    }
 
     for (const p of rawPages) {
       const rawUrl = p.imageUrl || p.url;
@@ -432,12 +455,9 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
         continue;
       }
 
-      try {
-        if (!key) {
-          const { v, e } = getParams(rawUrl);
-          key = await this.getKey(v, e);
-        }
+      if (keyFetchFailed || !key) continue;
 
+      try {
         let decrypted = decrypt(rawUrl, key);
         if (decrypted.startsWith("//")) {
           decrypted = "https:" + decrypted;
@@ -448,10 +468,8 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
         if (decrypted.startsWith("http://") || decrypted.startsWith("https://")) {
           pages.push(decrypted);
         }
-      } catch (err) {
-        if (err instanceof CloudflareError) {
-          throw err;
-        }
+      } catch {
+        // Ignora falha de descriptografia em página corrompida individual
       }
     }
 

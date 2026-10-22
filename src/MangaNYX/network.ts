@@ -11,9 +11,13 @@ import {
 export class MainInterceptor extends PaperbackInterceptor {
   override async interceptRequest(request: Request): Promise<Request> {
     const cfUserAgent = Application.getState("cf_user_agent") as string | undefined;
+    const fallbackReferer = request.url.startsWith("https://manganyx.org")
+      ? "https://manganyx.org/"
+      : "https://manganyx.com/";
+
     const headers: Record<string, string> = {
       ...request.headers,
-      referer: "https://manganyx.com/",
+      referer: request.headers?.referer ?? fallbackReferer,
       "user-agent": cfUserAgent ?? (await Application.getDefaultUserAgent()),
     };
 
@@ -35,9 +39,14 @@ export class MainInterceptor extends PaperbackInterceptor {
         /\.(jpg|jpeg|png|webp|gif|ico|avif)((\?|#).*)?$/i.test(request.url) ||
         request.url.includes("/cover/") ||
         request.url.includes("/manga/") ||
-        request.url.includes("img.");
+        request.url.includes("/manhwa/") ||
+        request.url.includes("img.") ||
+        request.url.includes("snipercache");
       if (!isImage) {
-        throw new CloudflareError(request, "Cloudflare detected, bypass it to continue!");
+        throw new CloudflareError(
+          { url: "https://manganyx.com/", method: "GET" },
+          "Proteção Cloudflare ativa no MangaNYX! Toque para resolver.",
+        );
       }
     }
 

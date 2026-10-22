@@ -39,8 +39,8 @@ export class MainInterceptor extends PaperbackInterceptor {
         request.url.includes("snipercache");
       if (!isImage) {
         throw new CloudflareError(
-          request,
-          "Cloudflare detectado, realize o bypass para continuar!",
+          { url: "https://mangasbrasuka.com.br/", method: "GET" },
+          "Proteção Cloudflare ativa no Mangás Brasuka! Toque para resolver.",
         );
       }
     }
