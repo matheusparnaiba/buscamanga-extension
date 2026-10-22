@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-10-22T04:18:05.500Z",
+  "buildTime": "2026-10-22T04:44:37.092Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -158,7 +158,7 @@
     {
       "name": "Sakura Mangas",
       "description": "Extensão do \"https://sakuramangas.org\"",
-      "version": "1.0.15",
+      "version": "1.0.16",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
