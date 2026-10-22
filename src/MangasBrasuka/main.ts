@@ -111,10 +111,12 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     }
 
     const domains = ["https://mangasbrasuka.com.br", "https://mangasbrasuka.org"];
+    let cloudflareErrorToThrow: CloudflareError | null = null;
+    let lastError: Error | null = null;
 
     for (const domain of domains) {
+      const url = `${domain}/api/atfield/key?v=${v}&e=${e}`;
       try {
-        const url = `${domain}/api/atfield/key?v=${v}&e=${e}`;
         const request: Request = {
           url,
           method: "GET",
@@ -130,18 +132,20 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
         const [response, buffer] = await Application.scheduleRequest(request);
         const data = Application.arrayBufferToUTF8String(buffer);
 
-        if (
+        const isCf =
           response.status === 403 ||
           response.status === 503 ||
           data.includes("Just a moment...") ||
           data.includes("_cf_chl_opt") ||
-          data.includes("challenges.cloudflare.com")
-        ) {
+          data.includes("challenges.cloudflare.com");
+
+        if (isCf) {
           const resolutionRequest = await this.getCloudflareResolutionRequest();
-          throw new CloudflareError(
+          cloudflareErrorToThrow = new CloudflareError(
             resolutionRequest,
             "Proteção Cloudflare ativa no Mangás Brasuka! Toque para resolver.",
           );
+          continue;
         }
 
         if (response.status === 200 && !data.trim().startsWith("<")) {
@@ -152,17 +156,24 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
             return json.k;
           }
         }
+
+        lastError = new Error(`Resposta inesperada ao obter chave (HTTP ${response.status})`);
       } catch (err) {
         if (err instanceof CloudflareError) {
-          throw err;
+          cloudflareErrorToThrow = err;
+        } else if (err instanceof Error) {
+          lastError = err;
         }
       }
     }
 
-    const resolutionRequest = await this.getCloudflareResolutionRequest();
-    throw new CloudflareError(
-      resolutionRequest,
-      "Proteção Cloudflare ativa no Mangás Brasuka! Toque para resolver.",
+    if (cloudflareErrorToThrow) {
+      throw cloudflareErrorToThrow;
+    }
+
+    throw (
+      lastError ??
+      new Error("Falha ao obter chave de descriptografia das páginas do Mangás Brasuka.")
     );
   }
 
@@ -225,13 +236,14 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
 
     for (const c of cookies) {
       if (!c || !c.name || !c.value) continue;
-      const domain = c.domain ? c.domain.replace(/^https?:\/\//, "") : "mangasbrasuka.com.br";
+      const rawDomain = c.domain ? c.domain.replace(/^https?:\/\//, "") : "mangasbrasuka.com.br";
+      const cleanDomain = rawDomain.replace(/^\./, "");
       const path = c.path || "/";
 
       cleanCookies.push({
         name: c.name,
         value: c.value,
-        domain,
+        domain: cleanDomain,
         path,
       });
 
@@ -241,7 +253,14 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
         this.cookieStorageInterceptor.setCookie({
           name: c.name,
           value: c.value,
-          domain,
+          domain: cleanDomain,
+          path,
+          expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        });
+        this.cookieStorageInterceptor.setCookie({
+          name: c.name,
+          value: c.value,
+          domain: `.${cleanDomain}`,
           path,
           expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
         });
@@ -545,10 +564,10 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
         if (err instanceof CloudflareError) {
           throw err;
         }
-        const resolutionRequest = await this.getCloudflareResolutionRequest();
-        throw new CloudflareError(
-          resolutionRequest,
-          "Proteção Cloudflare ativa no Mangás Brasuka! Toque para resolver.",
+        throw new Error(
+          err instanceof Error
+            ? err.message
+            : "Falha ao obter chave de descriptografia do capítulo.",
         );
       }
     }
@@ -581,11 +600,7 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     }
 
     if (pages.length === 0 && rawPages.length > 0) {
-      const resolutionRequest = await this.getCloudflareResolutionRequest();
-      throw new CloudflareError(
-        resolutionRequest,
-        "Não foi possível carregar as páginas do capítulo. Verifique a proteção Cloudflare.",
-      );
+      throw new Error("Não foi possível carregar as páginas do capítulo.");
     }
 
     return {

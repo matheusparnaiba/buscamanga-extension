@@ -43,10 +43,10 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
   private homePromise?: { promise: Promise<any>; timestamp: number };
   private keyCache: Map<string, string> = new Map();
 
-  private async getCloudflareResolutionRequest(targetUrl?: string): Promise<Request> {
+  private async getCloudflareResolutionRequest(): Promise<Request> {
     const cfUserAgent = Application.getState("cf_user_agent") as string | undefined;
     return {
-      url: targetUrl || "https://manganyx.com/",
+      url: "https://manganyx.com/",
       method: "GET",
       headers: {
         "user-agent": cfUserAgent ?? (await Application.getDefaultUserAgent()),
@@ -85,6 +85,9 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
             "sec-fetch-mode": "cors",
             "sec-fetch-site": "same-origin",
           },
+          cookies: {
+            mnx_adulto: "1",
+          },
         };
 
         const [response, buffer] = await Application.scheduleRequest(request);
@@ -106,7 +109,7 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
             response.status === 503 ||
             data.includes("challenges.cloudflare.com"))
         ) {
-          const resolutionRequest = await this.getCloudflareResolutionRequest(url);
+          const resolutionRequest = await this.getCloudflareResolutionRequest();
           cloudflareErrorToThrow = new CloudflareError(
             resolutionRequest,
             "Proteção Cloudflare ativa no MangaNYX! Toque para resolver.",
