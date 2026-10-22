@@ -1,0 +1,281 @@
+import {
+  BasicRateLimiter,
+  ContentRating,
+  DiscoverSectionType,
+  type Chapter,
+  type ChapterDetails,
+  type DiscoverSection,
+  type DiscoverSectionItem,
+  type ExtensionImpl,
+  type JSONValue,
+  type PagedResults,
+  type SearchQuery,
+  type SearchResultItem,
+  type SortingOption,
+  type SourceManga,
+  type Tag,
+} from "@paperback/types";
+import * as cheerio from "cheerio";
+
+import { MainInterceptor } from "./network";
+import type NHentaiBRConfig from "./pbconfig";
+
+const BASE_URL = "https://nhentaibr.com";
+
+const SECTIONS: { id: string; title: string; path: string }[] = [
+  { id: "latest", title: "Atualizações", path: "" },
+  { id: "doujinshi", title: "Doujinshi", path: "/category/doujinshi" },
+  { id: "manga-hentai", title: "Mangá Hentai", path: "/category/manga-hentai" },
+  { id: "one-shot", title: "One-Shot", path: "/category/one-shot" },
+  { id: "sem-censura", title: "Hentai Sem Censura", path: "/category/hentai-sem-censura" },
+  { id: "comics", title: "Comics", path: "/category/comics" },
+];
+
+function sanitizeTagId(raw: string): string {
+  return (
+    raw
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "tag"
+  );
+}
+
+/** Remove prefixos como "[Hentai]" ou "[Doujinshi]" do título dos posts. */
+function cleanTitle(raw: string): string {
+  return (
+    raw
+      .replace(/^(\s*\[[^\]]*\])+/, "")
+      .replace(/\s+/g, " ")
+      .trim() || raw.trim()
+  );
+}
+
+function slugFromUrl(href: string): string | undefined {
+  try {
+    const path = new URL(href, BASE_URL).pathname.replace(/^\/+|\/+$/g, "");
+    return path && !path.includes("/") ? path : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function imageFrom($img: cheerio.Cheerio<any>): string {
+  const src = (
+    $img.attr("data-src") ||
+    $img.attr("data-lazy-src") ||
+    $img.attr("src") ||
+    ""
+  ).trim();
+  return src.startsWith("/") ? BASE_URL + src : src;
+}
+
+async function fetchHtml(url: string): Promise<cheerio.CheerioAPI> {
+  const [, buffer] = await Application.scheduleRequest({ url, method: "GET" });
+  return cheerio.load(Application.arrayBufferToUTF8String(buffer));
+}
+
+function parseCards($: cheerio.CheerioAPI): SearchResultItem[] {
+  const items: SearchResultItem[] = [];
+  const seen = new Set<string>();
+
+  $(".thumb-conteudo").each((_, el) => {
+    // Posts VIP exigem login/assinatura no site e não exibem as páginas
+    if ($(el).find(".seloVIP").length > 0) return;
+
+    const a = $(el).find("a:not(.thumbParodiaNome)").first();
+    const mangaId = slugFromUrl(a.attr("href") ?? "");
+    const rawTitle = $(el).find(".thumb-titulo").first().text() || a.attr("title") || "";
+    if (!mangaId || !rawTitle.trim() || seen.has(mangaId)) return;
+    seen.add(mangaId);
+
+    items.push({
+      mangaId,
+      title: cleanTitle(rawTitle),
+      imageUrl: imageFrom($(el).find("img").first()),
+      contentRating: ContentRating.ADULT,
+    });
+  });
+
+  return items;
+}
+
+function pageUrl(path: string, page: number): string {
+  return page > 1 ? `${BASE_URL}${path}/page/${page}/` : `${BASE_URL}${path}/`;
+}
+
+export class NHentaiBRExtension implements ExtensionImpl<typeof NHentaiBRConfig> {
+  mainRateLimiter = new BasicRateLimiter("main", {
+    numberOfRequests: 8,
+    bufferInterval: 5,
+    ignoreImages: true,
+  });
+
+  mainInterceptor = new MainInterceptor("main");
+
+  async initialise(): Promise<void> {
+    this.mainRateLimiter.registerInterceptor();
+    this.mainInterceptor.registerInterceptor();
+  }
+
+  async getDiscoverSections(): Promise<DiscoverSection[]> {
+    return SECTIONS.map((s) => ({
+      id: s.id,
+      title: s.title,
+      type: DiscoverSectionType.simpleCarousel,
+    }));
+  }
+
+  async getDiscoverSectionItems(
+    section: DiscoverSection,
+    metadata: number | undefined,
+  ): Promise<PagedResults<DiscoverSectionItem>> {
+    const page = metadata ?? 1;
+    const def = SECTIONS.find((s) => s.id === section.id);
+    if (!def) return { items: [] };
+
+    const $ = await fetchHtml(pageUrl(def.path, page));
+    const items: DiscoverSectionItem[] = parseCards($).map((item) => ({
+      type: "simpleCarouselItem",
+      mangaId: item.mangaId,
+      title: item.title,
+      imageUrl: item.imageUrl,
+      contentRating: ContentRating.ADULT,
+    }));
+
+    return { items, metadata: items.length > 0 ? page + 1 : undefined };
+  }
+
+  async getSearchResults(
+    query: SearchQuery<JSONValue>,
+    metadata?: number,
+    _sortingOption?: SortingOption,
+  ): Promise<PagedResults<SearchResultItem>> {
+    const page = metadata ?? 1;
+    const term = encodeURIComponent(query.title ?? "");
+    const url = page > 1 ? `${BASE_URL}/page/${page}/?s=${term}` : `${BASE_URL}/?s=${term}`;
+
+    const items = parseCards(await fetchHtml(url));
+    return { items, metadata: items.length > 0 ? page + 1 : undefined };
+  }
+
+  async getMangaDetails(mangaId: string): Promise<SourceManga> {
+    const url = `${BASE_URL}/${mangaId}/`;
+    const $ = await fetchHtml(url);
+
+    const title = cleanTitle($("h1.post-titulo").first().text() || $("h1").first().text());
+    const cover =
+      $("meta[property='og:image']").attr("content") ||
+      imageFrom($(".post-capa img").first()) ||
+      undefined;
+
+    const groups = new Map<string, Tag[]>();
+    let pages = "";
+    $("ul.post-itens li").each((_, li) => {
+      const label = $(li).find("strong").first().text().replace(":", "").trim();
+      if (!label) return;
+      if (/^p[áa]ginas$/i.test(label)) {
+        pages = $(li).text().replace(label, "").trim();
+        return;
+      }
+      $(li)
+        .find("a")
+        .each((__, a) => {
+          const text = $(a).text().trim();
+          const href = $(a).attr("href") ?? "";
+          if (!text || /\/(entrar|cadastro)\/?$/.test(href)) return;
+          const tags = groups.get(label) ?? [];
+          tags.push({ id: `${sanitizeTagId(label)}-${sanitizeTagId(text)}`, title: text });
+          groups.set(label, tags);
+        });
+    });
+
+    const tagGroups = [...groups.entries()].map(([label, tags]) => ({
+      id: sanitizeTagId(label),
+      title: label,
+      tags,
+    }));
+
+    const artist = groups.get("Artista")?.[0]?.title;
+
+    return {
+      mangaId,
+      mangaInfo: {
+        primaryTitle: title || mangaId,
+        secondaryTitles: [],
+        thumbnailUrl:
+          cover ||
+          `https://ui-avatars.com/api/?name=${encodeURIComponent(title || "NHentai")}&background=random`,
+        synopsis: pages ? `${pages} páginas` : "",
+        contentRating: ContentRating.ADULT,
+        status: "COMPLETED",
+        author: artist,
+        tagGroups,
+        shareUrl: url,
+      },
+    };
+  }
+
+  async getChapters(sourceManga: SourceManga, _sinceDate?: Date): Promise<Chapter[]> {
+    const $ = await fetchHtml(`${BASE_URL}/${sourceManga.mangaId}/`);
+    const published = $("meta[property='article:modified_time']").attr("content");
+    const publishDate = published ? new Date(published) : undefined;
+
+    const tabs = $("div.galeriaTab");
+    if (tabs.length === 0) {
+      return [
+        {
+          chapterId: sourceManga.mangaId,
+          sourceManga,
+          langCode: "PT-BR",
+          chapNum: 1,
+          title: "Capítulo Único",
+          volume: 0,
+          publishDate,
+        },
+      ];
+    }
+
+    const chapters: Chapter[] = [];
+    tabs.each((index, el) => {
+      const tabId = $(el).attr("data-id") ?? String(index + 1);
+      const label = $(el).find(".galeriaTabCapitulo").text().replace(/\s+/g, " ").trim();
+      const sub = $(el).find(".galeriaTabTitulo").text().replace(/\s+/g, " ").trim();
+      const num = label.match(/\d+(\.\d+)?/);
+
+      chapters.push({
+        chapterId: `${sourceManga.mangaId}#${tabId}`,
+        sourceManga,
+        langCode: "PT-BR",
+        chapNum: num ? parseFloat(num[0]) : index + 1,
+        title: sub && sub !== label ? `${label} - ${sub}` : label,
+        volume: 0,
+        publishDate,
+      });
+    });
+
+    return chapters;
+  }
+
+  async getChapterDetails(chapter: Chapter): Promise<ChapterDetails> {
+    const [slug, tabId] = chapter.chapterId.split("#");
+    const $ = await fetchHtml(`${BASE_URL}/${slug}/`);
+
+    const scope = tabId ? $(`#galeria-${tabId} img`) : $("ul.post-fotos li img");
+    const pages: string[] = [];
+    scope.each((_, img) => {
+      const src = imageFrom($(img));
+      if (src && !pages.includes(src)) pages.push(src);
+    });
+
+    if (pages.length === 0) {
+      throw new Error("Conteúdo exclusivo VIP do site: nenhuma página disponível sem login.");
+    }
+
+    return { id: chapter.chapterId, mangaId: chapter.sourceManga.mangaId, pages };
+  }
+}
+
+export const NHentaiBR = new NHentaiBRExtension();

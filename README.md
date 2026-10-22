@@ -9,7 +9,7 @@
 Coleção otimizada de fontes para leitura de mangás, manhwas, manhuas e quadrinhos nacionais diretamente no aplicativo Paperback.
 
 [![Paperback v0.9+](https://img.shields.io/badge/Paperback-v0.9+-F97316?style=for-the-badge&logo=apple&logoColor=white)](https://paperback.moe/)
-[![Fontes Disponíveis](https://img.shields.io/badge/Fontes-18%20Dispon%C3%ADveis-10B981?style=for-the-badge&logo=safari&logoColor=white)](#-fontes-disponíveis)
+[![Fontes Disponíveis](https://img.shields.io/badge/Fontes-21%20Dispon%C3%ADveis-10B981?style=for-the-badge&logo=safari&logoColor=white)](#-fontes-disponíveis)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](LICENSE)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Ativo-success?style=for-the-badge&logo=github)](https://matheusparnaiba.github.io/buscamanga-extension/)
@@ -32,7 +32,7 @@ O **BuscaMangá Extension** é um repositório desenvolvido para suprir a demand
 
 ## 📦 Fontes Disponíveis
 
-Todas as 18 extensões estão ativas e sincronizadas no GitHub Pages:
+Todas as 21 extensões estão ativas e sincronizadas no GitHub Pages:
 
 |                                            Ícone                                            | Nome                   |  Versão  | Site Oficial                                                         | Categoria / Recurso                     |  Status  |
 | :-----------------------------------------------------------------------------------------: | :--------------------- | :------: | :------------------------------------------------------------------- | :-------------------------------------- | :------: |
@@ -43,6 +43,9 @@ Todas as 18 extensões estão ativas e sincronizadas no GitHub Pages:
 | <img src="src/KamiSamaExplorer/icon.png" width="28" height="28" alt="Kami Sama Explorer" /> | **Kami Sama Explorer** | `1.0.0`  | [leitor.kamisama.com.br](https://leitor.kamisama.com.br)             | Dragon Ball & Shonen                    | 🟢 Ativo |
 |   <img src="src/BorutoExplorer/icon.png" width="28" height="28" alt="Boruto Explorer" />    | **Boruto Explorer**    | `1.0.0`  | [leitor.borutoexplorer.com.br](https://leitor.borutoexplorer.com.br) | Naruto & Boruto                         | 🟢 Ativo |
 |        <img src="src/YuriOnAir/icon.png" width="28" height="28" alt="Yuri on Air" />        | **Yuri on Air**        | `1.0.0`  | [yurionair.top](https://yurionair.top)                               | Yuri & Shoujo Ai                        | 🟢 Ativo |
+|        <img src="src/NHentaiBR/icon.png" width="28" height="28" alt="NHentai BR" />         | **NHentai BR**         | `1.0.0`  | [nhentaibr.com](https://nhentaibr.com)                               | Hentai & Doujinshi • +18                | 🟢 Ativo |
+|      <img src="src/MundoHentai/icon.png" width="28" height="28" alt="Mundo Hentai" />       | **Mundo Hentai**       | `1.0.0`  | [mundohentaioficial.com](https://mundohentaioficial.com)             | Hentai & Doujinshi • +18                | 🟢 Ativo |
+|      <img src="src/MuitoHentai/icon.png" width="28" height="28" alt="Muito Hentai" />       | **Muito Hentai**       | `1.0.0`  | [muitohentai.com](https://www.muitohentai.com)                       | Hentai Mangá • +18                      | 🟢 Ativo |
 |      <img src="src/MangaOnline/icon.png" width="28" height="28" alt="Manga Online" />       | **Manga Online**       | `1.0.17` | [mangaonline.love](https://mangaonline.love)                         | Mangás & Manhwas                        | 🟢 Ativo |
 |   <img src="src/MangaLivreBlog/icon.png" width="28" height="28" alt="MangaLivre Blog" />    | **MangaLivre Blog**    | `1.0.10` | [mangalivre.blog](https://mangalivre.blog)                           | Mangás Diversos                         | 🟢 Ativo |
 |         <img src="src/Hipertoon/icon.png" width="28" height="28" alt="Hipertoon" />         | **Hipertoon**          | `1.0.16` | [hipertoon.com](https://hipertoon.com)                               | Manhwas • `Bypass Cloudflare` 🛡️        | 🟢 Ativo |
