@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-10-22T23:55:48.463Z",
+  "buildTime": "2026-10-22T23:59:22.948Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -14,7 +14,7 @@
     {
       "name": "Arthur Scan",
       "description": "Extensão oficial da Arthur Scan com foco em manhwas, cultivação e ação.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -107,7 +107,7 @@
     {
       "name": "HQ Hentai",
       "description": "Extensão do \"https://hqhentai.net\" (HQs e doujinshis hentai em português, conteúdo adulto +18)",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "ADULT",
@@ -208,7 +208,7 @@
     {
       "name": "Hentai HQ",
       "description": "Extensão do \"https://hentaihq.net\" (HQs de sexo e quadrinhos eróticos em português, conteúdo adulto +18)",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "ADULT",
@@ -569,7 +569,7 @@
     {
       "name": "Muito Hentai",
       "description": "Extensão do \"https://www.muitohentai.com\" (conteúdo adulto +18)",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "ADULT",
@@ -604,7 +604,7 @@
     {
       "name": "Mundo Hentai",
       "description": "Extensão do \"https://mundohentaioficial.com\" (conteúdo adulto +18)",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "ADULT",
@@ -639,7 +639,7 @@
     {
       "name": "NHentai BR",
       "description": "Extensão do \"https://nhentaibr.com\" (conteúdo adulto +18)",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "ADULT",
