@@ -284,7 +284,36 @@ export class NebulosaScanExtension implements ExtensionImpl<typeof ContentTempla
 
     const title = $(".post-title h1, h1").first().text().trim() || mangaId;
 
-    const rawImage = getImageSrc($(".summary_image img, .post-thumb img, img").first());
+    let rawImage = getImageSrc(
+      $(
+        ".summary_image img, .tab-summary .summary_image img, .post-thumb img, .profile-manga .summary_image img",
+      ).first(),
+    );
+
+    const ogImage = $('meta[property="og:image"]').attr("content")?.trim();
+    if (ogImage) {
+      let cleanOg = ogImage.trim().replace(/-\d+x\d+(\.[a-zA-Z0-9]+)$/, "$1");
+      if (cleanOg.startsWith("//")) cleanOg = "https:" + cleanOg;
+      else if (cleanOg.startsWith("/")) cleanOg = BASE_URL + cleanOg;
+
+      if (
+        (!rawImage ||
+          rawImage.toLowerCase().includes("nebulosa.png") ||
+          rawImage.toLowerCase().includes("logo")) &&
+        !cleanOg.toLowerCase().includes("nebulosa.png") &&
+        !cleanOg.toLowerCase().includes("logo")
+      ) {
+        rawImage = cleanOg;
+      }
+    }
+
+    if (
+      rawImage &&
+      (rawImage.toLowerCase().includes("nebulosa.png") || rawImage.toLowerCase().includes("logo"))
+    ) {
+      rawImage = "";
+    }
+
     const image = rawImage && rawImage.startsWith("http") ? rawImage : undefined;
     const fallbackImage =
       "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
