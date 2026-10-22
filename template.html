@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
-    <title>Catálogo de Extensões • BuscaMangá</title>
+    <title>BuscaMangá</title>
     <meta
       name="description"
       content="Catálogo interativo de fontes do BuscaMangá para o aplicativo Paperback v0.9+."
@@ -952,7 +952,7 @@
                 builtWith: json.builtWith,
               };
 
-              document.title = `${this.repository.name} • Catálogo de Extensões`;
+              document.title = this.repository.name || "BuscaMangá";
 
               // Popula badges disponíveis para filtragem na ordem ideal
               const badgeMap = new Map();

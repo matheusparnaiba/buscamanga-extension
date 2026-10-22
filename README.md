@@ -85,12 +85,12 @@ Se você estiver visualizando esta página pelo Safari no seu dispositivo iOS / 
 
 ## 💻 Desenvolvimento Local
 
-Este projeto utiliza **TypeScript**, **Node.js** (ou **Bun**) e a CLI oficial do Paperback.
+Este projeto utiliza **TypeScript**, **Node.js** e a CLI oficial do Paperback.
 
 ### Pré-requisitos
 
-- [Node.js](https://nodejs.org/) v20+ ou [Bun](https://bun.sh/)
-- Gerenciador de pacotes `npm` ou `bun`
+- [Node.js](https://nodejs.org/) v20+
+- Gerenciador de pacotes `npm`
 
 ### Instalação & Comandos
 
@@ -105,8 +105,6 @@ Este projeto utiliza **TypeScript**, **Node.js** (ou **Bun**) e a CLI oficial do
 
    ```bash
    npm install
-   # ou
-   bun install
    ```
 
 3. **Verificação de Conformidade (TypeScript, Lint e Formatação):**
