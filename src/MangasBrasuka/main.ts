@@ -51,16 +51,67 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
   private homePromise?: { promise: Promise<any>; timestamp: number };
   private keyCache = new Map<string, string>();
 
-  private async getCloudflareResolutionRequest(): Promise<Request> {
+  private async getCloudflareResolutionRequest(
+    domain = "https://mangasbrasuka.org",
+  ): Promise<Request> {
     const cfUserAgent = Application.getState("cf_user_agent") as string | undefined;
     return {
-      url: "https://mangasbrasuka.com.br/",
+      url: `${domain}/`,
       method: "GET",
       headers: {
         "user-agent": cfUserAgent ?? (await Application.getDefaultUserAgent()),
-        referer: "https://mangasbrasuka.com.br/",
+        referer: `${domain}/`,
       },
     };
+  }
+
+  private async tryUnlockGate(domain: string): Promise<boolean> {
+    try {
+      const startReq: Request = {
+        url: `${domain}/api/gate/start`,
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          referer: `${domain}/`,
+          accept: "application/json, text/plain, */*",
+        },
+        body: JSON.stringify({ returnTo: "/" }),
+      };
+
+      const [startRes, startBuf] = await Application.scheduleRequest(startReq);
+      const startData = Application.arrayBufferToUTF8String(startBuf);
+      if (startRes.status !== 200 || startData.trim().startsWith("<")) {
+        return false;
+      }
+
+      const json = JSON.parse(startData);
+      const token = json.data?.token;
+      if (!token || typeof token !== "string") {
+        return false;
+      }
+
+      const cbReq: Request = {
+        url: `${domain}/gate/callback?token=${encodeURIComponent(token)}`,
+        method: "GET",
+        headers: {
+          referer: `${domain}/`,
+          accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        },
+      };
+
+      const [cbRes, _] = await Application.scheduleRequest(cbReq);
+
+      if (cbRes.cookies && Array.isArray(cbRes.cookies)) {
+        await this.handleCloudflareBypass(cbRes.cookies);
+      }
+
+      return true;
+    } catch (err) {
+      if (err instanceof CloudflareError) {
+        throw err;
+      }
+      return false;
+    }
   }
 
   private async getHomeData(): Promise<any> {
@@ -110,7 +161,7 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
       return savedKey;
     }
 
-    const domains = ["https://mangasbrasuka.com.br", "https://mangasbrasuka.org"];
+    const domains = ["https://mangasbrasuka.org", "https://mangasbrasuka.com.br"];
     let cloudflareErrorToThrow: CloudflareError | null = null;
     let lastError: Error | null = null;
 
@@ -127,20 +178,27 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
             "sec-fetch-mode": "cors",
             "sec-fetch-site": "same-origin",
           },
+          cookies: {
+            mnx_adulto: "1",
+          },
         };
 
         const [response, buffer] = await Application.scheduleRequest(request);
         const data = Application.arrayBufferToUTF8String(buffer);
 
+        const cfMitigated =
+          response.headers?.["cf-mitigated"] || response.headers?.["Cf-Mitigated"];
         const isCf =
-          response.status === 403 ||
-          response.status === 503 ||
+          cfMitigated === "challenge" ||
           data.includes("Just a moment...") ||
           data.includes("_cf_chl_opt") ||
-          data.includes("challenges.cloudflare.com");
+          data.includes("challenges.cloudflare.com") ||
+          (response.status === 403 &&
+            data.trim().startsWith("<") &&
+            data.toLowerCase().includes("cloudflare"));
 
         if (isCf) {
-          const resolutionRequest = await this.getCloudflareResolutionRequest();
+          const resolutionRequest = await this.getCloudflareResolutionRequest(domain);
           cloudflareErrorToThrow = new CloudflareError(
             resolutionRequest,
             "Proteção Cloudflare ativa no Mangás Brasuka! Toque para resolver.",
@@ -154,6 +212,24 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
             this.keyCache.set(cacheKey, json.k);
             Application.setState(json.k, cacheKey);
             return json.k;
+          }
+        }
+
+        // Se a resposta for 403 não-Cloudflare (ex: {"error":"unauthorized"} por falta de gate/cookie),
+        // tenta obter o desbloqueio do gate automaticamente
+        if (response.status === 403 && data.includes("unauthorized")) {
+          const unlockSuccess = await this.tryUnlockGate(domain);
+          if (unlockSuccess) {
+            const [retryRes, retryBuf] = await Application.scheduleRequest(request);
+            const retryData = Application.arrayBufferToUTF8String(retryBuf);
+            if (retryRes.status === 200 && !retryData.trim().startsWith("<")) {
+              const retryJson = JSON.parse(retryData);
+              if (retryJson.k && typeof retryJson.k === "string") {
+                this.keyCache.set(cacheKey, retryJson.k);
+                Application.setState(retryJson.k, cacheKey);
+                return retryJson.k;
+              }
+            }
           }
         }
 
@@ -189,10 +265,32 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
       for (const c of saved) {
         if (c?.name && c?.value) {
           try {
+            const d = c.domain || "mangasbrasuka.org";
             this.cookieStorageInterceptor.setCookie({
               name: c.name,
               value: c.value,
-              domain: c.domain || "mangasbrasuka.com.br",
+              domain: d,
+              path: c.path || "/",
+              expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+            });
+            this.cookieStorageInterceptor.setCookie({
+              name: c.name,
+              value: c.value,
+              domain: `.${d.replace(/^\./, "")}`,
+              path: c.path || "/",
+              expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+            });
+            this.cookieStorageInterceptor.setCookie({
+              name: c.name,
+              value: c.value,
+              domain: "mangasbrasuka.com.br",
+              path: c.path || "/",
+              expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+            });
+            this.cookieStorageInterceptor.setCookie({
+              name: c.name,
+              value: c.value,
+              domain: ".mangasbrasuka.com.br",
               path: c.path || "/",
               expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
             });
@@ -236,7 +334,7 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
 
     for (const c of cookies) {
       if (!c || !c.name || !c.value) continue;
-      const rawDomain = c.domain ? c.domain.replace(/^https?:\/\//, "") : "mangasbrasuka.com.br";
+      const rawDomain = c.domain ? c.domain.replace(/^https?:\/\//, "") : "mangasbrasuka.org";
       const cleanDomain = rawDomain.replace(/^\./, "");
       const path = c.path || "/";
 
@@ -261,6 +359,24 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
           name: c.name,
           value: c.value,
           domain: `.${cleanDomain}`,
+          path,
+          expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        });
+
+        const otherDomain = cleanDomain.includes(".org")
+          ? "mangasbrasuka.com.br"
+          : "mangasbrasuka.org";
+        this.cookieStorageInterceptor.setCookie({
+          name: c.name,
+          value: c.value,
+          domain: otherDomain,
+          path,
+          expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        });
+        this.cookieStorageInterceptor.setCookie({
+          name: c.name,
+          value: c.value,
+          domain: `.${otherDomain}`,
           path,
           expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
         });

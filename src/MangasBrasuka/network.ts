@@ -20,9 +20,13 @@ export class MainInterceptor extends PaperbackInterceptor {
       request.url.includes("img.") ||
       request.url.includes("snipercache");
 
+    const targetDomain = request.url.startsWith("https://mangasbrasuka.org")
+      ? "https://mangasbrasuka.org"
+      : "https://mangasbrasuka.com.br";
+
     const headers: Record<string, string> = {
       ...request.headers,
-      referer: "https://mangasbrasuka.com.br/",
+      referer: request.headers?.referer ?? `${targetDomain}/`,
       "user-agent": ua,
       accept:
         request.headers?.["accept"] ??
@@ -34,7 +38,7 @@ export class MainInterceptor extends PaperbackInterceptor {
     };
 
     if (request.method && request.method.toUpperCase() !== "GET") {
-      headers["origin"] = "https://mangasbrasuka.com.br";
+      headers["origin"] = request.headers?.origin ?? targetDomain;
     }
 
     delete headers["Cookie"];
@@ -75,7 +79,9 @@ export class MainInterceptor extends PaperbackInterceptor {
 
     if (!isImage) {
       const text = Application.arrayBufferToUTF8String(data);
+      const cfMitigated = response.headers?.["cf-mitigated"] || response.headers?.["Cf-Mitigated"];
       const isCf =
+        cfMitigated === "challenge" ||
         text.includes("Just a moment...") ||
         text.includes("_cf_chl_opt") ||
         text.includes("challenges.cloudflare.com") ||
@@ -85,14 +91,16 @@ export class MainInterceptor extends PaperbackInterceptor {
 
       if (isCf) {
         const cfUserAgent = Application.getState("cf_user_agent") as string | undefined;
+        const targetDomain = request.url.startsWith("https://mangasbrasuka.org")
+          ? "https://mangasbrasuka.org"
+          : "https://mangasbrasuka.com.br";
+
         const resolutionRequest: Request = {
-          url: request.url.includes("/api/atfield/key")
-            ? request.url
-            : "https://mangasbrasuka.com.br/",
+          url: `${targetDomain}/`,
           method: "GET",
           headers: {
             "user-agent": cfUserAgent ?? (await Application.getDefaultUserAgent()),
-            referer: "https://mangasbrasuka.com.br/",
+            referer: `${targetDomain}/`,
           },
         };
 
