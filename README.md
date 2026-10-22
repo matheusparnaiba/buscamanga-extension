@@ -15,7 +15,7 @@ Atualmente, nosso repositório conta com as seguintes fontes:
 |  📓   | **MangaLivre Blog** | `1.0.9`  | matheusparnaiba | [mangalivre.blog](https://mangalivre.blog)           |
 |  💫   | **Hipertoon**       | `1.0.16` | matheusparnaiba | [hipertoon.com](https://hipertoon.com)               |
 |  🇧🇷   | **Mangás Brasuka**  | `1.0.14` | matheusparnaiba | [mangasbrasuka.com.br](https://mangasbrasuka.com.br) |
-|  🌙   | **MangaNYX**        | `1.0.10` | matheusparnaiba | [manganyx.com](https://manganyx.com)                 |
+|  🌙   | **MangaNYX**        | `1.0.11` | matheusparnaiba | [manganyx.com](https://manganyx.com)                 |
 
 ## 🚀 Como Instalar
 

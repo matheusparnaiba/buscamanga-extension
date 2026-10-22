@@ -43,16 +43,65 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
   private homePromise?: { promise: Promise<any>; timestamp: number };
   private keyCache: Map<string, string> = new Map();
 
-  private async getCloudflareResolutionRequest(): Promise<Request> {
+  private async getCloudflareResolutionRequest(domain = "https://manganyx.com"): Promise<Request> {
     const cfUserAgent = Application.getState("cf_user_agent") as string | undefined;
     return {
-      url: "https://manganyx.com/",
+      url: `${domain}/`,
       method: "GET",
       headers: {
         "user-agent": cfUserAgent ?? (await Application.getDefaultUserAgent()),
-        referer: "https://manganyx.com/",
+        referer: `${domain}/`,
       },
     };
+  }
+
+  private async tryUnlockGate(domain: string): Promise<boolean> {
+    try {
+      const startReq: Request = {
+        url: `${domain}/api/gate/start`,
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          referer: `${domain}/`,
+          accept: "application/json, text/plain, */*",
+        },
+        body: JSON.stringify({ returnTo: "/" }),
+      };
+
+      const [startRes, startBuf] = await Application.scheduleRequest(startReq);
+      const startData = Application.arrayBufferToUTF8String(startBuf);
+      if (startRes.status !== 200 || startData.trim().startsWith("<")) {
+        return false;
+      }
+
+      const json = JSON.parse(startData);
+      const token = json.data?.token;
+      if (!token || typeof token !== "string") {
+        return false;
+      }
+
+      const cbReq: Request = {
+        url: `${domain}/gate/callback?token=${encodeURIComponent(token)}`,
+        method: "GET",
+        headers: {
+          referer: `${domain}/`,
+          accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        },
+      };
+
+      const [cbRes, _] = await Application.scheduleRequest(cbReq);
+
+      if (cbRes.cookies && Array.isArray(cbRes.cookies)) {
+        await this.handleCloudflareBypass(cbRes.cookies);
+      }
+
+      return true;
+    } catch (err) {
+      if (err instanceof CloudflareError) {
+        throw err;
+      }
+      return false;
+    }
   }
 
   private async getKey(v: number, e: number): Promise<string> {
@@ -95,21 +144,17 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
 
         const cfMitigated =
           response.headers?.["cf-mitigated"] || response.headers?.["Cf-Mitigated"];
-        const isCfChallenge =
+        const isCf =
           cfMitigated === "challenge" ||
-          response.status === 403 ||
-          response.status === 503 ||
           data.includes("Just a moment...") ||
           data.includes("_cf_chl_opt") ||
-          data.includes("challenges.cloudflare.com");
+          data.includes("challenges.cloudflare.com") ||
+          (response.status === 403 &&
+            data.trim().startsWith("<") &&
+            data.toLowerCase().includes("cloudflare"));
 
-        if (
-          isCfChallenge &&
-          (response.status === 403 ||
-            response.status === 503 ||
-            data.includes("challenges.cloudflare.com"))
-        ) {
-          const resolutionRequest = await this.getCloudflareResolutionRequest();
+        if (isCf) {
+          const resolutionRequest = await this.getCloudflareResolutionRequest(domain);
           cloudflareErrorToThrow = new CloudflareError(
             resolutionRequest,
             "Proteção Cloudflare ativa no MangaNYX! Toque para resolver.",
@@ -123,6 +168,24 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
             this.keyCache.set(cacheKey, json.k);
             Application.setState(json.k, cacheKey);
             return json.k;
+          }
+        }
+
+        // Se a resposta for 403 não-Cloudflare (ex: {"error":"unauthorized"} por falta de gate/cookie),
+        // tenta obter o desbloqueio do gate automaticamente
+        if (response.status === 403 && data.includes("unauthorized")) {
+          const unlockSuccess = await this.tryUnlockGate(domain);
+          if (unlockSuccess) {
+            const [retryRes, retryBuf] = await Application.scheduleRequest(request);
+            const retryData = Application.arrayBufferToUTF8String(retryBuf);
+            if (retryRes.status === 200 && !retryData.trim().startsWith("<")) {
+              const retryJson = JSON.parse(retryData);
+              if (retryJson.k && typeof retryJson.k === "string") {
+                this.keyCache.set(cacheKey, retryJson.k);
+                Application.setState(retryJson.k, cacheKey);
+                return retryJson.k;
+              }
+            }
           }
         }
 
@@ -186,7 +249,7 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
   }
 
   async saveCloudflareBypassCookies(cookies: Cookie[]): Promise<void> {
-    await this.cloudflareBypassCompleted(undefined, cookies);
+    await this.handleCloudflareBypass(cookies);
   }
 
   async cloudflareBypassCompleted(
@@ -194,30 +257,69 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
     cookies?: Cookie[],
     _localStorage?: Record<string, string>,
   ): Promise<void> {
-    if (Array.isArray(cookies)) {
-      for (const cookie of cookies) {
-        if (!cookie || !cookie.name || !cookie.value) continue;
-        if (/^_{0,2}cf/i.test(cookie.name)) {
-          const rawDomain = cookie.domain
-            ? cookie.domain.replace(/^https?:\/\//, "")
-            : "manganyx.com";
-          this.cookieStorageInterceptor.setCookie({
-            ...cookie,
-            domain: rawDomain,
-            path: cookie.path || "/",
-            expires: cookie.expires
-              ? cookie.expires instanceof Date
-                ? cookie.expires
-                : new Date(cookie.expires)
-              : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-          });
+    let ua: string | undefined = undefined;
+    if (request?.headers) {
+      for (const key of Object.keys(request.headers)) {
+        if (key.toLowerCase() === "user-agent") {
+          ua = request.headers[key];
+          break;
         }
       }
     }
-
-    const ua = request?.headers?.["user-agent"] ?? request?.headers?.["User-Agent"];
     if (ua && typeof ua === "string") {
       Application.setState(ua, "cf_user_agent");
+    }
+    if (cookies) {
+      await this.handleCloudflareBypass(cookies);
+    }
+  }
+
+  private async handleCloudflareBypass(cookies: Cookie[]): Promise<void> {
+    if (!cookies || !Array.isArray(cookies)) return;
+
+    const cleanCookies: Array<{ name: string; value: string; domain: string; path: string }> = [];
+    const headerParts: string[] = [];
+
+    for (const c of cookies) {
+      if (!c || !c.name || !c.value) continue;
+      const rawDomain = c.domain ? c.domain.replace(/^https?:\/\//, "") : "manganyx.com";
+      const cleanDomain = rawDomain.replace(/^\./, "");
+      const path = c.path || "/";
+
+      cleanCookies.push({
+        name: c.name,
+        value: c.value,
+        domain: cleanDomain,
+        path,
+      });
+
+      headerParts.push(`${c.name}=${c.value}`);
+
+      try {
+        const domainsToSet = [
+          cleanDomain,
+          `.${cleanDomain}`,
+          cleanDomain.includes(".org") ? "manganyx.com" : "manganyx.org",
+          cleanDomain.includes(".org") ? ".manganyx.com" : ".manganyx.org",
+        ];
+
+        for (const dom of domainsToSet) {
+          this.cookieStorageInterceptor.setCookie({
+            name: c.name,
+            value: c.value,
+            domain: dom,
+            path,
+            expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+          });
+        }
+      } catch {
+        // Ignore
+      }
+    }
+
+    if (cleanCookies.length > 0) {
+      Application.setState(cleanCookies, "manganyx_saved_cookies");
+      Application.setState(headerParts.join("; "), "manganyx_cookie_header");
     }
   }
 
