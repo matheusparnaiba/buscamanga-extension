@@ -123,12 +123,12 @@ export class MangaLivreToExtension implements ExtensionImpl<typeof ContentTempla
     const seenIds = new Set<string>();
 
     if (section.id === "popular") {
-      $(".c-tabs-item__content, .manga-item").each((_, el) => {
-        const titleEl = $(el).find(".post-title a, .manga-title, h3 a, h3").first();
+      $("div.page-item-detail, div.c-tabs-item__content, div.manga-item").each((_, el) => {
+        const titleEl = $(el).find(".post-title a, .manga-title, h3 a, h3, h4 a, h4").first();
         const title = titleEl.text().trim();
-        const linkEl = $(el).find(".post-title a, a[href*='/manga/'], a").first();
+        const linkEl = $(el).find(".post-title a, a[href*='/manga/']").first();
         const href = linkEl.attr("href");
-        const img = getImageSrc($(el).find("img").first());
+        const img = getImageSrc($(el).find(".item-thumb img, .post-thumb img, img").first());
 
         if (href && title) {
           const idMatch = href.match(/\/manga\/([^/]+)/);
@@ -154,12 +154,12 @@ export class MangaLivreToExtension implements ExtensionImpl<typeof ContentTempla
     }
 
     if (section.id === "updates") {
-      $(".manga-item").each((_, el) => {
-        const titleEl = $(el).find(".manga-title, .post-title a, h3 a, h3").first();
+      $("div.manga-item, div.page-item-detail, div.c-tabs-item__content").each((_, el) => {
+        const titleEl = $(el).find(".manga-title, .post-title a, h3 a, h3, h4 a, h4").first();
         const title = titleEl.text().trim();
-        const linkEl = $(el).find("a[href*='/manga/']").first();
+        const linkEl = $(el).find("a[href*='/manga/'], .post-title a").first();
         const href = linkEl.attr("href");
-        const img = getImageSrc($(el).find("img").first());
+        const img = getImageSrc($(el).find(".item-thumb img, .post-thumb img, img").first());
 
         const chapEl = $(el).find(".chapter-list a.chapter-button, .list-chapter a").first();
         const chapHref = chapEl.attr("href") || "";
@@ -231,12 +231,12 @@ export class MangaLivreToExtension implements ExtensionImpl<typeof ContentTempla
     const items: SearchResultItem[] = [];
     const seenIds = new Set<string>();
 
-    $(".c-tabs-item__content, .manga-item").each((_, el) => {
-      const titleEl = $(el).find(".post-title a, .manga-title, h3 a, h3").first();
+    $("div.page-item-detail, div.c-tabs-item__content, div.manga-item").each((_, el) => {
+      const titleEl = $(el).find(".post-title a, .manga-title, h3 a, h3, h4 a, h4").first();
       const title = titleEl.text().trim();
-      const linkEl = $(el).find(".post-title a, a[href*='/manga/'], a").first();
+      const linkEl = $(el).find(".post-title a, a[href*='/manga/']").first();
       const href = linkEl.attr("href");
-      const img = getImageSrc($(el).find("img").first());
+      const img = getImageSrc($(el).find(".item-thumb img, .post-thumb img, img").first());
 
       if (href && title) {
         const idMatch = href.match(/\/manga\/([^/]+)/);
@@ -273,7 +273,18 @@ export class MangaLivreToExtension implements ExtensionImpl<typeof ContentTempla
 
     const title = $(".post-title h1, h1").first().text().trim() || mangaId;
 
-    const rawImage = getImageSrc($(".summary_image img, .post-thumb img, img").first());
+    let rawImage = "";
+    const summaryImg = $(
+      ".summary_image img, .post-thumb img, .tab-summary img, .featured-image img, .item-thumb img",
+    ).first();
+    if (summaryImg.length) {
+      rawImage = getImageSrc(summaryImg);
+    } else {
+      const ogImg = $("meta[property='og:image']").attr("content");
+      if (ogImg && ogImg.startsWith("http") && !ogImg.includes("logo")) {
+        rawImage = ogImg;
+      }
+    }
     const image = rawImage && rawImage.startsWith("http") ? rawImage : undefined;
     const fallbackImage =
       "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
