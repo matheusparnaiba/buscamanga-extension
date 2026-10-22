@@ -25,10 +25,10 @@ export class MainInterceptor extends PaperbackInterceptor {
     const headers: Record<string, string> = {
       ...request.headers,
       "user-agent": ua,
+      referer: request.headers?.referer ?? "https://sakuramangas.org/",
     };
 
     if (isSakuraDomain) {
-      headers["referer"] = "https://sakuramangas.org/";
       if (request.method && request.method.toUpperCase() !== "GET") {
         headers["origin"] = "https://sakuramangas.org";
       }
@@ -53,8 +53,13 @@ export class MainInterceptor extends PaperbackInterceptor {
       }
     }
 
-    if (!isImage) {
+    if (isImage) {
       headers["accept"] =
+        request.headers?.accept ??
+        "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8";
+    } else {
+      headers["accept"] =
+        request.headers?.accept ??
         "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8";
       headers["accept-language"] = "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7";
     }
@@ -72,8 +77,14 @@ export class MainInterceptor extends PaperbackInterceptor {
       const isImage =
         /\.(jpg|jpeg|png|webp|gif|ico|avif)((\?|#).*)?$/i.test(request.url) ||
         request.url.includes("/uploads/") ||
-        request.url.includes("img.");
-      if (!isImage) {
+        request.url.includes("img.") ||
+        request.url.includes("ui-avatars.com");
+
+      const isAjax =
+        request.headers?.["x-requested-with"] === "XMLHttpRequest" ||
+        request.headers?.["X-Requested-With"] === "XMLHttpRequest";
+
+      if (!isImage && !isAjax) {
         const cfUserAgent = Application.getState("cf_user_agent") as string | undefined;
         throw new CloudflareError(
           {

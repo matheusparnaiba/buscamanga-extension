@@ -41,5 +41,5 @@
     "moduleDetection": "force",
     "skipLibCheck": true
   },
-  "exclude": ["./src/tests"]
+  "exclude": ["./src/tests", "temp_inkdex_general", "temp_inkdex_madara"]
 }
