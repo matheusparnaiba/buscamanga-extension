@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-10-22T20:01:39.287Z",
+  "buildTime": "2026-10-22T20:19:41.796Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -11,6 +11,56 @@
     "website": "https://github.com/matheusparnaiba"
   },
   "sources": [
+    {
+      "name": "Fliptru",
+      "description": "Extensão do \"https://fliptru.com.br\"",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "Fliptru",
+      "author": "matheusparnaiba",
+      "desc": "Extensão do \"https://fliptru.com.br\"",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "HQ Now",
+      "description": "Extensão do \"https://www.hq-now.com\"",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "HQNow",
+      "author": "matheusparnaiba",
+      "desc": "Extensão do \"https://www.hq-now.com\"",
+      "website": "https://github.com/matheusparnaiba"
+    },
     {
       "name": "Hipertoon",
       "description": "Extensão do \"https://hipertoon.com\"",
@@ -176,7 +226,7 @@
     {
       "name": "Mangás Brasuka",
       "description": "Extensão do \"https://mangasbrasuka.com.br\"",
-      "version": "1.0.14",
+      "version": "1.0.15",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -228,6 +278,31 @@
       "id": "Manhastro",
       "author": "matheusparnaiba",
       "desc": "Extensão do \"https://manhastro.com\"",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Nebulosa Scan",
+      "description": "Extensão do \"https://nebulosascan.com\"",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "NebulosaScan",
+      "author": "matheusparnaiba",
+      "desc": "Extensão do \"https://nebulosascan.com\"",
       "website": "https://github.com/matheusparnaiba"
     }
   ]
