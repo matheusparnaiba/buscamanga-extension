@@ -16,6 +16,8 @@ Atualmente, nosso repositório conta com as seguintes fontes:
 |  💫   | **Hipertoon**       | `1.0.16` | matheusparnaiba | [hipertoon.com](https://hipertoon.com)               |
 |  🇧🇷   | **Mangás Brasuka**  | `1.0.14` | matheusparnaiba | [mangasbrasuka.com.br](https://mangasbrasuka.com.br) |
 |  🌙   | **MangaNYX**        | `1.0.12` | matheusparnaiba | [manganyx.com](https://manganyx.com)                 |
+|  📖   | **MangaLivre To**   | `1.0.0`  | matheusparnaiba | [mangalivre.to](https://mangalivre.to)               |
+|  ⚡   | **Manhastro**       | `1.0.0`  | matheusparnaiba | [manhastro.com](https://manhastro.com)               |
 
 ## 🚀 Como Instalar
 
