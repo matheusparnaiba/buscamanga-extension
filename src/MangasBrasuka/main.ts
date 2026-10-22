@@ -65,94 +65,88 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     };
   }
 
-  private async tryUnlockGate(domain: string, chapter?: Chapter): Promise<boolean> {
-    try {
-      const mangaId = chapter?.sourceManga.mangaId || "";
-      const chapNum = chapter?.chapNum != null ? chapter.chapNum : 1;
+  private extractCookies(res: any, domain: string): Cookie[] {
+    const parsedCookies: Cookie[] = [];
+    if (res.cookies && Array.isArray(res.cookies)) {
+      parsedCookies.push(...res.cookies);
+    }
 
-      // 1. Tenta rota direta de unlock do leitor (se suportada)
-      const candidates = chapter
-        ? [
-            `/series/${encodeURIComponent(mangaId)}/${chapNum}`,
-            `/manga/${encodeURIComponent(mangaId)}/${chapNum}`,
-            `/manhwa/${encodeURIComponent(mangaId)}/${chapNum}`,
-          ]
-        : ["/series/manga/1"];
-
-      for (const returnTo of candidates) {
-        try {
-          const unlockReq: Request = {
-            url: `${domain}/api/reader/unlock`,
-            method: "POST",
-            headers: {
-              "content-type": "application/json",
-              referer: `${domain}${returnTo}`,
-              origin: domain,
-              accept: "application/json, text/plain, */*",
-              "sec-fetch-dest": "empty",
-              "sec-fetch-mode": "cors",
-              "sec-fetch-site": "same-origin",
-            },
-            body: JSON.stringify({ returnTo }),
-          };
-
-          const [res, buf] = await Application.scheduleRequest(unlockReq);
-          const data = Application.arrayBufferToUTF8String(buf);
-
-          const isSuccess =
-            res.status === 200 &&
-            (data.includes('"ok":true') || (res.cookies && res.cookies.length > 0));
-
-          if (isSuccess) {
-            const parsedCookies: Cookie[] = [];
-
-            if (Array.isArray(res.cookies) && res.cookies.length > 0) {
-              parsedCookies.push(...res.cookies);
-            }
-
-            const rawSetCookie = res.headers?.["set-cookie"] || res.headers?.["Set-Cookie"];
-            if (rawSetCookie) {
-              const cookieLines = Array.isArray(rawSetCookie) ? rawSetCookie : [rawSetCookie];
-              for (const line of cookieLines) {
-                const parts = line.split(";")[0]?.trim();
-                if (parts) {
-                  const [cName, ...cValParts] = parts.split("=");
-                  if (cName && cValParts.length) {
-                    parsedCookies.push({
-                      name: cName.trim(),
-                      value: cValParts.join("=").trim(),
-                      domain: domain.replace(/^https?:\/\//, ""),
-                      path: "/",
-                    });
-                  }
-                }
-              }
-            }
-
-            if (parsedCookies.length > 0) {
-              await this.handleCloudflareBypass(parsedCookies);
-            }
-            return true;
+    const rawSetCookie = res.headers?.["set-cookie"] || res.headers?.["Set-Cookie"];
+    if (rawSetCookie) {
+      const cookieLines = Array.isArray(rawSetCookie) ? rawSetCookie : [rawSetCookie];
+      for (const line of cookieLines) {
+        const parts = line.split(";")[0]?.trim();
+        if (parts) {
+          const [cName, ...cValParts] = parts.split("=");
+          if (cName && cValParts.length) {
+            parsedCookies.push({
+              name: cName.trim(),
+              value: cValParts.join("=").trim(),
+              domain: domain.replace(/^https?:\/\//, ""),
+              path: "/",
+            });
           }
-        } catch {
-          // Continua para o próximo método se falhar
         }
       }
+    }
+    return parsedCookies;
+  }
 
-      // 2. Fluxo de gate (/api/gate/start -> /gate/callback)
+  private async tryUnlockGate(domain: string, chapter?: Chapter): Promise<boolean> {
+    try {
+      const mangaSlug = chapter?.sourceManga.mangaId || "";
+      const chapNum = chapter?.chapNum != null ? chapter.chapNum : 1;
+      const returnTo = mangaSlug ? `/manga/${encodeURIComponent(mangaSlug)}/${chapNum}` : "/";
+
+      // 1. Tenta rota direta de unlock do leitor (se suportada)
+      try {
+        const unlockReq: Request = {
+          url: `${domain}/api/reader/unlock`,
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            referer: `${domain}${returnTo}`,
+            origin: domain,
+            accept: "application/json, text/plain, */*",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-origin",
+          },
+          body: JSON.stringify({ returnTo }),
+        };
+
+        const [res, buf] = await Application.scheduleRequest(unlockReq);
+        const data = Application.arrayBufferToUTF8String(buf);
+
+        const isSuccess =
+          res.status === 200 &&
+          (data.includes('"ok":true') || (res.cookies && res.cookies.length > 0));
+
+        if (isSuccess) {
+          const parsedCookies = this.extractCookies(res, domain);
+          if (parsedCookies.length > 0) {
+            await this.handleCloudflareBypass(parsedCookies);
+          }
+          return true;
+        }
+      } catch {
+        // Continua para o fluxo oficial de gate se reader/unlock não for suportado
+      }
+
+      // 2. Fluxo oficial de gate do Mangás Brasuka (/api/gate/start -> aguarda minWait -> /gate/callback)
       const startReq: Request = {
         url: `${domain}/api/gate/start`,
         method: "POST",
         headers: {
           "content-type": "application/json",
-          referer: `${domain}/`,
+          referer: `${domain}${returnTo}`,
           origin: domain,
           accept: "application/json, text/plain, */*",
           "sec-fetch-dest": "empty",
           "sec-fetch-mode": "cors",
           "sec-fetch-site": "same-origin",
         },
-        body: JSON.stringify({ returnTo: "/" }),
+        body: JSON.stringify({ returnTo }),
       };
 
       const [startRes, startBuf] = await Application.scheduleRequest(startReq);
@@ -167,49 +161,51 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
         return false;
       }
 
+      const gateUrl = json.data?.gateUrl;
+      const minWaitSeconds =
+        typeof json.data?.minWaitSeconds === "number" ? json.data.minWaitSeconds : 8;
+
+      if (gateUrl && typeof gateUrl === "string") {
+        try {
+          const pingReq: Request = {
+            url: gateUrl,
+            method: "GET",
+            headers: {
+              referer: `${domain}/`,
+            },
+          };
+          await Application.scheduleRequest(pingReq);
+        } catch {
+          // Ignora falha de ping externo
+        }
+      }
+
+      // O servidor exige um intervalo mínimo (~8s) antes de autorizar o token no callback,
+      // caso contrário retorna redirecionamento com ?gate_error=too_fast sem definir os cookies.
+      const waitMs = Math.max(8, minWaitSeconds) * 1000 + 500;
+      await new Promise((resolve) => setTimeout(resolve, waitMs));
+
       const cbReq: Request = {
         url: `${domain}/gate/callback?token=${encodeURIComponent(token)}`,
         method: "GET",
         headers: {
-          referer: `${domain}/`,
+          referer: gateUrl || `${domain}${returnTo}`,
           accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
           "sec-fetch-dest": "document",
           "sec-fetch-mode": "navigate",
-          "sec-fetch-site": "same-origin",
+          "sec-fetch-site": "cross-site",
         },
       };
 
       const [cbRes, _] = await Application.scheduleRequest(cbReq);
-
-      const parsedCookies: Cookie[] = [];
-      if (cbRes.cookies && Array.isArray(cbRes.cookies)) {
-        parsedCookies.push(...cbRes.cookies);
-      }
-
-      const rawSetCookie = cbRes.headers?.["set-cookie"] || cbRes.headers?.["Set-Cookie"];
-      if (rawSetCookie) {
-        const cookieLines = Array.isArray(rawSetCookie) ? rawSetCookie : [rawSetCookie];
-        for (const line of cookieLines) {
-          const parts = line.split(";")[0]?.trim();
-          if (parts) {
-            const [cName, ...cValParts] = parts.split("=");
-            if (cName && cValParts.length) {
-              parsedCookies.push({
-                name: cName.trim(),
-                value: cValParts.join("=").trim(),
-                domain: domain.replace(/^https?:\/\//, ""),
-                path: "/",
-              });
-            }
-          }
-        }
-      }
+      const parsedCookies = this.extractCookies(cbRes, domain);
 
       if (parsedCookies.length > 0) {
         await this.handleCloudflareBypass(parsedCookies);
+        return true;
       }
 
-      return true;
+      return false;
     } catch (err) {
       if (err instanceof CloudflareError) {
         throw err;
@@ -271,7 +267,7 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
 
     const mangaId = chapter?.sourceManga.mangaId || "";
     const chapNum = chapter?.chapNum != null ? chapter.chapNum : 1;
-    const chapterPath = chapter ? `/series/${encodeURIComponent(mangaId)}/${chapNum}` : "/";
+    const chapterPath = chapter ? `/manga/${encodeURIComponent(mangaId)}/${chapNum}` : "/";
 
     for (const domain of domains) {
       const url = `${domain}/api/atfield/key?v=${v}&e=${e}`;
@@ -319,7 +315,17 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
         if (response.status === 403 && data.includes("unauthorized")) {
           const unlockSuccess = await this.tryUnlockGate(domain, chapter);
           if (unlockSuccess) {
-            const [retryRes, retryBuf] = await Application.scheduleRequest(request);
+            const latestCookie = Application.getState("brasuka_cookie_header") as
+              | string
+              | undefined;
+            const retryRequest: Request = {
+              ...request,
+              headers: {
+                ...request.headers,
+                ...(latestCookie ? { cookie: latestCookie } : {}),
+              },
+            };
+            const [retryRes, retryBuf] = await Application.scheduleRequest(retryRequest);
             response = retryRes;
             buffer = retryBuf;
             data = Application.arrayBufferToUTF8String(retryBuf);
