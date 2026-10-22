@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-10-22T20:44:15.790Z",
+  "buildTime": "2026-10-22T20:53:15.686Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -24,7 +24,13 @@
         64,
         1
       ],
-      "badges": [],
+      "badges": [
+        {
+          "label": "Quadrinhos Nacionais",
+          "textColor": "#ffffff",
+          "backgroundColor": "#10b981"
+        }
+      ],
       "developers": [
         {
           "name": "matheusparnaiba",
@@ -49,7 +55,13 @@
         64,
         1
       ],
-      "badges": [],
+      "badges": [
+        {
+          "label": "HQs & Comics",
+          "textColor": "#ffffff",
+          "backgroundColor": "#ef4444"
+        }
+      ],
       "developers": [
         {
           "name": "matheusparnaiba",
@@ -77,9 +89,14 @@
       ],
       "badges": [
         {
+          "label": "Manhwas",
+          "textColor": "#ffffff",
+          "backgroundColor": "#8b5cf6"
+        },
+        {
           "label": "Cloudflare",
           "textColor": "#000000",
-          "backgroundColor": "#ffc107"
+          "backgroundColor": "#f59e0b"
         }
       ],
       "developers": [
@@ -106,7 +123,13 @@
         64,
         1
       ],
-      "badges": [],
+      "badges": [
+        {
+          "label": "Mangás & Manhuas",
+          "textColor": "#ffffff",
+          "backgroundColor": "#3b82f6"
+        }
+      ],
       "developers": [
         {
           "name": "matheusparnaiba",
@@ -131,7 +154,13 @@
         64,
         1
       ],
-      "badges": [],
+      "badges": [
+        {
+          "label": "Mangás Diversos",
+          "textColor": "#ffffff",
+          "backgroundColor": "#3b82f6"
+        }
+      ],
       "developers": [
         {
           "name": "matheusparnaiba",
@@ -156,7 +185,13 @@
         64,
         1
       ],
-      "badges": [],
+      "badges": [
+        {
+          "label": "Mangás Populares",
+          "textColor": "#ffffff",
+          "backgroundColor": "#3b82f6"
+        }
+      ],
       "developers": [
         {
           "name": "matheusparnaiba",
@@ -184,9 +219,14 @@
       ],
       "badges": [
         {
+          "label": "Catálogo Geral",
+          "textColor": "#ffffff",
+          "backgroundColor": "#6366f1"
+        },
+        {
           "label": "Cloudflare",
           "textColor": "#000000",
-          "backgroundColor": "#ffc107"
+          "backgroundColor": "#f59e0b"
         }
       ],
       "developers": [
@@ -213,7 +253,13 @@
         64,
         1
       ],
-      "badges": [],
+      "badges": [
+        {
+          "label": "Mangás & Manhwas",
+          "textColor": "#ffffff",
+          "backgroundColor": "#3b82f6"
+        }
+      ],
       "developers": [
         {
           "name": "matheusparnaiba"
@@ -239,9 +285,14 @@
       ],
       "badges": [
         {
+          "label": "Mangás & Scans",
+          "textColor": "#ffffff",
+          "backgroundColor": "#06b6d4"
+        },
+        {
           "label": "Cloudflare",
           "textColor": "#000000",
-          "backgroundColor": "#ffc107"
+          "backgroundColor": "#f59e0b"
         }
       ],
       "developers": [
@@ -268,7 +319,13 @@
         64,
         1
       ],
-      "badges": [],
+      "badges": [
+        {
+          "label": "Manhwas & Ação",
+          "textColor": "#ffffff",
+          "backgroundColor": "#8b5cf6"
+        }
+      ],
       "developers": [
         {
           "name": "matheusparnaiba",
@@ -293,7 +350,13 @@
         64,
         1
       ],
-      "badges": [],
+      "badges": [
+        {
+          "label": "Scans Exclusivas",
+          "textColor": "#ffffff",
+          "backgroundColor": "#ec4899"
+        }
+      ],
       "developers": [
         {
           "name": "matheusparnaiba",
