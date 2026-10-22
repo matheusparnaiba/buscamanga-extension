@@ -152,8 +152,11 @@ buscamanga-extension/
 │   ├── ArthurScan/
 │   ├── BorutoExplorer/
 │   ├── Fliptru/
+│   ├── HentaiHQ/
 │   ├── Hipertoon/
+│   ├── HQHentai/
 │   ├── HQNow/
+│   ├── HQPorno/
 │   ├── KamiSamaExplorer/
 │   ├── LeituraManga/
 │   ├── MangaFlix/
@@ -163,7 +166,10 @@ buscamanga-extension/
 │   ├── MangaOnline/
 │   ├── MangasBrasuka/
 │   ├── Manhastro/
+│   ├── MuitoHentai/
+│   ├── MundoHentai/
 │   ├── NebulosaScan/
+│   ├── NHentaiBR/
 │   ├── NinjaScan/
 │   ├── TaoSect/
 │   └── YuriOnAir/
