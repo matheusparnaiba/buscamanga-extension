@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-10-22T21:26:16.296Z",
+  "buildTime": "2026-10-22T22:00:42.470Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -272,7 +272,7 @@
     {
       "name": "Mangás Brasuka",
       "description": "Extensão do \"https://mangasbrasuka.com.br\"",
-      "version": "1.0.15",
+      "version": "1.0.16",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
