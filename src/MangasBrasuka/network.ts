@@ -37,10 +37,10 @@ export class MainInterceptor extends PaperbackInterceptor {
       headers["origin"] = "https://mangasbrasuka.com.br";
     }
 
+    delete headers["Cookie"];
     const cookieHeader = Application.getState("brasuka_cookie_header") as string | undefined;
     if (cookieHeader) {
       headers["cookie"] = cookieHeader;
-      headers["Cookie"] = cookieHeader;
     }
 
     const savedCookies = Application.getState("brasuka_saved_cookies") as
@@ -74,29 +74,28 @@ export class MainInterceptor extends PaperbackInterceptor {
       request.url.includes("snipercache");
 
     if (!isImage) {
-      const cfUserAgent = Application.getState("cf_user_agent") as string | undefined;
-      const resolutionRequest: Request = {
-        url: "https://mangasbrasuka.com.br/",
-        method: "GET",
-        headers: {
-          "user-agent": cfUserAgent ?? (await Application.getDefaultUserAgent()),
-          referer: "https://mangasbrasuka.com.br/",
-        },
-      };
-
-      if (response.status === 403 || response.status === 503) {
-        throw new CloudflareError(
-          resolutionRequest,
-          "Proteção Cloudflare ativa no Mangás Brasuka! Toque para resolver.",
-        );
-      }
-
       const text = Application.arrayBufferToUTF8String(data);
-      if (
+      const isCf =
         text.includes("Just a moment...") ||
         text.includes("_cf_chl_opt") ||
-        text.includes("challenges.cloudflare.com")
-      ) {
+        text.includes("challenges.cloudflare.com") ||
+        (response.status === 403 &&
+          text.trim().startsWith("<") &&
+          text.toLowerCase().includes("cloudflare"));
+
+      if (isCf) {
+        const cfUserAgent = Application.getState("cf_user_agent") as string | undefined;
+        const resolutionRequest: Request = {
+          url: request.url.includes("/api/atfield/key")
+            ? request.url
+            : "https://mangasbrasuka.com.br/",
+          method: "GET",
+          headers: {
+            "user-agent": cfUserAgent ?? (await Application.getDefaultUserAgent()),
+            referer: "https://mangasbrasuka.com.br/",
+          },
+        };
+
         throw new CloudflareError(
           resolutionRequest,
           "Proteção Cloudflare ativa no Mangás Brasuka! Toque para resolver.",

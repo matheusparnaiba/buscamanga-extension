@@ -33,10 +33,10 @@ export class MainInterceptor extends PaperbackInterceptor {
         headers["origin"] = "https://sakuramangas.org";
       }
 
+      delete headers["Cookie"];
       const cookieHeader = Application.getState("sakura_cookie_header") as string | undefined;
       if (cookieHeader) {
         headers["cookie"] = cookieHeader;
-        headers["Cookie"] = cookieHeader;
       }
 
       const savedCookies = Application.getState("sakura_saved_cookies") as

@@ -1,7 +1,6 @@
 import {
   BasicRateLimiter,
   CloudflareError,
-  CookieStorageInterceptor,
   ContentRating,
   DiscoverSectionType,
   type Chapter,
@@ -23,7 +22,7 @@ import {
 import { decrypt, getParams } from "./decrypt";
 import { SettingsForm } from "./forms";
 import type { ContentTemplateSearchMetadata } from "./models";
-import { MainInterceptor } from "./network";
+import { MainInterceptor, SafeCookieStorageInterceptor } from "./network";
 import type ContentTemplateConfig from "./pbconfig";
 
 const API_BASE = "https://app.manganyx.com/v1/www";
@@ -35,8 +34,8 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
     ignoreImages: true,
   });
 
-  cookieStorageInterceptor = new CookieStorageInterceptor({
-    storage: "memory",
+  cookieStorageInterceptor = new SafeCookieStorageInterceptor({
+    storage: "stateManager",
   });
 
   mainInterceptor = new MainInterceptor("main");
@@ -44,10 +43,10 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
   private homePromise?: { promise: Promise<any>; timestamp: number };
   private keyCache: Map<string, string> = new Map();
 
-  private async getCloudflareResolutionRequest(): Promise<Request> {
+  private async getCloudflareResolutionRequest(targetUrl?: string): Promise<Request> {
     const cfUserAgent = Application.getState("cf_user_agent") as string | undefined;
     return {
-      url: "https://manganyx.com/",
+      url: targetUrl || "https://manganyx.com/",
       method: "GET",
       headers: {
         "user-agent": cfUserAgent ?? (await Application.getDefaultUserAgent()),
@@ -70,10 +69,12 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
     }
 
     const domains = ["https://manganyx.com", "https://manganyx.org"];
+    let cloudflareErrorToThrow: CloudflareError | null = null;
+    let lastError: Error | null = null;
 
     for (const domain of domains) {
+      const url = `${domain}/api/atfield/key?v=${v}&e=${e}`;
       try {
-        const url = `${domain}/api/atfield/key?v=${v}&e=${e}`;
         const request: Request = {
           url,
           method: "GET",
@@ -89,18 +90,28 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
         const [response, buffer] = await Application.scheduleRequest(request);
         const data = Application.arrayBufferToUTF8String(buffer);
 
-        if (
+        const cfMitigated =
+          response.headers?.["cf-mitigated"] || response.headers?.["Cf-Mitigated"];
+        const isCfChallenge =
+          cfMitigated === "challenge" ||
           response.status === 403 ||
           response.status === 503 ||
           data.includes("Just a moment...") ||
           data.includes("_cf_chl_opt") ||
-          data.includes("challenges.cloudflare.com")
+          data.includes("challenges.cloudflare.com");
+
+        if (
+          isCfChallenge &&
+          (response.status === 403 ||
+            response.status === 503 ||
+            data.includes("challenges.cloudflare.com"))
         ) {
-          const resolutionRequest = await this.getCloudflareResolutionRequest();
-          throw new CloudflareError(
+          const resolutionRequest = await this.getCloudflareResolutionRequest(url);
+          cloudflareErrorToThrow = new CloudflareError(
             resolutionRequest,
             "Proteção Cloudflare ativa no MangaNYX! Toque para resolver.",
           );
+          continue;
         }
 
         if (response.status === 200 && !data.trim().startsWith("<")) {
@@ -111,18 +122,24 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
             return json.k;
           }
         }
+
+        lastError = new Error(
+          `Resposta inválida ao obter chave de descriptografia (HTTP ${response.status})`,
+        );
       } catch (err) {
         if (err instanceof CloudflareError) {
-          throw err;
+          cloudflareErrorToThrow = err;
+        } else if (err instanceof Error) {
+          lastError = err;
         }
       }
     }
 
-    const resolutionRequest = await this.getCloudflareResolutionRequest();
-    throw new CloudflareError(
-      resolutionRequest,
-      "Proteção Cloudflare ativa no MangaNYX! Toque para resolver.",
-    );
+    if (cloudflareErrorToThrow) {
+      throw cloudflareErrorToThrow;
+    }
+
+    throw lastError ?? new Error("Não foi possível obter a chave de descriptografia das páginas.");
   }
 
   private async getHomeData(): Promise<any> {
@@ -163,91 +180,41 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
     this.mainRateLimiter.registerInterceptor();
     this.cookieStorageInterceptor.registerInterceptor();
     this.mainInterceptor.registerInterceptor();
-
-    const saved = Application.getState("manganyx_saved_cookies") as
-      | Array<{ name: string; value: string; domain?: string; path?: string }>
-      | undefined;
-    if (Array.isArray(saved)) {
-      for (const c of saved) {
-        if (c?.name && c?.value) {
-          try {
-            this.cookieStorageInterceptor.setCookie({
-              name: c.name,
-              value: c.value,
-              domain: c.domain || "manganyx.com",
-              path: c.path || "/",
-              expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-            });
-          } catch {
-            // Ignore any CookieStorageInterceptor issues
-          }
-        }
-      }
-    }
   }
 
   async saveCloudflareBypassCookies(cookies: Cookie[]): Promise<void> {
-    await this.handleCloudflareBypass(cookies);
+    await this.cloudflareBypassCompleted(undefined, cookies);
   }
 
   async cloudflareBypassCompleted(
-    request: Request,
-    cookies: Cookie[],
-    _localStorage: Record<string, string>,
+    request?: Request,
+    cookies?: Cookie[],
+    _localStorage?: Record<string, string>,
   ): Promise<void> {
-    let ua: string | undefined = undefined;
-    if (request.headers) {
-      for (const key of Object.keys(request.headers)) {
-        if (key.toLowerCase() === "user-agent") {
-          ua = request.headers[key];
-          break;
+    if (Array.isArray(cookies)) {
+      for (const cookie of cookies) {
+        if (!cookie || !cookie.name || !cookie.value) continue;
+        if (/^_{0,2}cf/i.test(cookie.name)) {
+          const rawDomain = cookie.domain
+            ? cookie.domain.replace(/^https?:\/\//, "")
+            : "manganyx.com";
+          this.cookieStorageInterceptor.setCookie({
+            ...cookie,
+            domain: rawDomain,
+            path: cookie.path || "/",
+            expires: cookie.expires
+              ? cookie.expires instanceof Date
+                ? cookie.expires
+                : new Date(cookie.expires)
+              : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+          });
         }
       }
     }
+
+    const ua = request?.headers?.["user-agent"] ?? request?.headers?.["User-Agent"];
     if (ua && typeof ua === "string") {
       Application.setState(ua, "cf_user_agent");
-    }
-    await this.handleCloudflareBypass(cookies);
-  }
-
-  private async handleCloudflareBypass(cookies: Cookie[]): Promise<void> {
-    if (!cookies || !Array.isArray(cookies)) return;
-
-    const cleanCookies: Array<{ name: string; value: string; domain: string; path: string }> = [];
-    const headerParts: string[] = [];
-
-    for (const c of cookies) {
-      if (!c || !c.name || !c.value) continue;
-      const domain = c.domain ? c.domain.replace(/^https?:\/\//, "") : "manganyx.com";
-      const path = c.path || "/";
-
-      cleanCookies.push({
-        name: c.name,
-        value: c.value,
-        domain,
-        path,
-      });
-
-      headerParts.push(`${c.name}=${c.value}`);
-
-      try {
-        this.cookieStorageInterceptor.setCookie({
-          name: c.name,
-          value: c.value,
-          domain,
-          path,
-          expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-        });
-      } catch {
-        // Ignore any CookieStorageInterceptor issues
-      }
-    }
-
-    if (cleanCookies.length > 0) {
-      Application.setState(cleanCookies, "manganyx_saved_cookies");
-    }
-    if (headerParts.length > 0) {
-      Application.setState(headerParts.join("; "), "manganyx_cookie_header");
     }
   }
 
@@ -549,11 +516,7 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
     }
 
     if (pages.length === 0 && rawPages.length > 0) {
-      const resolutionRequest = await this.getCloudflareResolutionRequest();
-      throw new CloudflareError(
-        resolutionRequest,
-        "Não foi possível carregar as páginas do capítulo. Proteção Cloudflare ativa! Toque para resolver.",
-      );
+      throw new Error("Não foi possível carregar as páginas do capítulo.");
     }
 
     return {

@@ -36,10 +36,10 @@ export class MainInterceptor extends PaperbackInterceptor {
       headers["origin"] = "https://hipertoon.com";
     }
 
+    delete headers["Cookie"];
     const cookieHeader = Application.getState("hipertoon_cookie_header") as string | undefined;
     if (cookieHeader) {
       headers["cookie"] = cookieHeader;
-      headers["Cookie"] = cookieHeader;
     }
 
     const savedCookies = Application.getState("hipertoon_saved_cookies") as
@@ -70,29 +70,26 @@ export class MainInterceptor extends PaperbackInterceptor {
       request.url.includes("img.");
 
     if (!isImage) {
-      const cfUserAgent = Application.getState("cf_user_agent") as string | undefined;
-      const resolutionRequest: Request = {
-        url: "https://hipertoon.com/",
-        method: "GET",
-        headers: {
-          "user-agent": cfUserAgent ?? (await Application.getDefaultUserAgent()),
-          referer: "https://hipertoon.com/",
-        },
-      };
-
-      if (response.status === 403 || response.status === 503) {
-        throw new CloudflareError(
-          resolutionRequest,
-          "Cloudflare detectado no Hipertoon, resolva o desafio para continuar!",
-        );
-      }
-
       const text = Application.arrayBufferToUTF8String(data);
-      if (
+      const isCf =
         text.includes("Just a moment...") ||
         text.includes("_cf_chl_opt") ||
-        text.includes("challenges.cloudflare.com")
-      ) {
+        text.includes("challenges.cloudflare.com") ||
+        (response.status === 403 &&
+          text.trim().startsWith("<") &&
+          text.toLowerCase().includes("cloudflare"));
+
+      if (isCf) {
+        const cfUserAgent = Application.getState("cf_user_agent") as string | undefined;
+        const resolutionRequest: Request = {
+          url: "https://hipertoon.com/",
+          method: "GET",
+          headers: {
+            "user-agent": cfUserAgent ?? (await Application.getDefaultUserAgent()),
+            referer: "https://hipertoon.com/",
+          },
+        };
+
         throw new CloudflareError(
           resolutionRequest,
           "Cloudflare detectado no Hipertoon, resolva o desafio para continuar!",

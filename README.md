@@ -11,11 +11,11 @@ Atualmente, nosso repositório conta com as seguintes fontes:
 | Ícone | Nome                |  Versão  | Desenvolvedor   | Site Oficial                                         |
 | :---: | ------------------- | :------: | --------------- | ---------------------------------------------------- |
 |  🌟   | **Manga Online**    | `1.0.16` | matheusparnaiba | [mangaonline.love](https://mangaonline.love)         |
-|  🌸   | **Sakura Mangas**   | `1.0.16` | matheusparnaiba | [sakuramangas.org](https://sakuramangas.org)         |
+|  🌸   | **Sakura Mangas**   | `1.0.17` | matheusparnaiba | [sakuramangas.org](https://sakuramangas.org)         |
 |  📓   | **MangaLivre Blog** | `1.0.9`  | matheusparnaiba | [mangalivre.blog](https://mangalivre.blog)           |
-|  💫   | **Hipertoon**       | `1.0.15` | matheusparnaiba | [hipertoon.com](https://hipertoon.com)               |
-|  🇧🇷   | **Mangás Brasuka**  | `1.0.11` | matheusparnaiba | [mangasbrasuka.com.br](https://mangasbrasuka.com.br) |
-|  🌙   | **MangaNYX**        | `1.0.8`  | matheusparnaiba | [manganyx.com](https://manganyx.com)                 |
+|  💫   | **Hipertoon**       | `1.0.16` | matheusparnaiba | [hipertoon.com](https://hipertoon.com)               |
+|  🇧🇷   | **Mangás Brasuka**  | `1.0.12` | matheusparnaiba | [mangasbrasuka.com.br](https://mangasbrasuka.com.br) |
+|  🌙   | **MangaNYX**        | `1.0.9`  | matheusparnaiba | [manganyx.com](https://manganyx.com)                 |
 
 ## 🚀 Como Instalar
 
