@@ -67,46 +67,6 @@ jobs:
           cp -r bundles/* deploy_root/${{ github.ref_name }}/
           cp root-index.html deploy_root/index.html
           cp -r assets deploy_root/assets
-          mkdir -p deploy_root/0.8/stable
-          cp bundles/index.html deploy_root/0.8/stable/index.html
-          cp bundles/logo.png deploy_root/0.8/stable/logo.png
-          cp bundles/buscamanga.ico deploy_root/0.8/stable/buscamanga.ico
-          if [ -f "bundles/tests.json" ]; then cp bundles/tests.json deploy_root/0.8/stable/tests.json; fi
-          for ext in MangaLivreBlog MangaOnline MangasBrasuka; do
-            if [ -d "bundles/$ext" ]; then
-              cp -r "bundles/$ext" deploy_root/0.8/stable/
-              if [ -f "deploy_root/0.8/stable/$ext/index.js" ]; then
-                cp "deploy_root/0.8/stable/$ext/index.js" "deploy_root/0.8/stable/$ext/source.js"
-                node -e "const fs=require('fs');const p='deploy_root/0.8/stable/'+'$ext'+'/source.js';let code=fs.readFileSync(p,'utf8');const extId='$ext';const wrap='\n;(function(){var mod=typeof source!==\"undefined\"?source:{};var cls=mod.'+extId+'Extension||mod.BuscaMangaExtension||mod.HipertoonExtension||mod.MangaLivreBlogExtension||mod.MangasBrasukaExtension||Object.values(mod).find(v=>typeof v===\"function\");if(cls){globalThis.Sources=globalThis.Sources||{};globalThis.Sources['+JSON.stringify(extId)+']=cls;if(typeof this!==\"undefined\")this.Sources=globalThis.Sources;if(typeof module!==\"undefined\"&&module.exports)module.exports.Sources=globalThis.Sources;}})();\n';fs.writeFileSync(p,code+wrap);"
-              fi
-              if [ -f "deploy_root/0.8/stable/$ext/icon.png" ]; then
-                mkdir -p "deploy_root/0.8/stable/$ext/includes"
-                cp "deploy_root/0.8/stable/$ext/icon.png" "deploy_root/0.8/stable/$ext/includes/icon.png"
-              fi
-            fi
-          done
-          node -e "
-            const fs = require('fs');
-            const v = JSON.parse(fs.readFileSync('bundles/versioning.json', 'utf8'));
-            if (v.repository) {
-              v.repository.author = 'matheusparnaiba';
-              v.repository.website = 'https://github.com/matheusparnaiba/buscamanga-extension';
-            }
-            const compatible = ['MangaLivreBlog', 'MangaOnline', 'MangasBrasuka'];
-            v.sources = v.sources
-              .filter(s => compatible.includes(s.id) || compatible.includes(s.name))
-              .map(s => {
-                s.author = (s.developers && s.developers[0] && s.developers[0].name) ? s.developers[0].name : 'matheusparnaiba';
-                s.desc = s.desc || s.description || '';
-                s.website = (s.developers && s.developers[0] && s.developers[0].github) ? s.developers[0].github : 'https://github.com/matheusparnaiba/buscamanga-extension';
-                s.tags = Array.isArray(s.tags) ? s.tags : [];
-                s.intents = 21;
-                const urlMatch = (s.description || '').match(/https?:\/\/[^\s\"]+/);
-                s.websiteBaseURL = s.websiteBaseURL || (urlMatch ? urlMatch[0] : '');
-                return s;
-              });
-            fs.writeFileSync('deploy_root/0.8/stable/versioning.json', JSON.stringify(v, null, 2));
-          "
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:

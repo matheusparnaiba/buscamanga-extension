@@ -2,27 +2,26 @@
 
 Bem-vindo ao repositório do **BuscaMangá Extension**, uma coleção de fontes para o aplicativo **Paperback** criada para facilitar a leitura de mangás em português.
 
-> ℹ️ **Aviso de Compatibilidade:** Este repositório possui suporte para as versões **0.9** e **0.8** do aplicativo Paperback. Na rota `0.9/stable`, todas as fontes estão disponíveis com recursos nativos de Cloudflare Bypass. Na rota `0.8/stable`, estão disponíveis exclusivamente as fontes compatíveis com a versão 0.8 do aplicativo.
+> ℹ️ **Aviso de Compatibilidade:** Este repositório possui suporte exclusivo para o **Paperback v0.9+**, com recursos nativos de Cloudflare Bypass em todas as fontes disponíveis.
 
 ## 📦 Fontes Disponíveis
 
 Atualmente, nosso repositório conta com as seguintes fontes:
 
-| Ícone | Nome                |  Versão  | Desenvolvedor   | v0.8 | v0.9 | Site Oficial                                         |
-| :---: | ------------------- | :------: | --------------- | :--: | :--: | ---------------------------------------------------- |
-|  🌟   | **Manga Online**    | `1.0.16` | matheusparnaiba |  ✅  |  ✅  | [mangaonline.love](https://mangaonline.love)         |
-|  🌸   | **Sakura Mangas**   | `1.0.13` | matheusparnaiba |  ❌  |  ✅  | [sakuramangas.org](https://sakuramangas.org)         |
-|  📓   | **MangaLivre Blog** | `1.0.9`  | matheusparnaiba |  ✅  |  ✅  | [mangalivre.blog](https://mangalivre.blog)           |
-|  💫   | **Hipertoon**       | `1.0.14` | matheusparnaiba |  ❌  |  ✅  | [hipertoon.com](https://hipertoon.com)               |
-|  🇧🇷   | **Mangás Brasuka**  | `1.0.9`  | matheusparnaiba |  ✅  |  ✅  | [mangasbrasuka.com.br](https://mangasbrasuka.com.br) |
-|  🌙   | **MangaNYX**        | `1.0.5`  | matheusparnaiba |  ❌  |  ✅  | [manganyx.com](https://manganyx.com)                 |
+| Ícone | Nome                |  Versão  | Desenvolvedor   | Site Oficial                                         |
+| :---: | ------------------- | :------: | --------------- | ---------------------------------------------------- |
+|  🌟   | **Manga Online**    | `1.0.16` | matheusparnaiba | [mangaonline.love](https://mangaonline.love)         |
+|  🌸   | **Sakura Mangas**   | `1.0.13` | matheusparnaiba | [sakuramangas.org](https://sakuramangas.org)         |
+|  📓   | **MangaLivre Blog** | `1.0.9`  | matheusparnaiba | [mangalivre.blog](https://mangalivre.blog)           |
+|  💫   | **Hipertoon**       | `1.0.14` | matheusparnaiba | [hipertoon.com](https://hipertoon.com)               |
+|  🇧🇷   | **Mangás Brasuka**  | `1.0.9`  | matheusparnaiba | [mangasbrasuka.com.br](https://mangasbrasuka.com.br) |
+|  🌙   | **MangaNYX**        | `1.0.5`  | matheusparnaiba | [manganyx.com](https://manganyx.com)                 |
 
 ## 🚀 Como Instalar
 
 1. Baixe o aplicativo **Paperback** em seu dispositivo móvel.
-2. Acesse a página do repositório correspondente à sua versão do aplicativo:
-   - Para o **Paperback v0.9**: [https://matheusparnaiba.github.io/buscamanga-extension/0.9/stable/](https://matheusparnaiba.github.io/buscamanga-extension/0.9/stable/)
-   - Para o **Paperback v0.8**: [https://matheusparnaiba.github.io/buscamanga-extension/0.8/stable/](https://matheusparnaiba.github.io/buscamanga-extension/0.8/stable/)
+2. Acesse a página do repositório:
+   - [https://matheusparnaiba.github.io/buscamanga-extension/0.9/stable/](https://matheusparnaiba.github.io/buscamanga-extension/0.9/stable/)
 3. Clique no botão **Adicionar ao Paperback** ou adicione o link do repositório diretamente na aba de repositórios do aplicativo.
 4. Vá em Extensões (Fontes) no app e instale as fontes desejadas.
 
