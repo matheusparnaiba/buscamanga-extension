@@ -41,10 +41,21 @@ export class MainInterceptor extends PaperbackInterceptor {
       headers["origin"] = request.headers?.origin ?? targetDomain;
     }
 
-    delete headers["Cookie"];
     const cookieHeader = Application.getState("brasuka_cookie_header") as string | undefined;
-    if (cookieHeader) {
-      headers["cookie"] = cookieHeader;
+    const existingCookie = request.headers?.["cookie"] ?? request.headers?.["Cookie"];
+    delete headers["Cookie"];
+    if (cookieHeader || existingCookie) {
+      const mergedMap: Record<string, string> = {};
+      for (const src of [cookieHeader, existingCookie]) {
+        if (!src) continue;
+        for (const part of src.split(";")) {
+          const [k, ...v] = part.trim().split("=");
+          if (k && v.length) mergedMap[k.trim()] = v.join("=").trim();
+        }
+      }
+      headers["cookie"] = Object.entries(mergedMap)
+        .map(([k, v]) => `${k}=${v}`)
+        .join("; ");
     }
 
     const savedCookies = Application.getState("brasuka_saved_cookies") as

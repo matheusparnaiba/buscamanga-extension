@@ -53,16 +53,38 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
 
   private async getCloudflareResolutionRequest(
     domain = "https://mangasbrasuka.org",
+    chapter?: Chapter,
   ): Promise<Request> {
     const cfUserAgent = Application.getState("cf_user_agent") as string | undefined;
+    const mangaId = chapter?.sourceManga.mangaId || "";
+    const chapNum = chapter?.chapNum != null ? chapter.chapNum : 1;
+    const path = mangaId ? `/manga/${encodeURIComponent(mangaId)}/${chapNum}` : "/";
     return {
-      url: `${domain}/`,
+      url: `${domain}${path}`,
       method: "GET",
       headers: {
-        "user-agent": cfUserAgent ?? (await Application.getDefaultUserAgent()),
+        ...(cfUserAgent ? { "user-agent": cfUserAgent } : {}),
         referer: `${domain}/`,
       },
     };
+  }
+
+  async handleRedirect(
+    proposedRequest: Request,
+    redirectedResponse: any,
+  ): Promise<Request | undefined> {
+    try {
+      const domain = proposedRequest.url.startsWith("https://mangasbrasuka.org")
+        ? "https://mangasbrasuka.org"
+        : "https://mangasbrasuka.com.br";
+      const cookies = this.extractCookies(redirectedResponse, domain);
+      if (cookies.length > 0) {
+        await this.handleCloudflareBypass(cookies);
+      }
+    } catch {
+      // Ignore
+    }
+    return proposedRequest;
   }
 
   private extractCookies(res: any, domain: string): Cookie[] {
@@ -182,8 +204,12 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
 
       // O servidor exige um intervalo mínimo (~8s) antes de autorizar o token no callback,
       // caso contrário retorna redirecionamento com ?gate_error=too_fast sem definir os cookies.
-      const waitMs = Math.max(8, minWaitSeconds) * 1000 + 500;
-      await new Promise((resolve) => setTimeout(resolve, waitMs));
+      const waitSec = Math.max(8, minWaitSeconds);
+      if (typeof (Application as any).sleep === "function") {
+        await (Application as any).sleep(waitSec + 1);
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, (waitSec + 1) * 1000));
+      }
 
       const cbReq: Request = {
         url: `${domain}/gate/callback?token=${encodeURIComponent(token)}`,
@@ -202,6 +228,16 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
 
       if (parsedCookies.length > 0) {
         await this.handleCloudflareBypass(parsedCookies);
+        return true;
+      }
+
+      // Se a resposta seguiu o redirecionamento com sucesso (200, 302 ou 307)
+      // e não indicou erro de timing, o gate foi aceito e os cookies foram processados
+      const loc = String(cbRes.headers?.["location"] || cbRes.headers?.["Location"] || "");
+      if (
+        !loc.includes("too_fast") &&
+        (cbRes.status === 200 || cbRes.status === 302 || cbRes.status === 307)
+      ) {
         return true;
       }
 
@@ -302,7 +338,7 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
             data.toLowerCase().includes("cloudflare"));
 
         if (isCf) {
-          const resolutionRequest = await this.getCloudflareResolutionRequest(domain);
+          const resolutionRequest = await this.getCloudflareResolutionRequest(domain, chapter);
           cloudflareErrorToThrow = new CloudflareError(
             resolutionRequest,
             "Proteção Cloudflare ativa no Mangás Brasuka! Toque para resolver.",
@@ -355,6 +391,22 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
       throw cloudflareErrorToThrow;
     }
 
+    if (
+      lastError &&
+      (lastError.message.includes("403") ||
+        lastError.message.includes("unauthorized") ||
+        lastError.message.includes("inesperada"))
+    ) {
+      const resolutionRequest = await this.getCloudflareResolutionRequest(
+        "https://mangasbrasuka.org",
+        chapter,
+      );
+      throw new CloudflareError(
+        resolutionRequest,
+        "Proteção Cloudflare ou verificação do leitor ativa no Mangás Brasuka! Toque para resolver.",
+      );
+    }
+
     throw (
       lastError ??
       new Error("Falha ao obter chave de descriptografia das páginas do Mangás Brasuka.")
@@ -365,6 +417,12 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     this.mainRateLimiter.registerInterceptor();
     this.cookieStorageInterceptor.registerInterceptor();
     this.mainInterceptor.registerInterceptor();
+
+    try {
+      Application.setRedirectHandler(Application.Selector(this as any, "handleRedirect"));
+    } catch {
+      // Ignore if not supported in execution context
+    }
 
     const saved = Application.getState("brasuka_saved_cookies") as
       | Array<{ name: string; value: string; domain?: string; path?: string }>
