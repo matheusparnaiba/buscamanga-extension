@@ -3,3 +3,6 @@
 /bundles
 /.agents
 /.vscode
+scratch_*
+test_*
+cb_page.html

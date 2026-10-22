@@ -13,11 +13,14 @@ Atualmente, nosso repositório conta com as seguintes fontes:
 |  🌟   | **Manga Online**    | `1.0.16` | matheusparnaiba | [mangaonline.love](https://mangaonline.love)         |
 |  📓   | **MangaLivre Blog** | `1.0.9`  | matheusparnaiba | [mangalivre.blog](https://mangalivre.blog)           |
 |  💫   | **Hipertoon**       | `1.0.16` | matheusparnaiba | [hipertoon.com](https://hipertoon.com)               |
-|  🇧🇷   | **Mangás Brasuka**  | `1.0.14` | matheusparnaiba | [mangasbrasuka.com.br](https://mangasbrasuka.com.br) |
+|  🇧🇷   | **Mangás Brasuka**  | `1.0.15` | matheusparnaiba | [mangasbrasuka.com.br](https://mangasbrasuka.com.br) |
 |  🌙   | **MangaNYX**        | `1.0.12` | matheusparnaiba | [manganyx.com](https://manganyx.com)                 |
 |  📖   | **MangaLivre To**   | `1.0.0`  | matheusparnaiba | [mangalivre.to](https://mangalivre.to)               |
 |  ⚡   | **Manhastro**       | `1.0.0`  | matheusparnaiba | [manhastro.com](https://manhastro.com)               |
 |  📚   | **Leitura Manga**   | `1.0.0`  | matheusparnaiba | [leituramanga.net](https://leituramanga.net)         |
+|  🌌   | **Nebulosa Scan**   | `1.0.0`  | matheusparnaiba | [nebulosascan.com](https://nebulosascan.com)         |
+|  🎨   | **Fliptru**         | `1.0.0`  | matheusparnaiba | [fliptru.com.br](https://fliptru.com.br)             |
+|  🦸   | **HQ Now**          | `1.0.0`  | matheusparnaiba | [hq-now.com](https://www.hq-now.com)                 |
 
 ## 🚀 Como Instalar
 

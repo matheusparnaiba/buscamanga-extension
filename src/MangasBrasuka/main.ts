@@ -65,15 +65,92 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     };
   }
 
-  private async tryUnlockGate(domain: string): Promise<boolean> {
+  private async tryUnlockGate(domain: string, chapter?: Chapter): Promise<boolean> {
     try {
+      const mangaId = chapter?.sourceManga.mangaId || "";
+      const chapNum = chapter?.chapNum != null ? chapter.chapNum : 1;
+
+      // 1. Tenta rota direta de unlock do leitor (se suportada)
+      const candidates = chapter
+        ? [
+            `/series/${encodeURIComponent(mangaId)}/${chapNum}`,
+            `/manga/${encodeURIComponent(mangaId)}/${chapNum}`,
+            `/manhwa/${encodeURIComponent(mangaId)}/${chapNum}`,
+          ]
+        : ["/series/manga/1"];
+
+      for (const returnTo of candidates) {
+        try {
+          const unlockReq: Request = {
+            url: `${domain}/api/reader/unlock`,
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+              referer: `${domain}${returnTo}`,
+              origin: domain,
+              accept: "application/json, text/plain, */*",
+              "sec-fetch-dest": "empty",
+              "sec-fetch-mode": "cors",
+              "sec-fetch-site": "same-origin",
+            },
+            body: JSON.stringify({ returnTo }),
+          };
+
+          const [res, buf] = await Application.scheduleRequest(unlockReq);
+          const data = Application.arrayBufferToUTF8String(buf);
+
+          const isSuccess =
+            res.status === 200 &&
+            (data.includes('"ok":true') || (res.cookies && res.cookies.length > 0));
+
+          if (isSuccess) {
+            const parsedCookies: Cookie[] = [];
+
+            if (Array.isArray(res.cookies) && res.cookies.length > 0) {
+              parsedCookies.push(...res.cookies);
+            }
+
+            const rawSetCookie = res.headers?.["set-cookie"] || res.headers?.["Set-Cookie"];
+            if (rawSetCookie) {
+              const cookieLines = Array.isArray(rawSetCookie) ? rawSetCookie : [rawSetCookie];
+              for (const line of cookieLines) {
+                const parts = line.split(";")[0]?.trim();
+                if (parts) {
+                  const [cName, ...cValParts] = parts.split("=");
+                  if (cName && cValParts.length) {
+                    parsedCookies.push({
+                      name: cName.trim(),
+                      value: cValParts.join("=").trim(),
+                      domain: domain.replace(/^https?:\/\//, ""),
+                      path: "/",
+                    });
+                  }
+                }
+              }
+            }
+
+            if (parsedCookies.length > 0) {
+              await this.handleCloudflareBypass(parsedCookies);
+            }
+            return true;
+          }
+        } catch {
+          // Continua para o próximo método se falhar
+        }
+      }
+
+      // 2. Fluxo de gate (/api/gate/start -> /gate/callback)
       const startReq: Request = {
         url: `${domain}/api/gate/start`,
         method: "POST",
         headers: {
           "content-type": "application/json",
           referer: `${domain}/`,
+          origin: domain,
           accept: "application/json, text/plain, */*",
+          "sec-fetch-dest": "empty",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-site": "same-origin",
         },
         body: JSON.stringify({ returnTo: "/" }),
       };
@@ -96,13 +173,40 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
         headers: {
           referer: `${domain}/`,
           accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          "sec-fetch-dest": "document",
+          "sec-fetch-mode": "navigate",
+          "sec-fetch-site": "same-origin",
         },
       };
 
       const [cbRes, _] = await Application.scheduleRequest(cbReq);
 
+      const parsedCookies: Cookie[] = [];
       if (cbRes.cookies && Array.isArray(cbRes.cookies)) {
-        await this.handleCloudflareBypass(cbRes.cookies);
+        parsedCookies.push(...cbRes.cookies);
+      }
+
+      const rawSetCookie = cbRes.headers?.["set-cookie"] || cbRes.headers?.["Set-Cookie"];
+      if (rawSetCookie) {
+        const cookieLines = Array.isArray(rawSetCookie) ? rawSetCookie : [rawSetCookie];
+        for (const line of cookieLines) {
+          const parts = line.split(";")[0]?.trim();
+          if (parts) {
+            const [cName, ...cValParts] = parts.split("=");
+            if (cName && cValParts.length) {
+              parsedCookies.push({
+                name: cName.trim(),
+                value: cValParts.join("=").trim(),
+                domain: domain.replace(/^https?:\/\//, ""),
+                path: "/",
+              });
+            }
+          }
+        }
+      }
+
+      if (parsedCookies.length > 0) {
+        await this.handleCloudflareBypass(parsedCookies);
       }
 
       return true;
@@ -148,7 +252,7 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     }
   }
 
-  private async getKey(v: number, e: number): Promise<string> {
+  private async getKey(v: number, e: number, chapter?: Chapter): Promise<string> {
     const cacheKey = `atfield_key_${v}_${e}`;
 
     if (this.keyCache.has(cacheKey)) {
@@ -165,6 +269,10 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     let cloudflareErrorToThrow: CloudflareError | null = null;
     let lastError: Error | null = null;
 
+    const mangaId = chapter?.sourceManga.mangaId || "";
+    const chapNum = chapter?.chapNum != null ? chapter.chapNum : 1;
+    const chapterPath = chapter ? `/series/${encodeURIComponent(mangaId)}/${chapNum}` : "/";
+
     for (const domain of domains) {
       const url = `${domain}/api/atfield/key?v=${v}&e=${e}`;
       try {
@@ -173,7 +281,7 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
           method: "GET",
           headers: {
             accept: "application/json, text/plain, */*",
-            referer: `${domain}/`,
+            referer: `${domain}${chapterPath}`,
             "sec-fetch-dest": "empty",
             "sec-fetch-mode": "cors",
             "sec-fetch-site": "same-origin",
@@ -183,8 +291,8 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
           },
         };
 
-        const [response, buffer] = await Application.scheduleRequest(request);
-        const data = Application.arrayBufferToUTF8String(buffer);
+        let [response, buffer] = await Application.scheduleRequest(request);
+        let data = Application.arrayBufferToUTF8String(buffer);
 
         const cfMitigated =
           response.headers?.["cf-mitigated"] || response.headers?.["Cf-Mitigated"];
@@ -206,30 +314,24 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
           continue;
         }
 
+        // Se a resposta for 403 não-Cloudflare (ex: {"error":"unauthorized"} por falta de gate/cookie),
+        // tenta obter o desbloqueio do gate automaticamente
+        if (response.status === 403 && data.includes("unauthorized")) {
+          const unlockSuccess = await this.tryUnlockGate(domain, chapter);
+          if (unlockSuccess) {
+            const [retryRes, retryBuf] = await Application.scheduleRequest(request);
+            response = retryRes;
+            buffer = retryBuf;
+            data = Application.arrayBufferToUTF8String(retryBuf);
+          }
+        }
+
         if (response.status === 200 && !data.trim().startsWith("<")) {
           const json = JSON.parse(data);
           if (json.k && typeof json.k === "string") {
             this.keyCache.set(cacheKey, json.k);
             Application.setState(json.k, cacheKey);
             return json.k;
-          }
-        }
-
-        // Se a resposta for 403 não-Cloudflare (ex: {"error":"unauthorized"} por falta de gate/cookie),
-        // tenta obter o desbloqueio do gate automaticamente
-        if (response.status === 403 && data.includes("unauthorized")) {
-          const unlockSuccess = await this.tryUnlockGate(domain);
-          if (unlockSuccess) {
-            const [retryRes, retryBuf] = await Application.scheduleRequest(request);
-            const retryData = Application.arrayBufferToUTF8String(retryBuf);
-            if (retryRes.status === 200 && !retryData.trim().startsWith("<")) {
-              const retryJson = JSON.parse(retryData);
-              if (retryJson.k && typeof retryJson.k === "string") {
-                this.keyCache.set(cacheKey, retryJson.k);
-                Application.setState(retryJson.k, cacheKey);
-                return retryJson.k;
-              }
-            }
           }
         }
 
@@ -386,8 +488,22 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
     }
 
     if (cleanCookies.length > 0) {
+      const existingHeader = Application.getState("brasuka_cookie_header") as string | undefined;
+      const cookieMap: Record<string, string> = {};
+      if (existingHeader) {
+        for (const part of existingHeader.split(";")) {
+          const [k, ...v] = part.trim().split("=");
+          if (k && v.length) cookieMap[k.trim()] = v.join("=").trim();
+        }
+      }
+      for (const c of cleanCookies) {
+        cookieMap[c.name] = c.value;
+      }
+      const mergedHeader = Object.entries(cookieMap)
+        .map(([k, v]) => `${k}=${v}`)
+        .join("; ");
       Application.setState(cleanCookies, "brasuka_saved_cookies");
-      Application.setState(headerParts.join("; "), "brasuka_cookie_header");
+      Application.setState(mergedHeader, "brasuka_cookie_header");
     }
   }
 
@@ -675,7 +791,7 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
       const rawUrl = firstEncrypted.imageUrl || firstEncrypted.url;
       try {
         const { v, e } = getParams(rawUrl);
-        key = await this.getKey(v, e);
+        key = await this.getKey(v, e, chapter);
       } catch (err) {
         if (err instanceof CloudflareError) {
           throw err;
