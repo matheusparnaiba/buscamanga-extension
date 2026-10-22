@@ -14,36 +14,49 @@ export class MainInterceptor extends PaperbackInterceptor {
     const cfUserAgent = Application.getState("cf_user_agent") as string | undefined;
     const ua = cfUserAgent ?? (await Application.getDefaultUserAgent());
 
+    const isImage =
+      /\.(jpg|jpeg|png|webp|gif|ico|avif)((\?|#).*)?$/i.test(request.url) ||
+      request.url.includes("/uploads/") ||
+      request.url.includes("img.") ||
+      request.url.includes("ui-avatars.com");
+
+    const isSakuraDomain = request.url.includes("sakuramangas.org");
+
     const headers: Record<string, string> = {
       ...request.headers,
-      referer: "https://sakuramangas.org/",
       "user-agent": ua,
-      accept:
-        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-      "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
     };
 
-    if (request.method && request.method.toUpperCase() !== "GET") {
-      headers["origin"] = "https://sakuramangas.org";
-    }
-
-    const cookieHeader = Application.getState("sakura_cookie_header") as string | undefined;
-    if (cookieHeader) {
-      headers["cookie"] = cookieHeader;
-      headers["Cookie"] = cookieHeader;
-    }
-
-    const savedCookies = Application.getState("sakura_saved_cookies") as
-      | Array<{ name: string; value: string }>
-      | undefined;
-    if (Array.isArray(savedCookies)) {
-      const cookieMap: Record<string, string> = { ...request.cookies };
-      for (const c of savedCookies) {
-        if (c?.name && c?.value) {
-          cookieMap[c.name] = c.value;
-        }
+    if (isSakuraDomain) {
+      headers["referer"] = "https://sakuramangas.org/";
+      if (request.method && request.method.toUpperCase() !== "GET") {
+        headers["origin"] = "https://sakuramangas.org";
       }
-      request.cookies = cookieMap;
+
+      const cookieHeader = Application.getState("sakura_cookie_header") as string | undefined;
+      if (cookieHeader) {
+        headers["cookie"] = cookieHeader;
+        headers["Cookie"] = cookieHeader;
+      }
+
+      const savedCookies = Application.getState("sakura_saved_cookies") as
+        | Array<{ name: string; value: string }>
+        | undefined;
+      if (Array.isArray(savedCookies)) {
+        const cookieMap: Record<string, string> = { ...request.cookies };
+        for (const c of savedCookies) {
+          if (c?.name && c?.value) {
+            cookieMap[c.name] = c.value;
+          }
+        }
+        request.cookies = cookieMap;
+      }
+    }
+
+    if (!isImage) {
+      headers["accept"] =
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8";
+      headers["accept-language"] = "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7";
     }
 
     request.headers = headers;

@@ -11,6 +11,8 @@ import {
 export class MainInterceptor extends PaperbackInterceptor {
   override async interceptRequest(request: Request): Promise<Request> {
     const cfUserAgent = Application.getState("cf_user_agent") as string | undefined;
+    const ua = cfUserAgent ?? (await Application.getDefaultUserAgent());
+
     const fallbackReferer = request.url.startsWith("https://manganyx.org")
       ? "https://manganyx.org/"
       : "https://manganyx.com/";
@@ -18,11 +20,34 @@ export class MainInterceptor extends PaperbackInterceptor {
     const headers: Record<string, string> = {
       ...request.headers,
       referer: request.headers?.referer ?? fallbackReferer,
-      "user-agent": cfUserAgent ?? (await Application.getDefaultUserAgent()),
+      "user-agent": ua,
+      accept:
+        request.headers?.accept ??
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+      "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
     };
 
     if (request.method && request.method.toUpperCase() !== "GET") {
       headers["origin"] = "https://manganyx.com";
+    }
+
+    const cookieHeader = Application.getState("manganyx_cookie_header") as string | undefined;
+    if (cookieHeader) {
+      headers["cookie"] = cookieHeader;
+      headers["Cookie"] = cookieHeader;
+    }
+
+    const savedCookies = Application.getState("manganyx_saved_cookies") as
+      | Array<{ name: string; value: string }>
+      | undefined;
+    if (Array.isArray(savedCookies)) {
+      const cookieMap: Record<string, string> = { ...request.cookies };
+      for (const c of savedCookies) {
+        if (c?.name && c?.value) {
+          cookieMap[c.name] = c.value;
+        }
+      }
+      request.cookies = cookieMap;
     }
 
     request.headers = headers;
@@ -43,8 +68,17 @@ export class MainInterceptor extends PaperbackInterceptor {
         request.url.includes("img.") ||
         request.url.includes("snipercache");
       if (!isImage) {
+        const cfUserAgent = Application.getState("cf_user_agent") as string | undefined;
+        const ua = cfUserAgent ?? (await Application.getDefaultUserAgent());
         throw new CloudflareError(
-          { url: "https://manganyx.com/", method: "GET" },
+          {
+            url: "https://manganyx.com/",
+            method: "GET",
+            headers: {
+              "user-agent": ua,
+              referer: "https://manganyx.com/",
+            },
+          },
           "Proteção Cloudflare ativa no MangaNYX! Toque para resolver.",
         );
       }

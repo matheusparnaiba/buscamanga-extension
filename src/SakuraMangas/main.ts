@@ -31,17 +31,30 @@ import type ContentTemplateConfig from "./pbconfig";
 const BASE_URL = "https://sakuramangas.org";
 
 function getImageSrc($img: cheerio.Cheerio<any>): string {
+  if (!$img || $img.length === 0) return "";
+
   let src =
     $img.attr("data-src") ||
     $img.attr("data-lazy-src") ||
     $img.attr("data-original") ||
-    $img.attr("srcset")?.split(" ")[0] ||
-    $img.attr("src") ||
     $img.attr("data-cfsrc") ||
+    $img.attr("srcset")?.split(",")[0]?.trim()?.split(" ")[0] ||
+    $img.attr("src") ||
     $img.attr("data-bg") ||
     "";
-  src = src.trim().replace(/-\d+x\d+/g, "");
-  if (!src) return "";
+
+  if (src.startsWith("data:")) {
+    src =
+      $img.attr("data-src") ||
+      $img.attr("data-lazy-src") ||
+      $img.attr("data-original") ||
+      $img.attr("data-cfsrc") ||
+      "";
+  }
+
+  src = src.trim();
+  if (!src || src.startsWith("data:")) return "";
+
   if (src.startsWith("//")) return "https:" + src;
   if (src.startsWith("/")) return BASE_URL + src;
   return src;
@@ -227,12 +240,12 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
     }
 
     const request: Request = { url, method: "GET" };
-    let [response, buffer] = await Application.scheduleRequest(request);
-    let data = Application.arrayBufferToUTF8String(buffer);
+    const [response, buffer] = await Application.scheduleRequest(request);
+    const data = Application.arrayBufferToUTF8String(buffer);
 
     await this.checkCloudflare(response, data);
 
-    let $ = cheerio.load(data);
+    const $ = cheerio.load(data);
     const items: DiscoverSectionItem[] = [];
 
     if (section.id === "popular") {
@@ -284,7 +297,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
                 "&background=random";
             }
 
-            if (!items.some((it) => (it as any).mangaId === mangaId)) {
+            if (!items.some((it) => "mangaId" in it && it.mangaId === mangaId)) {
               items.push({
                 mangaId,
                 title,
@@ -365,7 +378,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
                 "&background=random";
             }
 
-            if (!items.some((it) => (it as any).mangaId === mangaId)) {
+            if (!items.some((it) => "mangaId" in it && it.mangaId === mangaId)) {
               items.push({
                 mangaId,
                 chapterId: chapterHref,
@@ -437,7 +450,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
             ? (idMatch[1] as string)
             : href.replace(/^https?:\/\/[^/]+\//, "").replace(/\/$/, "");
 
-          if (!items.some((it) => (it as any).mangaId === mangaId)) {
+          if (!items.some((it) => "mangaId" in it && it.mangaId === mangaId)) {
             items.push({
               mangaId,
               title,
@@ -479,7 +492,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
 
     await this.checkCloudflare(response, data);
 
-    let $ = cheerio.load(data);
+    const $ = cheerio.load(data);
     const items: SearchResultItem[] = [];
 
     const parseResults = ($doc: cheerio.CheerioAPI): void => {
@@ -551,57 +564,83 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
   }
 
   async getMangaDetails(mangaId: string): Promise<SourceManga> {
-    const url = mangaId.startsWith("http") ? mangaId : `${BASE_URL}/obras/${mangaId}/`;
-    const request = { url, method: "GET" };
-    let [response, buffer] = await Application.scheduleRequest(request);
-    let data = Application.arrayBufferToUTF8String(buffer);
+    const candidates: string[] = [];
+    if (mangaId.startsWith("http")) {
+      candidates.push(mangaId);
+    } else {
+      candidates.push(`${BASE_URL}/obras/${mangaId}/`);
+      candidates.push(`${BASE_URL}/manga/${mangaId}/`);
+    }
 
-    await this.checkCloudflare(response, data);
+    let $doc: cheerio.CheerioAPI | null = null;
+    let chosenUrl = candidates[0]!;
 
-    let $ = cheerio.load(data);
-
-    let title = $(".post-title h1, .manga-title h1, h1.entry-title, .manga-info h1, h1")
-      .first()
-      .text()
-      .trim();
-
-    // Fallback if title not found
-    if (!title && !mangaId.startsWith("http")) {
+    for (const candUrl of candidates) {
       try {
-        const fallbackUrl = `${BASE_URL}/manga/${mangaId}/`;
-        const fallbackReq = { url: fallbackUrl, method: "GET" };
-        const [fRes, fBuf] = await Application.scheduleRequest(fallbackReq);
-        const fData = Application.arrayBufferToUTF8String(fBuf);
-        await this.checkCloudflare(fRes, fData);
-        if (fRes.status === 200) {
-          $ = cheerio.load(fData);
-          title = $(".post-title h1, .manga-title h1, h1.entry-title, .manga-info h1, h1")
+        const request = { url: candUrl, method: "GET" };
+        const [response, buffer] = await Application.scheduleRequest(request);
+        const data = Application.arrayBufferToUTF8String(buffer);
+
+        await this.checkCloudflare(response, data);
+
+        if (response.status === 200) {
+          const $ = cheerio.load(data);
+          const testTitle = $(".post-title h1, .manga-title h1, h1.entry-title, .manga-info h1, h1")
             .first()
             .text()
             .trim();
+
+          if (testTitle) {
+            $doc = $;
+            chosenUrl = candUrl;
+            break;
+          }
         }
       } catch (e) {
         if (e instanceof CloudflareError) throw e;
       }
     }
 
-    if (!title) title = "Sem título";
+    if (!$doc) {
+      const fallbackReq = { url: chosenUrl, method: "GET" };
+      const [response, buffer] = await Application.scheduleRequest(fallbackReq);
+      const data = Application.arrayBufferToUTF8String(buffer);
+      await this.checkCloudflare(response, data);
+      $doc = cheerio.load(data);
+    }
 
-    const rawImage = getImageSrc(
-      $(".summary_image img, .manga-thumb img, .thumb img, .item-thumb img"),
+    const title =
+      $doc(".post-title h1, .manga-title h1, h1.entry-title, .manga-info h1, h1")
+        .first()
+        .text()
+        .trim() || "Sem título";
+
+    const ogImage =
+      $doc("meta[property='og:image']").attr("content") ||
+      $doc("meta[name='twitter:image']").attr("content") ||
+      $doc("link[rel='image_src']").attr("href") ||
+      "";
+
+    const parsedImage = getImageSrc(
+      $doc(
+        ".summary_image img, .tab-summary img, .manga-thumb img, .thumb img, .item-thumb img, .post-thumb img, .featured-image img, img.wp-post-image",
+      ).first(),
     );
+
+    const rawImage = (ogImage && ogImage.startsWith("http") ? ogImage : "") || parsedImage;
     const image = rawImage && rawImage.startsWith("http") ? rawImage : undefined;
     const fallbackImage =
       "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
     const thumbnailUrl = image || fallbackImage;
 
-    const synopsis = $(
+    const synopsis = $doc(
       ".description-summary .summary__content, .summary_content, .manga-excerpt, .entry-content p",
     )
       .text()
       .trim();
-    const author = $(".author-content a, .manga-authors a").first().text().trim() || "Desconhecido";
-    const statusText = $(".post-status .post-content_item .summary-content")
+    const author =
+      $doc(".author-content a, .manga-authors a").first().text().trim() || "Desconhecido";
+    const statusText = $doc(".post-status .post-content_item .summary-content")
       .last()
       .text()
       .trim()
@@ -611,8 +650,8 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
     if (statusText.includes("completo") || statusText.includes("completed")) status = "COMPLETED";
 
     const genres: Tag[] = [];
-    $(".genres-content a, .manga-genres a").each((_, el) => {
-      const g = $(el).text().trim();
+    $doc(".genres-content a, .manga-genres a").each((_, el) => {
+      const g = $doc(el).text().trim();
       if (g) genres.push({ id: encodeURI(g), title: g });
     });
 
@@ -628,78 +667,131 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
         author,
         tagGroups: [{ id: "genres", title: "Genres", tags: genres }],
         artworkUrls: image ? [image] : [thumbnailUrl],
-        shareUrl: url,
+        shareUrl: chosenUrl,
       },
     };
   }
 
   async getChapters(sourceManga: SourceManga, _sinceDate?: Date): Promise<Chapter[]> {
-    const baseUrlManga = sourceManga.mangaId.startsWith("http")
-      ? sourceManga.mangaId
-      : `${BASE_URL}/obras/${sourceManga.mangaId}`;
-    const url = `${baseUrlManga.replace(/\/$/, "")}/ajax/chapters/`;
-    const request = {
-      url,
-      method: "POST",
-    };
+    const mangaId = sourceManga.mangaId;
+    const candidates: string[] = [];
 
-    const chapters: Chapter[] = [];
-    try {
-      const [res, buffer] = await Application.scheduleRequest(request);
-      const data = Application.arrayBufferToUTF8String(buffer);
-      await this.checkCloudflare(res, data);
-
-      const $ = cheerio.load(data);
-      $(".wp-manga-chapter, .chapter-item, li.chapter").each((_, el) => {
-        const a = $(el).find("a");
-        const href = a.attr("href")?.trim() ?? "";
-        const name = a.text().trim();
-        if (!href) return;
-        const numMatch = name.match(/[\d.]+/);
-        const chapNum = numMatch ? parseFloat(numMatch[0]) : 0;
-
-        chapters.push({
-          chapterId: href,
-          sourceManga,
-          langCode: "PT-BR",
-          chapNum,
-          title: name,
-          volume: 0,
-        });
-      });
-    } catch (e) {
-      if (e instanceof CloudflareError) throw e;
+    if (sourceManga.mangaInfo?.shareUrl && sourceManga.mangaInfo.shareUrl.startsWith("http")) {
+      candidates.push(sourceManga.mangaInfo.shareUrl);
+    }
+    if (mangaId.startsWith("http")) {
+      candidates.push(mangaId);
+    } else {
+      candidates.push(`${BASE_URL}/obras/${mangaId}/`);
+      candidates.push(`${BASE_URL}/manga/${mangaId}/`);
     }
 
-    if (chapters.length === 0) {
-      const getUrl = sourceManga.mangaId.startsWith("http")
-        ? sourceManga.mangaId
-        : `${BASE_URL}/obras/${sourceManga.mangaId}/`;
-      const getReq = { url: getUrl, method: "GET" };
-      const [res, buffer] = await Application.scheduleRequest(getReq);
-      const data = Application.arrayBufferToUTF8String(buffer);
-      await this.checkCloudflare(res, data);
+    const chapters: Chapter[] = [];
 
-      const $ = cheerio.load(data);
-      $(
-        ".wp-manga-chapter, .chapter-item, .chapter-item.parent, li.chapter, .listing-chapters_wrap li",
+    const parseChaptersFrom$ = ($doc: cheerio.CheerioAPI): void => {
+      $doc(
+        ".wp-manga-chapter, li.wp-manga-chapter, .chapter-item, .chapter-item.parent, li.chapter, .listing-chapters_wrap li, .version-chap li, ul.main.version-chap li, .sub-chap-list li, .list-chapter li, [class*='chapter-item'], .chapters-list li",
       ).each((_, el) => {
-        const a = $(el).find("a");
-        const href = a.attr("href")?.trim() ?? "";
-        const name = a.text().trim();
-        if (!href) return;
-        const numMatch = name.match(/[\d.]+/);
-        const chapNum = numMatch ? parseFloat(numMatch[0]) : 0;
+        const a = $doc(el).find("a").first();
+        let href = a.attr("href")?.trim() ?? "";
+        const name =
+          a.text().trim() ||
+          $doc(el)
+            .find(".chapter-manhwa-title, .chapter-title, .chap-title, a")
+            .first()
+            .text()
+            .trim() ||
+          $doc(el).text().trim();
 
-        chapters.push({
-          chapterId: href,
-          sourceManga,
-          langCode: "PT-BR",
-          chapNum,
-          title: name,
-          volume: 0,
-        });
+        if (!href || href === "#" || href.startsWith("javascript:")) return;
+        if (href.startsWith("/")) href = BASE_URL + href;
+
+        const numMatch =
+          name.match(/(?:cap[íi]tulo|cap\.?|ch\.?|chapter)\s*([\d.]+)/i) || name.match(/[\d.]+/);
+        const chapNum = numMatch ? parseFloat(numMatch[1] ?? numMatch[0]) : 0;
+
+        if (!chapters.some((c) => c.chapterId === href)) {
+          chapters.push({
+            chapterId: href,
+            sourceManga,
+            langCode: "PT-BR",
+            chapNum,
+            title: name,
+            volume: 0,
+          });
+        }
       });
+    };
+
+    for (const baseUrl of candidates) {
+      try {
+        const getReq: Request = { url: baseUrl, method: "GET" };
+        const [res, buffer] = await Application.scheduleRequest(getReq);
+        const data = Application.arrayBufferToUTF8String(buffer);
+        await this.checkCloudflare(res, data);
+
+        const $ = cheerio.load(data);
+        parseChaptersFrom$($);
+
+        // If direct HTML parsing found 0 chapters, try AJAX POST to /ajax/chapters/
+        if (chapters.length === 0) {
+          const ajaxUrl = `${baseUrl.replace(/\/$/, "")}/ajax/chapters/`;
+          try {
+            const ajaxReq: Request = {
+              url: ajaxUrl,
+              method: "POST",
+              headers: {
+                "x-requested-with": "XMLHttpRequest",
+                referer: baseUrl,
+              },
+            };
+            const [ajaxRes, ajaxBuf] = await Application.scheduleRequest(ajaxReq);
+            const ajaxData = Application.arrayBufferToUTF8String(ajaxBuf);
+            await this.checkCloudflare(ajaxRes, ajaxData);
+            const $ajax = cheerio.load(ajaxData);
+            parseChaptersFrom$($ajax);
+          } catch (e) {
+            if (e instanceof CloudflareError) throw e;
+          }
+        }
+
+        // If still 0 chapters, try WordPress admin-ajax.php
+        if (chapters.length === 0) {
+          const mangaPostId =
+            $("#manga-chapters-holder").attr("data-id") ||
+            $(".rating-post-id").val() ||
+            $("[name='wp-manga-id']").val() ||
+            $("input.rating-post-id").attr("value");
+
+          if (mangaPostId) {
+            try {
+              const adminAjaxReq: Request = {
+                url: `${BASE_URL}/wp-admin/admin-ajax.php`,
+                method: "POST",
+                headers: {
+                  "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+                  "x-requested-with": "XMLHttpRequest",
+                  referer: baseUrl,
+                },
+                body: `action=manga_get_chapters&manga=${encodeURIComponent(String(mangaPostId))}`,
+              };
+              const [adminRes, adminBuf] = await Application.scheduleRequest(adminAjaxReq);
+              const adminData = Application.arrayBufferToUTF8String(adminBuf);
+              await this.checkCloudflare(adminRes, adminData);
+              const $admin = cheerio.load(adminData);
+              parseChaptersFrom$($admin);
+            } catch (e) {
+              if (e instanceof CloudflareError) throw e;
+            }
+          }
+        }
+
+        if (chapters.length > 0) {
+          break;
+        }
+      } catch (e) {
+        if (e instanceof CloudflareError) throw e;
+      }
     }
 
     return chapters;
@@ -707,7 +799,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
 
   async getChapterDetails(chapter: Chapter): Promise<ChapterDetails> {
     const url = chapter.chapterId;
-    const request = { url, method: "GET" };
+    const request: Request = { url, method: "GET" };
     const [response, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
 
@@ -720,7 +812,7 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
       "[id^='pges_'] img, [id*='pges'] img, .page-break img, .reading-content img, .chapter-content img, .entry-content img, #readerarea img, .container-chapter-reader img",
     ).each((_, el) => {
       const src = getImageSrc($(el));
-      if (src) pages.push(src);
+      if (src && !pages.includes(src)) pages.push(src);
     });
 
     if (pages.length === 0) {
