@@ -1,9 +1,9 @@
 import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/types";
 
 export default {
-  name: "Sakura Mangas",
-  description: 'Extensão do "https://sakuramangas.org"',
-  version: "1.0.19",
+  name: "Leitura Manga",
+  description: 'Extensão do "https://leituramanga.net"',
+  version: "1.0.0",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,
@@ -12,9 +12,8 @@ export default {
     SourceIntents.DISCOVER_SECTION_PROVIDING,
     SourceIntents.SEARCH_RESULT_PROVIDING,
     SourceIntents.CHAPTER_PROVIDING,
-    SourceIntents.CLOUDFLARE_BYPASS_PROVIDING,
   ],
-  badges: [{ label: "Cloudflare", textColor: "#000000", backgroundColor: "#ffc107" }],
+  badges: [],
   developers: [
     {
       name: "matheusparnaiba",
