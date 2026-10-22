@@ -40,6 +40,20 @@ function getImageSrc($img: cheerio.Cheerio<any>): string {
   return src.startsWith("/") ? BASE_URL + src : src;
 }
 
+function sanitizeTagId(raw: string): string {
+  return (
+    raw
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/['’]/g, "")
+      .replace(/[^a-zA-Z0-9._\-@()[\]%?#+=/&:]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "") || "tag"
+  );
+}
+
 export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemplateConfig> {
   constructor(public cheerioInstance?: any) {
     this.getHomePageSections = this.getHomePageSections.bind(this);
@@ -357,9 +371,12 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
       ".manga-tags .manga-tag, .genres-content a, .manga-genres a, .genres a, a[href*='/genero/'], a[href*='/genre/']",
     ).each((_, el) => {
       const g = $(el).text().trim();
-      if (g && !addedGenres.has(g) && !/^\d+$/.test(g)) {
-        addedGenres.add(g);
-        genres.push({ id: encodeURI(g), title: g });
+      if (g && !/^\d+$/.test(g)) {
+        const id = sanitizeTagId(g);
+        if (!addedGenres.has(id)) {
+          addedGenres.add(id);
+          genres.push({ id, title: g });
+        }
       }
     });
 

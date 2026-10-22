@@ -42,6 +42,20 @@ function getImageSrc($img: cheerio.Cheerio<any>): string {
   return src;
 }
 
+function sanitizeTagId(raw: string): string {
+  return (
+    raw
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/['’]/g, "")
+      .replace(/[^a-zA-Z0-9._\-@()[\]%?#+=/&:]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "") || "tag"
+  );
+}
+
 export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplateConfig> {
   constructor(public cheerioInstance?: any) {
     this.getHomePageSections = this.getHomePageSections.bind(this);
@@ -404,9 +418,12 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
     const seenGenres = new Set<string>();
     $(".manga-tags a, .genres-content a, .manga-card-genres a").each((_, el) => {
       const g = $(el).text().trim();
-      if (g && !seenGenres.has(g.toLowerCase())) {
-        seenGenres.add(g.toLowerCase());
-        genres.push({ id: encodeURI(g), title: g });
+      if (g) {
+        const id = sanitizeTagId(g);
+        if (!seenGenres.has(id)) {
+          seenGenres.add(id);
+          genres.push({ id, title: g });
+        }
       }
     });
 

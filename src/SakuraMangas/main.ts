@@ -72,6 +72,20 @@ function getImageSrc($img: cheerio.Cheerio<any>): string {
   return "";
 }
 
+function sanitizeTagId(raw: string): string {
+  return (
+    raw
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/['’]/g, "")
+      .replace(/[^a-zA-Z0-9._\-@()[\]%?#+=/&:]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "") || "tag"
+  );
+}
+
 function extractPostId($: cheerio.CheerioAPI, htmlText: string): string | undefined {
   const holderId =
     $("#manga-chapters-holder").attr("data-id") || $("#manga-chapters-holder").attr("data-post-id");
@@ -676,9 +690,16 @@ export class SakuraMangasExtension implements ExtensionImpl<typeof ContentTempla
     if (statusText.includes("completo") || statusText.includes("completed")) status = "COMPLETED";
 
     const genres: Tag[] = [];
+    const seenGenres = new Set<string>();
     $doc(".genres-content a, .manga-genres a").each((_, el) => {
       const g = $doc(el).text().trim();
-      if (g) genres.push({ id: encodeURI(g), title: g });
+      if (g) {
+        const id = sanitizeTagId(g);
+        if (!seenGenres.has(id)) {
+          seenGenres.add(id);
+          genres.push({ id, title: g });
+        }
+      }
     });
 
     return {
