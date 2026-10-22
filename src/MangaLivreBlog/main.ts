@@ -36,7 +36,7 @@ function getImageSrc($img: cheerio.Cheerio<any>): string {
     $img.attr("src") ||
     $img.attr("data-cfsrc") ||
     "";
-  src = src.trim().replace(/-\d+x\d+/g, "");
+  src = src.trim().replace(/-\d+x\d+(\.[a-zA-Z0-9]+)$/, "$1");
   return src.startsWith("/") ? BASE_URL + src : src;
 }
 
@@ -105,17 +105,26 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
     const items: DiscoverSectionItem[] = [];
 
     if (section.id === "popular") {
-      let populars = $(".manga-card-modern");
-      if (populars.length === 0) populars = $(".sidebar .popular-item-wrap");
-      if (populars.length === 0) populars = $(".popular-item-wrap");
+      let populars = $(
+        ".home-popular article.home-manga-card, .home-popular .home-manga-card, .manga-card-modern, .sidebar .popular-item-wrap, .popular-item-wrap",
+      );
 
       populars.toArray().forEach((el) => {
-        const title = $(el).find(".manga-title-modern, .manga-title").text().trim();
-        const subtitle = $(el).find(".chapter-item-modern a").first().text().trim();
-        const img = getImageSrc($(el).find("img"));
-        const href = $(el).find("a.manga-cover-link").attr("href");
+        const title = $(el)
+          .find(".home-card-body h3 a, .manga-title-modern, .manga-title, h3 a, h3")
+          .first()
+          .text()
+          .trim();
+        const subtitle = $(el)
+          .find(".home-card-chapters a, .chapter-item-modern a")
+          .first()
+          .text()
+          .trim()
+          .replace(/\s+/g, " ");
+        const img = getImageSrc($(el).find("img.manga-cover-img, img").first());
+        const href = $(el).find("a.home-manga-cover, a.manga-cover-link, a").first().attr("href");
 
-        if (href) {
+        if (href && title) {
           const idMatch = href.match(/\/manga\/([^/]+)/);
           const mangaId = idMatch ? (idMatch[1] as string) : href;
 
@@ -143,15 +152,23 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
     }
 
     if (section.id === "updates") {
-      $(".manga-card-modern").each((_, el) => {
-        const title = $(el).find(".manga-title-modern, .manga-title").text().trim();
-        const href = $(el).find("a.manga-cover-link").attr("href");
-        const img = getImageSrc($(el).find("img"));
-        const chapterEl = $(el).find(".chapter-item-modern a").first();
-        const chapterSubtitle = chapterEl.text().trim();
+      const updates = $(
+        ".home-latest article.home-manga-card, .home-latest .home-manga-card, article.home-manga-card, .manga-card-modern",
+      );
+
+      updates.each((_, el) => {
+        const title = $(el)
+          .find(".home-card-body h3 a, .manga-title-modern, .manga-title, h3 a, h3")
+          .first()
+          .text()
+          .trim();
+        const href = $(el).find("a.home-manga-cover, a.manga-cover-link, a").first().attr("href");
+        const img = getImageSrc($(el).find("img.manga-cover-img, img").first());
+        const chapterEl = $(el).find(".home-card-chapters a, .chapter-item-modern a").first();
+        const chapterSubtitle = chapterEl.text().trim().replace(/\s+/g, " ");
         const chapterHref = chapterEl.attr("href") || "unknown";
 
-        if (href) {
+        if (href && title) {
           const idMatch = href.match(/\/manga\/([^/]+)/);
           const mangaId = idMatch ? (idMatch[1] as string) : href;
 
@@ -183,25 +200,41 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
     }
 
     if (section.id === "recommended") {
-      $(".manga-card-modern, .sidebar .popular-item-wrap")
-        .slice(0, 15)
-        .each((_, el) => {
-          const title = $(el).find(".manga-title-modern, .manga-title, h3, a").text().trim();
-          const href = $(el).find("a.manga-cover-link, a").attr("href");
-          const img = getImageSrc($(el).find("img"));
+      let recommended = $(".home-featured-slide");
+      if (recommended.length === 0) {
+        recommended = $(
+          ".home-popular article.home-manga-card, .home-popular .home-manga-card, .manga-card-modern",
+        );
+      }
 
-          if (href && title) {
-            const idMatch = href.match(/\/manga\/([^/]+)/);
-            const mangaId = idMatch ? (idMatch[1] as string) : href;
-            items.push({
-              mangaId,
-              title,
-              imageUrl: img || "https://ui-avatars.com/api/?name=" + encodeURIComponent(title),
-              type: "prominentCarouselItem",
-              contentRating: ContentRating.EVERYONE,
-            });
-          }
-        });
+      recommended.each((_, el) => {
+        const title = $(el)
+          .find(".home-featured-title, .home-card-body h3 a, h1, h2, h3")
+          .first()
+          .text()
+          .trim();
+        const href = $(el)
+          .find("a.home-featured-cover, a.home-manga-cover, a[href*='/manga/']")
+          .first()
+          .attr("href");
+        const img = getImageSrc($(el).find("img.manga-cover-img, img").first());
+
+        if (href && title) {
+          const idMatch = href.match(/\/manga\/([^/]+)/);
+          const mangaId = idMatch ? (idMatch[1] as string) : href;
+          items.push({
+            mangaId,
+            title,
+            imageUrl:
+              img ||
+              "https://ui-avatars.com/api/?name=" +
+                encodeURIComponent(title) +
+                "&background=random",
+            type: "prominentCarouselItem",
+            contentRating: ContentRating.EVERYONE,
+          });
+        }
+      });
       return { items, metadata: undefined };
     }
 
@@ -220,7 +253,7 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
     _sortingOption?: SortingOption,
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata ?? 1;
-    const searchUrl = `${BASE_URL}/page/${page}/?s=${encodeURIComponent(query.title)}&post_type=wp-manga`;
+    const searchUrl = `${BASE_URL}/page/${page}/?s=${encodeURIComponent(query.title)}`;
 
     const request = { url: searchUrl, method: "GET" };
     const [_, buffer] = await Application.scheduleRequest(request);
@@ -228,13 +261,17 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
     const $ = cheerio.load(data);
     const items: SearchResultItem[] = [];
 
-    $(".c-tabs-item__content").each((_, el) => {
-      const titleElement = $(el).find(".post-title h3 a");
-      const title = titleElement.text().trim();
-      const href = titleElement.attr("href");
-      const img = getImageSrc($(el).find(".tab-thumb a img"));
+    $(".manga-card, .c-tabs-item__content, article.home-manga-card").each((_, el) => {
+      const linkEl = $(el).find("a.manga-card-link, .post-title h3 a, a[href*='/manga/']").first();
+      const href = linkEl.attr("href");
+      const title = $(el)
+        .find(".manga-card-title, h3 a, h3, .post-title h3 a")
+        .first()
+        .text()
+        .trim();
+      const img = getImageSrc($(el).find("img.manga-cover-img, .tab-thumb a img, img").first());
 
-      if (href) {
+      if (href && title) {
         const idMatch = href.match(/\/manga\/([^/]+)/);
         const mangaId = idMatch ? (idMatch[1] as string) : href;
 
@@ -265,12 +302,21 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
     const $ = cheerio.load(data);
 
     const title =
-      $(".post-title h1, .manga-title, h1")
+      $(".manga-title, .post-title h1, h1")
+        .filter((_, el) => !$(el).hasClass("site-title"))
+        .first()
+        .text()
+        .trim() ||
+      $("h1")
         .map((_, el) => $(el).text().trim())
         .get()
-        .find((t) => t.length > 0) || "";
+        .find((t) => t.length > 0) ||
+      "";
+
     const rawImage = getImageSrc(
-      $(".manga-cover img, .manga-cover-image, .summary_image img").first(),
+      $(
+        ".manga-cover img, img.manga-cover-img, .manga-poster img, .manga-info img, .summary_image img",
+      ).first(),
     );
     const image = rawImage && rawImage.startsWith("http") ? rawImage : undefined;
     const fallbackImage =
@@ -280,32 +326,41 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
     const thumbnailUrl = image || fallbackImage;
 
     const synopsis = $(
-      ".description-summary .summary__content, .manga-synopsis, .manga-description",
+      ".synopsis-content, .manga-synopsis, .synopsis, .description-summary .summary__content, .manga-description",
     )
       .first()
       .text()
+      .replace(/^Sinopse\s*/i, "")
       .trim();
-    let author = $(".author-content a").text().trim();
-    let statusText = $(".post-status .post-content_item .summary-content")
-      .last()
-      .text()
-      .trim()
-      .toLowerCase();
 
-    $(".manga-meta-item").each((_, el) => {
+    let author = "";
+    let statusText = "";
+    $(".manga-meta-item, .post-content_item").each((_, el) => {
       const txt = $(el).text().trim();
       if (!author && txt.includes("Autor:")) author = txt.replace("Autor:", "").trim();
       if (!statusText && txt.includes("Status:"))
         statusText = txt.replace("Status:", "").trim().toLowerCase();
     });
 
+    if (!author) {
+      author = $(".author-content a").text().trim() || "Desconhecido";
+    }
+
     let status = "ONGOING";
-    if (statusText.includes("completo") || statusText.includes("completed")) status = "COMPLETED";
+    if (statusText.includes("completo") || statusText.includes("completed")) {
+      status = "COMPLETED";
+    }
 
     const genres: Tag[] = [];
-    $(".genres-content a, .manga-genres a, .genres a").each((_, el) => {
+    const addedGenres = new Set<string>();
+    $(
+      ".manga-tags .manga-tag, .genres-content a, .manga-genres a, .genres a, a[href*='/genero/'], a[href*='/genre/']",
+    ).each((_, el) => {
       const g = $(el).text().trim();
-      if (g) genres.push({ id: encodeURI(g), title: g });
+      if (g && !addedGenres.has(g) && !/^\d+$/.test(g)) {
+        addedGenres.add(g);
+        genres.push({ id: encodeURI(g), title: g });
+      }
     });
 
     return {
@@ -337,29 +392,58 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
     const chapters: Chapter[] = [];
     const addedUrls = new Set<string>();
 
-    $("li.chapter-item, .chapter-item, .wp-manga-chapter").each((_, el) => {
-      const a = $(el).find("a.chapter-link").first();
-      const fallbackA = $(el).find("a").first();
-      const href = a.attr("href")?.trim() || fallbackA.attr("href")?.trim() || "";
-      if (!href || addedUrls.has(href)) return;
-      addedUrls.add(href);
+    const parseChapterElements = ($root: cheerio.CheerioAPI) => {
+      $root("li.chapter-item, .chapter-item, .wp-manga-chapter").each((_, el) => {
+        const a = $root(el).find("a.chapter-link, a").first();
+        const href = a.attr("href")?.trim() || "";
+        if (!href || addedUrls.has(href)) return;
+        addedUrls.add(href);
 
-      let name =
-        a.find(".chapter-number").text().trim() || a.text().trim() || fallbackA.text().trim();
-      name = name.replace(/\s+/g, " ").trim();
+        let name = a.find(".chapter-number").text().trim() || a.text().trim();
+        name = name.replace(/\s+/g, " ").trim();
 
-      const numMatch = name.match(/[\d.]+/);
-      const chapNum = numMatch ? parseFloat(numMatch[0]) : 0;
+        const numMatch = name.match(/[\d.]+/);
+        const chapNum = numMatch ? parseFloat(numMatch[0]) : 0;
 
-      chapters.push({
-        chapterId: href,
-        sourceManga,
-        langCode: "PT-BR",
-        chapNum,
-        title: name,
-        volume: 0,
+        chapters.push({
+          chapterId: href,
+          sourceManga,
+          langCode: "PT-BR",
+          chapNum,
+          title: name,
+          volume: 0,
+        });
       });
-    });
+    };
+
+    parseChapterElements($);
+
+    const btn = $("#sr-load-chapters");
+    const mangaNumId = btn.attr("data-manga");
+    let offset = parseInt(btn.attr("data-offset") || "0", 10);
+    const total = parseInt(btn.attr("data-total") || "0", 10);
+
+    if (mangaNumId && total > chapters.length) {
+      while (offset < total) {
+        try {
+          const req = {
+            url: `${BASE_URL}/wp-json/slimeread/v1/chapters/${mangaNumId}?offset=${offset}`,
+            method: "GET",
+          };
+          const [__, apiBuffer] = await Application.scheduleRequest(req);
+          const apiDataStr = Application.arrayBufferToUTF8String(apiBuffer);
+          const apiData = JSON.parse(apiDataStr);
+          if (!apiData.list) break;
+          const $list = cheerio.load(`<ul>${apiData.list}</ul>`);
+          parseChapterElements($list);
+          if (apiData.offset <= offset) break;
+          offset = apiData.offset;
+          if (!apiData.has_more) break;
+        } catch {
+          break;
+        }
+      }
+    }
 
     return chapters;
   }
@@ -373,10 +457,12 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
 
     const pages: string[] = [];
     $(
-      ".page-break img, .reading-content img, .chapter-image img, .chapter-images img, #chapter-container img, article img",
+      ".chapter-images img, .chapter-reader img, .page-break img, .reading-content img, .chapter-image img, #chapter-container img, article img",
     ).each((_, el) => {
       const src = getImageSrc($(el));
-      if (src && !pages.includes(src)) pages.push(src);
+      if (src && !pages.includes(src) && !src.includes("logo") && !src.includes("avatar")) {
+        pages.push(src);
+      }
     });
 
     return {

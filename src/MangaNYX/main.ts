@@ -1,5 +1,6 @@
 import {
   BasicRateLimiter,
+  CloudflareError,
   CookieStorageInterceptor,
   ContentRating,
   DiscoverSectionType,
@@ -19,6 +20,7 @@ import {
   type Request,
 } from "@paperback/types";
 
+import { decrypt, getParams } from "./decrypt";
 import { SettingsForm } from "./forms";
 import type { ContentTemplateSearchMetadata } from "./models";
 import { MainInterceptor } from "./network";
@@ -40,6 +42,68 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
   mainInterceptor = new MainInterceptor("main");
 
   private homePromise?: { promise: Promise<any>; timestamp: number };
+  private keyCache: Map<string, string> = new Map();
+
+  private async getKey(v: number, e: number): Promise<string> {
+    const cacheKey = `atfield_key_${v}_${e}`;
+
+    if (this.keyCache.has(cacheKey)) {
+      return this.keyCache.get(cacheKey)!;
+    }
+
+    const savedKey = Application.getState(cacheKey) as string | undefined;
+    if (savedKey && typeof savedKey === "string" && savedKey.length > 0) {
+      this.keyCache.set(cacheKey, savedKey);
+      return savedKey;
+    }
+
+    const domains = ["https://manganyx.com", "https://manganyx.org"];
+    let lastError: unknown = null;
+
+    for (const domain of domains) {
+      try {
+        const url = `${domain}/api/atfield/key?v=${v}&e=${e}`;
+        const request: Request = {
+          url,
+          method: "GET",
+          headers: {
+            accept: "application/json, text/plain, */*",
+            referer: `${domain}/`,
+            rsc: "1",
+          },
+        };
+
+        const [response, buffer] = await Application.scheduleRequest(request);
+        const data = Application.arrayBufferToUTF8String(buffer);
+
+        if (
+          response.status === 403 ||
+          response.status === 503 ||
+          data.includes("Just a moment...") ||
+          data.includes("_cf_chl_opt") ||
+          data.includes("challenges.cloudflare.com")
+        ) {
+          throw new CloudflareError(request, "Proteção Cloudflare ativa! Toque para resolver.");
+        }
+
+        if (response.status === 200 && !data.trim().startsWith("<")) {
+          const json = JSON.parse(data);
+          if (json.k && typeof json.k === "string") {
+            this.keyCache.set(cacheKey, json.k);
+            Application.setState(json.k, cacheKey);
+            return json.k;
+          }
+        }
+      } catch (err) {
+        if (err instanceof CloudflareError) {
+          throw err;
+        }
+        lastError = err;
+      }
+    }
+
+    throw lastError || new Error("Falha ao obter chave de descriptografia das páginas do MangaNYX");
+  }
 
   private async getHomeData(): Promise<any> {
     const now = Date.now();
@@ -357,9 +421,44 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
     rawPages.sort((a: any, b: any) => (a.index || 0) - (b.index || 0));
 
     const pages: string[] = [];
+    let key: string | null = null;
+
     for (const p of rawPages) {
-      if (p.imageUrl) pages.push(p.imageUrl);
-      else if (p.url) pages.push(p.url);
+      const rawUrl = p.imageUrl || p.url;
+      if (!rawUrl || typeof rawUrl !== "string") continue;
+
+      if (rawUrl.startsWith("http://") || rawUrl.startsWith("https://")) {
+        pages.push(rawUrl);
+        continue;
+      }
+
+      try {
+        if (!key) {
+          const { v, e } = getParams(rawUrl);
+          key = await this.getKey(v, e);
+        }
+
+        let decrypted = decrypt(rawUrl, key);
+        if (decrypted.startsWith("//")) {
+          decrypted = "https:" + decrypted;
+        } else if (decrypted.startsWith("/")) {
+          decrypted = "https://manganyx.com" + decrypted;
+        }
+
+        if (decrypted.startsWith("http://") || decrypted.startsWith("https://")) {
+          pages.push(decrypted);
+        }
+      } catch (err) {
+        if (err instanceof CloudflareError) {
+          throw err;
+        }
+      }
+    }
+
+    if (pages.length === 0 && rawPages.length > 0) {
+      throw new Error(
+        "Não foi possível carregar as páginas do capítulo. Verifique a proteção Cloudflare.",
+      );
     }
 
     return {

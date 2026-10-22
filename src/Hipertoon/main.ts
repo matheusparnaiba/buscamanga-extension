@@ -15,6 +15,9 @@ import {
   type SortingOption,
   type SourceManga,
   type Tag,
+  type Cookie,
+  type Request,
+  CloudflareError,
 } from "@paperback/types";
 
 import { SettingsForm } from "./forms";
@@ -48,6 +51,74 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     this.mainInterceptor.registerInterceptor();
   }
 
+  async saveCloudflareBypassCookies(cookies: Cookie[]): Promise<void> {
+    for (const cookie of cookies) {
+      this.cookieStorageInterceptor.setCookie(cookie);
+    }
+  }
+
+  async cloudflareBypassCompleted(
+    request: Request,
+    cookies: Cookie[],
+    _localStorage: Record<string, string>,
+  ): Promise<void> {
+    for (const cookie of cookies) {
+      this.cookieStorageInterceptor.setCookie(cookie);
+    }
+    let ua: string | undefined = undefined;
+    if (request.headers) {
+      for (const key of Object.keys(request.headers)) {
+        if (key.toLowerCase() === "user-agent") {
+          ua = request.headers[key];
+          break;
+        }
+      }
+    }
+    if (ua && typeof ua === "string") {
+      Application.setState(ua, "cf_user_agent");
+    }
+  }
+
+  private async fetchJson(request: Request): Promise<any> {
+    const [response, buffer] = await Application.scheduleRequest(request);
+    const data = Application.arrayBufferToUTF8String(buffer);
+
+    if (
+      response.status === 403 ||
+      response.status === 503 ||
+      data.includes("Just a moment...") ||
+      data.includes("_cf_chl_opt") ||
+      data.includes("challenges.cloudflare.com")
+    ) {
+      throw new CloudflareError(
+        { url: "https://hipertoon.com/", method: "GET" },
+        "Proteção Cloudflare ativa no Hipertoon! Toque para resolver.",
+      );
+    }
+
+    if (data.trim().startsWith("<")) {
+      throw new CloudflareError(
+        { url: "https://hipertoon.com/", method: "GET" },
+        "Resposta inesperada do Hipertoon (HTML recebido em vez de JSON). Toque para verificar o Cloudflare no navegador.",
+      );
+    }
+
+    let json: any;
+    try {
+      json = JSON.parse(data);
+    } catch {
+      throw new Error("Falha ao converter resposta da API do Hipertoon em JSON.");
+    }
+
+    if (json && json.error) {
+      throw new Error(
+        `Erro na API do Hipertoon: ${json.error?.message || JSON.stringify(json.error)}`,
+      );
+    }
+
+    return json;
+  }
+
   async getSettingsForm(): Promise<Form> {
     return new SettingsForm();
   }
@@ -79,17 +150,12 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     const url =
       "https://hipertoon.com/api/trpc/auth.me,recommendations.trending,recommendations.latestChapters,recommendations.newlyAdded?batch=1&input=%7B%220%22%3A%7B%22json%22%3Anull%2C%22meta%22%3A%7B%22values%22%3A%5B%22undefined%22%5D%7D%7D%2C%221%22%3A%7B%22json%22%3A%7B%22limit%22%3A20%7D%7D%2C%222%22%3A%7B%22json%22%3A%7B%22limit%22%3A20%7D%7D%2C%223%22%3A%7B%22json%22%3A%7B%22limit%22%3A10%7D%7D%7D";
 
-    const request = {
+    const request: Request = {
       url,
       method: "GET",
     };
 
-    const [_, buffer] = await Application.scheduleRequest(request);
-    const data = Application.arrayBufferToUTF8String(buffer);
-    const json = JSON.parse(data);
-    if (json && json.error) {
-      throw new Error(`Erro na API do Hipertoon: ${json.error}`);
-    }
+    const json = await this.fetchJson(request);
     const items: DiscoverSectionItem[] = [];
 
     if (section.id === "popular") {
@@ -192,11 +258,9 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     };
 
     const searchUrl = `https://hipertoon.com/api/trpc/search.query?batch=1&input=${encodeURIComponent(JSON.stringify(input))}`;
-    const request = { url: searchUrl, method: "GET" };
+    const request: Request = { url: searchUrl, method: "GET" };
 
-    const [_, buffer] = await Application.scheduleRequest(request);
-    const data = Application.arrayBufferToUTF8String(buffer);
-    const json = JSON.parse(data);
+    const json = await this.fetchJson(request);
 
     const hits = json[0]?.result?.data?.json?.hits || [];
     const items: SearchResultItem[] = [];
@@ -225,11 +289,9 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     const actualSlug = slug || mangaId;
 
     const url = `https://hipertoon.com/api/trpc/series.bySlugWithGenres?batch=1&input=${encodeURIComponent(JSON.stringify({ "0": { json: { slug: actualSlug } } }))}`;
-    const request = { url, method: "GET" };
+    const request: Request = { url, method: "GET" };
 
-    const [_, buffer] = await Application.scheduleRequest(request);
-    const data = Application.arrayBufferToUTF8String(buffer);
-    const json = JSON.parse(data);
+    const json = await this.fetchJson(request);
 
     const manga = json[0]?.result?.data?.json;
     if (!manga) throw new Error("Failed to parse Manga Details from Hipertoon API");
@@ -275,11 +337,9 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     if (!seriesId) throw new Error("Invalid mangaId format, missing seriesId");
 
     const url = `https://hipertoon.com/api/trpc/series.chapters?batch=1&input=${encodeURIComponent(JSON.stringify({ "0": { json: { seriesId: parseInt(seriesId) } } }))}`;
-    const request = { url, method: "GET" };
+    const request: Request = { url, method: "GET" };
 
-    const [_, buffer] = await Application.scheduleRequest(request);
-    const data = Application.arrayBufferToUTF8String(buffer);
-    const json = JSON.parse(data);
+    const json = await this.fetchJson(request);
 
     const chaptersData = json[0]?.result?.data?.json || [];
     const chapters: Chapter[] = [];
@@ -305,11 +365,9 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     const actualSlug = slug || chapter.sourceManga.mangaId;
 
     const url = `https://hipertoon.com/api/trpc/reader.chapterPages?batch=1&input=${encodeURIComponent(JSON.stringify({ "0": { json: { seriesSlug: actualSlug, chapterNumber: parseFloat(chapter.chapterId) } } }))}`;
-    const request = { url, method: "GET" };
+    const request: Request = { url, method: "GET" };
 
-    const [_, buffer] = await Application.scheduleRequest(request);
-    const data = Application.arrayBufferToUTF8String(buffer);
-    const json = JSON.parse(data);
+    const json = await this.fetchJson(request);
 
     const pagesData = json[0]?.result?.data?.json || [];
     const pages: string[] = [];
@@ -372,6 +430,7 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
         homeSection.items = mangaItems;
         sectionCallback(homeSection);
       } catch (e) {
+        if (e instanceof CloudflareError) throw e;
         console.error(`Erro ao carregar seção ${sec.title}:`, e);
       }
     }

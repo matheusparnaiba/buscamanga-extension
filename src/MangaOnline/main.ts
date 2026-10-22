@@ -25,18 +25,21 @@ import type ContentTemplateConfig from "./pbconfig";
 
 declare const App: any;
 
-const BASE_URL = "https://mangaonline.blue";
+const BASE_URL = "https://mangaonline.love";
 
 function getImageSrc($img: cheerio.Cheerio<any>): string {
   let src =
     $img.attr("data-src") ||
     $img.attr("data-lazy-src") ||
-    $img.attr("srcset")?.split(" ")[0] ||
+    $img.attr("data-original") ||
+    $img.attr("srcset")?.split(",")[0]?.trim()?.split(" ")[0]?.trim() ||
     $img.attr("src") ||
     $img.attr("data-cfsrc") ||
     "";
-  src = src.trim().replace(/-\d+x\d+/g, ""); // Remove dimensões do nome
-  return src.startsWith("/") ? BASE_URL + src : src;
+  src = src.trim().replace(/-\d+x\d+(\.[a-zA-Z0-9]+)$/, "$1");
+  if (src.startsWith("//")) src = "https:" + src;
+  else if (src.startsWith("/")) src = BASE_URL + src;
+  return src;
 }
 
 export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplateConfig> {
@@ -87,11 +90,12 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
     metadata: number | undefined,
   ): Promise<PagedResults<DiscoverSectionItem>> {
     const page = metadata ?? 1;
-    let url = `${BASE_URL}/page/${page}/`;
 
     if ((section.id === "latest" || section.id === "ranking") && page > 1) {
       return { items: [], metadata: undefined };
     }
+
+    const url = page === 1 ? `${BASE_URL}/` : `${BASE_URL}/page/${page}/`;
 
     const request = {
       url,
@@ -102,62 +106,96 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
     const items: DiscoverSectionItem[] = [];
+    const seenIds = new Set<string>();
 
     if (section.id === "latest") {
-      $(".es-hero-slide").each((_, el) => {
-        const title = $(el).find(".es-hero-title").text().trim();
-        const href = $(el).find(".es-hero-actions a").attr("href");
-        const img = getImageSrc($(el).find(".es-hero-cover img"));
+      $(".home-featured-slide, .es-hero-slide").each((_, el) => {
+        const title = $(el).find(".home-featured-title, .es-hero-title").text().trim();
+        const href = $(el)
+          .find(".home-featured-cover, .home-featured-actions a, .es-hero-actions a")
+          .attr("href");
+        const img = getImageSrc($(el).find(".home-featured-cover img, .es-hero-cover img, img"));
 
         if (href) {
           const idMatch = href.match(/\/manga\/([^/]+)/);
-          const mangaId = idMatch ? (idMatch[1] as string) : href;
+          const mangaId = idMatch
+            ? (idMatch[1] as string)
+            : href.replace(/\/+$/, "").split("/").pop() || href;
 
-          items.push({
-            mangaId,
-            title,
-            imageUrl: img,
-            type: "featuredCarouselItem",
-            contentRating: ContentRating.EVERYONE,
-          });
+          if (!seenIds.has(mangaId)) {
+            seenIds.add(mangaId);
+            items.push({
+              mangaId,
+              title: title || mangaId,
+              imageUrl:
+                img ||
+                "https://ui-avatars.com/api/?name=" +
+                  encodeURIComponent(title || "Manga") +
+                  "&background=random",
+              type: "featuredCarouselItem",
+              contentRating: ContentRating.EVERYONE,
+            });
+          }
         }
       });
       return { items, metadata: undefined };
     }
 
     if (section.id === "updates") {
-      $(".es-upd-card").each((_, el) => {
-        const title = $(el).find(".es-upd-title").text().trim();
-        const href = $(el).find(".es-upd-title").attr("href");
-        const img = getImageSrc($(el).find(".es-upd-cover img"));
+      $(
+        ".home-latest-grid article.home-manga-card, .home-latest article.home-manga-card, article.home-manga-card, .es-upd-card",
+      ).each((_, el) => {
+        const title = $(el)
+          .find(".home-card-body h3 a, .es-upd-title, h3 a, h3")
+          .first()
+          .text()
+          .trim();
+        const href = $(el)
+          .find(".home-card-body h3 a, .home-manga-cover, .es-upd-title, a")
+          .first()
+          .attr("href");
+        const img = getImageSrc(
+          $(el).find(".home-manga-cover img, .es-upd-cover img, img").first(),
+        );
 
         if (href) {
           const idMatch = href.match(/\/manga\/([^/]+)/);
-          const mangaId = idMatch ? (idMatch[1] as string) : href;
+          const mangaId = idMatch
+            ? (idMatch[1] as string)
+            : href.replace(/\/+$/, "").split("/").pop() || href;
 
-          const firstChapterEl = $(el).find(".es-upd-chap").first();
+          const firstChapterEl = $(el).find(".home-card-chapters a, .es-upd-chap").first();
           const chapterUrl = firstChapterEl.attr("href");
-          const chapterName = firstChapterEl.find(".es-upd-chap-name").text().trim() || "Cap. ?";
+          const chapterName =
+            firstChapterEl.find("span, .es-upd-chap-name").first().text().trim() ||
+            firstChapterEl.text().trim() ||
+            "Cap. ?";
 
           let chapterId = mangaId;
           if (chapterUrl) {
-            const chapMatch = chapterUrl.match(/\/manga\/[^/]+\/([^/]+)/);
+            const chapMatch =
+              chapterUrl.match(/\/capitulo\/([^/]+)/) ||
+              chapterUrl.match(/\/manga\/[^/]+\/([^/]+)/);
             if (chapMatch) chapterId = chapMatch[1] as string;
+            else chapterId = chapterUrl;
           }
 
-          items.push({
-            mangaId,
-            chapterId,
-            title,
-            subtitle: chapterName,
-            imageUrl:
-              img ||
-              "https://ui-avatars.com/api/?name=" +
-                encodeURIComponent(title) +
-                "&background=random",
-            type: "chapterUpdatesCarouselItem",
-            contentRating: ContentRating.EVERYONE,
-          });
+          if (!seenIds.has(mangaId)) {
+            seenIds.add(mangaId);
+            items.push({
+              mangaId,
+              chapterId,
+              title: title || mangaId,
+              subtitle: chapterName,
+              imageUrl:
+                img ||
+                "https://ui-avatars.com/api/?name=" +
+                  encodeURIComponent(title || "Manga") +
+                  "&background=random",
+              type: "chapterUpdatesCarouselItem",
+              contentRating: ContentRating.EVERYONE,
+            });
+          }
         }
       });
       return {
@@ -167,31 +205,73 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
     }
 
     if (section.id === "ranking") {
-      const match = data.match(/var esRankData = ({.*?});/);
-      if (match && match[1]) {
-        try {
-          const rankJson = JSON.parse(match[1]);
-          const rankList = rankJson.all || rankJson.month || [];
-          for (const item of rankList) {
-            if (item.url) {
-              const idMatch = item.url.match(/\/manga\/([^/]+)/);
-              const mangaId = idMatch ? (idMatch[1] as string) : item.url;
+      $(".home-popular-track article.home-manga-card, .home-popular article.home-manga-card").each(
+        (_, el) => {
+          const title = $(el).find(".home-card-body h3 a, h3 a, h3").first().text().trim();
+          const href = $(el)
+            .find(".home-card-body h3 a, .home-manga-cover, a")
+            .first()
+            .attr("href");
+          const img = getImageSrc($(el).find(".home-manga-cover img, img").first());
+          const chapEl = $(el).find(".home-card-chapters a").first();
+          const subtitle =
+            chapEl.find("span").first().text().trim() || chapEl.text().trim() || undefined;
+
+          if (href) {
+            const idMatch = href.match(/\/manga\/([^/]+)/);
+            const mangaId = idMatch
+              ? (idMatch[1] as string)
+              : href.replace(/\/+$/, "").split("/").pop() || href;
+
+            if (!seenIds.has(mangaId)) {
+              seenIds.add(mangaId);
               items.push({
                 mangaId,
-                title: item.title,
-                subtitle: item.views
-                  ? `${item.views.toLocaleString("pt-BR")} visualizações`
-                  : undefined,
+                title: title || mangaId,
+                subtitle,
                 imageUrl:
-                  item.cover ||
-                  "https://ui-avatars.com/api/?name=" + encodeURIComponent(item.title),
+                  img ||
+                  "https://ui-avatars.com/api/?name=" +
+                    encodeURIComponent(title || "Manga") +
+                    "&background=random",
                 type: "prominentCarouselItem",
                 contentRating: ContentRating.EVERYONE,
               });
             }
           }
-        } catch (e) {
-          console.error("Erro ao fazer parse do ranking", e);
+        },
+      );
+
+      if (items.length === 0) {
+        const match = data.match(/var esRankData = ({.*?});/);
+        if (match && match[1]) {
+          try {
+            const rankJson = JSON.parse(match[1]);
+            const rankList = rankJson.all || rankJson.month || [];
+            for (const item of rankList) {
+              if (item.url) {
+                const idMatch = item.url.match(/\/manga\/([^/]+)/);
+                const mangaId = idMatch ? (idMatch[1] as string) : item.url;
+                if (!seenIds.has(mangaId)) {
+                  seenIds.add(mangaId);
+                  items.push({
+                    mangaId,
+                    title: item.title,
+                    subtitle: item.views
+                      ? `${item.views.toLocaleString("pt-BR")} visualizações`
+                      : undefined,
+                    imageUrl:
+                      item.cover ||
+                      "https://ui-avatars.com/api/?name=" + encodeURIComponent(item.title),
+                    type: "prominentCarouselItem",
+                    contentRating: ContentRating.EVERYONE,
+                  });
+                }
+              }
+            }
+          } catch (e) {
+            console.error("Erro ao fazer parse do ranking", e);
+          }
         }
       }
       return { items, metadata: undefined };
@@ -212,34 +292,58 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
     _sortingOption?: SortingOption,
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata ?? 1;
-    const searchUrl = `${BASE_URL}/page/${page}/?s=${encodeURIComponent(query.title)}&post_type=wp-manga`;
+    let searchUrl: string;
+
+    if (query.title && query.title.trim()) {
+      searchUrl =
+        page === 1
+          ? `${BASE_URL}/?s=${encodeURIComponent(query.title.trim())}`
+          : `${BASE_URL}/page/${page}/?s=${encodeURIComponent(query.title.trim())}`;
+    } else {
+      searchUrl = page === 1 ? `${BASE_URL}/manga/` : `${BASE_URL}/manga/page/${page}/`;
+    }
 
     const request = { url: searchUrl, method: "GET" };
     const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
     const items: SearchResultItem[] = [];
+    const seenIds = new Set<string>();
 
-    $(".c-tabs-item__content").each((_, el) => {
-      const titleElement = $(el).find(".post-title h3 a");
+    $(
+      ".manga-card, article.home-manga-card, .home-manga-card, .c-tabs-item__content, .search-results-grid .manga-card",
+    ).each((_, el) => {
+      const titleElement = $(el)
+        .find(".manga-card-title, .home-card-body h3 a, .post-title h3 a, h3 a, .title")
+        .first();
       const title = titleElement.text().trim();
-      const href = titleElement.attr("href");
-      const img = getImageSrc($(el).find(".tab-thumb a img"));
+      const linkElement = $(el)
+        .find("a.manga-card-link, .home-card-body h3 a, .home-manga-cover, .tab-thumb a, a")
+        .first();
+      const href = linkElement.attr("href");
+      const img = getImageSrc(
+        $(el).find(".manga-cover-img, .home-manga-cover img, .tab-thumb a img, img").first(),
+      );
 
       if (href) {
         const idMatch = href.match(/\/manga\/([^/]+)/);
-        const mangaId = idMatch ? (idMatch[1] as string) : href;
+        const mangaId = idMatch
+          ? (idMatch[1] as string)
+          : href.replace(/\/+$/, "").split("/").pop() || href;
 
-        items.push({
-          mangaId,
-          title,
-          imageUrl:
-            img ||
-            "https://ui-avatars.com/api/?name=" +
-              encodeURIComponent(title || "Manga") +
-              "&background=random",
-          contentRating: ContentRating.EVERYONE,
-        });
+        if (!seenIds.has(mangaId)) {
+          seenIds.add(mangaId);
+          items.push({
+            mangaId,
+            title: title || mangaId,
+            imageUrl:
+              img ||
+              "https://ui-avatars.com/api/?name=" +
+                encodeURIComponent(title || "Manga") +
+                "&background=random",
+            contentRating: ContentRating.EVERYONE,
+          });
+        }
       }
     });
 
@@ -256,28 +360,54 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
 
-    const title = $(".post-title h1").text().trim() || "Sem título";
-    const rawImage = getImageSrc($(".summary_image a img, .summary_image img"));
+    const titleNode = $(".manga-info h1, h1.manga-title, .post-title h1, h1").first().clone();
+    titleNode.find(".manga-language-flag, .screen-reader-text").remove();
+    const title = titleNode.text().trim() || mangaId;
+
+    const rawImage = getImageSrc(
+      $(
+        ".manga-cover img, .summary_image a img, .summary_image img, img.manga-cover, .post-thumb img",
+      ).first(),
+    );
     const image = rawImage && rawImage.startsWith("http") ? rawImage : undefined;
     const fallbackImage =
       "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
     const thumbnailUrl = image || fallbackImage;
 
-    const synopsis = $(".description-summary .summary__content").text().trim();
-    const author = $(".author-content a").text().trim() || "Desconhecido";
-    const statusText = $(".post-status .post-content_item .summary-content")
-      .last()
+    const synopsis = $(
+      ".manga-synopsis .synopsis-content p, .manga-synopsis .synopsis-content, .description-summary .summary__content, .entry-content",
+    )
+      .first()
       .text()
-      .trim()
-      .toLowerCase();
+      .replace(/^Sinopse\s*/i, "")
+      .trim();
+
+    let author = "Desconhecido";
+    $(".manga-meta-item, .post-content_item, .author-content").each((_, el) => {
+      const label = $(el).find(".meta-label, .summary-heading").text().toLowerCase();
+      if (label.includes("autor") || label.includes("author") || label.includes("artista")) {
+        const val = $(el).find(".meta-value, .summary-content, a").text().trim();
+        if (val) author = val;
+      }
+    });
 
     let status = "ONGOING";
-    if (statusText.includes("completo") || statusText.includes("completed")) status = "COMPLETED";
+    $(
+      ".manga-meta-item, .post-status .post-content_item, .home-featured-meta, .home-featured-pills",
+    ).each((_, el) => {
+      const text = $(el).text().toLowerCase();
+      if (text.includes("completo") || text.includes("completed")) status = "COMPLETED";
+      else if (text.includes("andamento") || text.includes("ongoing")) status = "ONGOING";
+    });
 
     const genres: Tag[] = [];
-    $(".genres-content a").each((_, el) => {
+    const seenGenres = new Set<string>();
+    $(".manga-tags a, .genres-content a, .manga-card-genres a").each((_, el) => {
       const g = $(el).text().trim();
-      if (g) genres.push({ id: encodeURI(g), title: g });
+      if (g && !seenGenres.has(g.toLowerCase())) {
+        seenGenres.add(g.toLowerCase());
+        genres.push({ id: encodeURI(g), title: g });
+      }
     });
 
     return {
@@ -304,51 +434,92 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
     const data = Application.arrayBufferToUTF8String(buffer);
     let $ = cheerio.load(data);
     const chapters: Chapter[] = [];
+    const seenChapters = new Set<string>();
 
     const mangaIdAttr = $("#manga-chapters-holder").attr("data-id");
     if (mangaIdAttr) {
-      const ajaxReq = {
-        url: `${BASE_URL}/wp-admin/admin-ajax.php`,
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `action=manga_get_chapters&manga=${mangaIdAttr}`,
-      };
-      const [_, ajaxBuffer] = await Application.scheduleRequest(ajaxReq);
-      const ajaxData = Application.arrayBufferToUTF8String(ajaxBuffer);
-      $ = cheerio.load(ajaxData);
+      try {
+        const ajaxReq = {
+          url: `${BASE_URL}/wp-admin/admin-ajax.php`,
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: `action=manga_get_chapters&manga=${mangaIdAttr}`,
+        };
+        const [_, ajaxBuffer] = await Application.scheduleRequest(ajaxReq);
+        const ajaxData = Application.arrayBufferToUTF8String(ajaxBuffer);
+        $ = cheerio.load(ajaxData);
+      } catch (e) {
+        console.error("Erro ao carregar capítulos via ajax:", e);
+      }
     }
 
-    $(".wp-manga-chapter").each((_, el) => {
-      const a = $(el).find("a");
-      const href = a.attr("href")?.trim() ?? "";
-      const name = a.text().trim();
-      const numMatch = name.match(/[\d.]+/);
-      const chapNum = numMatch ? parseFloat(numMatch[0]) : 0;
+    if ($("li.chapter-item").length > 0) {
+      $("li.chapter-item").each((_, el) => {
+        const a = $(el).find("a.chapter-link, a").first();
+        const href = a.attr("href")?.trim() ?? "";
+        const name = $(el).find(".chapter-number").text().trim() || a.text().trim();
+        const numMatch = name.match(/[\d.]+/);
+        const chapNum = numMatch ? parseFloat(numMatch[0]) : 0;
 
-      chapters.push({
-        chapterId: href,
-        sourceManga,
-        langCode: "PT-BR",
-        chapNum,
-        title: name,
-        volume: 0,
+        if (href && !seenChapters.has(href)) {
+          seenChapters.add(href);
+          chapters.push({
+            chapterId: href,
+            sourceManga,
+            langCode: "PT-BR",
+            chapNum,
+            title: name,
+            volume: 0,
+          });
+        }
       });
-    });
+    } else {
+      $(".chapter-grid-item, .wp-manga-chapter, .chapter-list-item").each((_, el) => {
+        const a = $(el).find("a").first();
+        const href = a.attr("href")?.trim() ?? "";
+        const name =
+          $(el).find("strong, .chapter-grid-number, .chapter-name").text().trim() ||
+          a.text().trim();
+        const numMatch = name.match(/[\d.]+/);
+        const chapNum = numMatch ? parseFloat(numMatch[0]) : 0;
+
+        if (href && !seenChapters.has(href)) {
+          seenChapters.add(href);
+          chapters.push({
+            chapterId: href,
+            sourceManga,
+            langCode: "PT-BR",
+            chapNum,
+            title: name,
+            volume: 0,
+          });
+        }
+      });
+    }
 
     return chapters;
   }
 
   async getChapterDetails(chapter: Chapter): Promise<ChapterDetails> {
-    const url = chapter.chapterId;
+    const url = chapter.chapterId.startsWith("http")
+      ? chapter.chapterId
+      : `${BASE_URL}${chapter.chapterId.startsWith("/") ? "" : "/"}${chapter.chapterId}`;
     const request = { url, method: "GET" };
     const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
 
     const pages: string[] = [];
-    $(".reading-content img").each((_, el) => {
+    const seenPages = new Set<string>();
+
+    $(
+      ".chapter-images img, img.chapter-image, .reading-content img, .entry-content img, .chapter-content img",
+    ).each((_, el) => {
       const src = getImageSrc($(el));
-      if (src) pages.push(src);
+      if (src && src.startsWith("http") && !seenPages.has(src)) {
+        seenPages.add(src);
+        pages.push(src);
+      }
     });
 
     return {
