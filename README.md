@@ -9,7 +9,7 @@
 Coleção otimizada de fontes para leitura de mangás, manhwas, manhuas e quadrinhos nacionais diretamente no aplicativo Paperback.
 
 [![Paperback v0.9+](https://img.shields.io/badge/Paperback-v0.9+-F97316?style=for-the-badge&logo=apple&logoColor=white)](https://paperback.moe/)
-[![Fontes Disponíveis](https://img.shields.io/badge/Fontes-11%20Dispon%C3%ADveis-10B981?style=for-the-badge&logo=safari&logoColor=white)](#-fontes-disponíveis)
+[![Fontes Disponíveis](https://img.shields.io/badge/Fontes-18%20Dispon%C3%ADveis-10B981?style=for-the-badge&logo=safari&logoColor=white)](#-fontes-disponíveis)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](LICENSE)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Ativo-success?style=for-the-badge&logo=github)](https://matheusparnaiba.github.io/buscamanga-extension/)
@@ -32,21 +32,28 @@ O **BuscaMangá Extension** é um repositório desenvolvido para suprir a demand
 
 ## 📦 Fontes Disponíveis
 
-Todas as 11 extensões estão ativas e sincronizadas no GitHub Pages:
+Todas as 18 extensões estão ativas e sincronizadas no GitHub Pages:
 
-|                                         Ícone                                          | Nome                |  Versão  | Site Oficial                                         | Categoria / Recurso                     |  Status  |
-| :------------------------------------------------------------------------------------: | :------------------ | :------: | :--------------------------------------------------- | :-------------------------------------- | :------: |
-|    <img src="src/MangaOnline/icon.png" width="28" height="28" alt="Manga Online" />    | **Manga Online**    | `1.0.17` | [mangaonline.love](https://mangaonline.love)         | Mangás & Manhwas                        | 🟢 Ativo |
-| <img src="src/MangaLivreBlog/icon.png" width="28" height="28" alt="MangaLivre Blog" /> | **MangaLivre Blog** | `1.0.10` | [mangalivre.blog](https://mangalivre.blog)           | Mangás Diversos                         | 🟢 Ativo |
-|      <img src="src/Hipertoon/icon.png" width="28" height="28" alt="Hipertoon" />       | **Hipertoon**       | `1.0.16` | [hipertoon.com](https://hipertoon.com)               | Manhwas • `Bypass Cloudflare` 🛡️        | 🟢 Ativo |
-|  <img src="src/MangasBrasuka/icon.png" width="28" height="28" alt="Mangás Brasuka" />  | **Mangás Brasuka**  | `1.0.16` | [mangasbrasuka.com.br](https://mangasbrasuka.com.br) | Mangás & Scans • `Bypass Cloudflare` 🛡️ | 🟢 Ativo |
-|       <img src="src/MangaNYX/icon.png" width="28" height="28" alt="MangaNYX" />        | **MangaNYX**        | `1.0.12` | [manganyx.com](https://manganyx.com)                 | Catálogo Geral • `Bypass Cloudflare` 🛡️ | 🟢 Ativo |
-|   <img src="src/MangaLivreTo/icon.png" width="28" height="28" alt="MangaLivre To" />   | **MangaLivre To**   | `1.0.1`  | [mangalivre.to](https://mangalivre.to)               | Mangás Populares                        | 🟢 Ativo |
-|      <img src="src/Manhastro/icon.png" width="28" height="28" alt="Manhastro" />       | **Manhastro**       | `1.0.0`  | [manhastro.net](https://manhastro.net)               | Manhwas & Ação                          | 🟢 Ativo |
-|   <img src="src/LeituraManga/icon.png" width="28" height="28" alt="Leitura Manga" />   | **Leitura Manga**   | `1.0.0`  | [leituramanga.net](https://leituramanga.net)         | Mangás & Manhuas                        | 🟢 Ativo |
-|   <img src="src/NebulosaScan/icon.png" width="28" height="28" alt="Nebulosa Scan" />   | **Nebulosa Scan**   | `1.0.0`  | [nebulosascan.com](https://nebulosascan.com)         | Scans Exclusivas                        | 🟢 Ativo |
-|        <img src="src/Fliptru/icon.png" width="28" height="28" alt="Fliptru" />         | **Fliptru**         | `1.0.0`  | [fliptru.com.br](https://fliptru.com.br)             | Quadrinhos Nacionais Independentes      | 🟢 Ativo |
-|          <img src="src/HQNow/icon.png" width="28" height="28" alt="HQ Now" />          | **HQ Now**          | `1.0.0`  | [hq-now.com](https://www.hq-now.com)                 | Quadrinhos Ocidentais & HQs             | 🟢 Ativo |
+|                                            Ícone                                            | Nome                   |  Versão  | Site Oficial                                                         | Categoria / Recurso                     |  Status  |
+| :-----------------------------------------------------------------------------------------: | :--------------------- | :------: | :------------------------------------------------------------------- | :-------------------------------------- | :------: |
+|        <img src="src/MangaFlix/icon.png" width="28" height="28" alt="Manga Flix" />         | **Manga Flix**         | `1.0.0`  | [mangaflix.net](https://mangaflix.net)                               | Mangás & Manhwas                        | 🟢 Ativo |
+|          <img src="src/TaoSect/icon.png" width="28" height="28" alt="Tao Sect" />           | **Tao Sect**           | `1.0.0`  | [taosect.com](https://taosect.com)                                   | Artes Marciais & Seinen                 | 🟢 Ativo |
+|       <img src="src/ArthurScan/icon.png" width="28" height="28" alt="Arthur Scan" />        | **Arthur Scan**        | `1.0.0`  | [arthurscan.xyz](https://arthurscan.xyz)                             | Ação & Cultivação                       | 🟢 Ativo |
+|        <img src="src/NinjaScan/icon.png" width="28" height="28" alt="Ninja Scan" />         | **Ninja Scan**         | `1.0.0`  | [ninjacomics.xyz](https://ninjacomics.xyz)                           | Manhwas & Fantasia                      | 🟢 Ativo |
+| <img src="src/KamiSamaExplorer/icon.png" width="28" height="28" alt="Kami Sama Explorer" /> | **Kami Sama Explorer** | `1.0.0`  | [leitor.kamisama.com.br](https://leitor.kamisama.com.br)             | Dragon Ball & Shonen                    | 🟢 Ativo |
+|   <img src="src/BorutoExplorer/icon.png" width="28" height="28" alt="Boruto Explorer" />    | **Boruto Explorer**    | `1.0.0`  | [leitor.borutoexplorer.com.br](https://leitor.borutoexplorer.com.br) | Naruto & Boruto                         | 🟢 Ativo |
+|        <img src="src/YuriOnAir/icon.png" width="28" height="28" alt="Yuri on Air" />        | **Yuri on Air**        | `1.0.0`  | [yurionair.top](https://yurionair.top)                               | Yuri & Shoujo Ai                        | 🟢 Ativo |
+|      <img src="src/MangaOnline/icon.png" width="28" height="28" alt="Manga Online" />       | **Manga Online**       | `1.0.17` | [mangaonline.love](https://mangaonline.love)                         | Mangás & Manhwas                        | 🟢 Ativo |
+|   <img src="src/MangaLivreBlog/icon.png" width="28" height="28" alt="MangaLivre Blog" />    | **MangaLivre Blog**    | `1.0.10` | [mangalivre.blog](https://mangalivre.blog)                           | Mangás Diversos                         | 🟢 Ativo |
+|         <img src="src/Hipertoon/icon.png" width="28" height="28" alt="Hipertoon" />         | **Hipertoon**          | `1.0.16` | [hipertoon.com](https://hipertoon.com)                               | Manhwas • `Bypass Cloudflare` 🛡️        | 🟢 Ativo |
+|    <img src="src/MangasBrasuka/icon.png" width="28" height="28" alt="Mangás Brasuka" />     | **Mangás Brasuka**     | `1.0.16` | [mangasbrasuka.com.br](https://mangasbrasuka.com.br)                 | Mangás & Scans • `Bypass Cloudflare` 🛡️ | 🟢 Ativo |
+|          <img src="src/MangaNYX/icon.png" width="28" height="28" alt="MangaNYX" />          | **MangaNYX**           | `1.0.12` | [manganyx.com](https://manganyx.com)                                 | Catálogo Geral • `Bypass Cloudflare` 🛡️ | 🟢 Ativo |
+|     <img src="src/MangaLivreTo/icon.png" width="28" height="28" alt="MangaLivre To" />      | **MangaLivre To**      | `1.0.1`  | [mangalivre.to](https://mangalivre.to)                               | Mangás Populares                        | 🟢 Ativo |
+|         <img src="src/Manhastro/icon.png" width="28" height="28" alt="Manhastro" />         | **Manhastro**          | `1.0.0`  | [manhastro.net](https://manhastro.net)                               | Manhwas & Ação                          | 🟢 Ativo |
+|     <img src="src/LeituraManga/icon.png" width="28" height="28" alt="Leitura Manga" />      | **Leitura Manga**      | `1.0.0`  | [leituramanga.net](https://leituramanga.net)                         | Mangás & Manhuas                        | 🟢 Ativo |
+|     <img src="src/NebulosaScan/icon.png" width="28" height="28" alt="Nebulosa Scan" />      | **Nebulosa Scan**      | `1.0.0`  | [nebulosascan.com](https://nebulosascan.com)                         | Scans Exclusivas                        | 🟢 Ativo |
+|           <img src="src/Fliptru/icon.png" width="28" height="28" alt="Fliptru" />           | **Fliptru**            | `1.0.0`  | [fliptru.com.br](https://fliptru.com.br)                             | Quadrinhos Nacionais Independentes      | 🟢 Ativo |
+|            <img src="src/HQNow/icon.png" width="28" height="28" alt="HQ Now" />             | **HQ Now**             | `1.0.0`  | [hq-now.com](https://www.hq-now.com)                                 | Quadrinhos Ocidentais & HQs             | 🟢 Ativo |
 
 > ℹ️ _Sites protegidos por Cloudflare utilizam rotinas de bypass compatíveis com o ambiente de execução do Paperback._
 
@@ -136,17 +143,24 @@ buscamanga-extension/
 ├── assets/               # Identidade visual, logotipos e ícones das fontes
 ├── bundles/              # Pacotes compilados das extensões e versioning.json
 ├── src/                  # Código-fonte TypeScript de cada extensão
+│   ├── ArthurScan/
+│   ├── BorutoExplorer/
 │   ├── Fliptru/
 │   ├── Hipertoon/
 │   ├── HQNow/
+│   ├── KamiSamaExplorer/
 │   ├── LeituraManga/
+│   ├── MangaFlix/
 │   ├── MangaLivreBlog/
 │   ├── MangaLivreTo/
 │   ├── MangaNYX/
 │   ├── MangaOnline/
 │   ├── MangasBrasuka/
 │   ├── Manhastro/
-│   └── NebulosaScan/
+│   ├── NebulosaScan/
+│   ├── NinjaScan/
+│   ├── TaoSect/
+│   └── YuriOnAir/
 ├── root-index.html       # Landing page do repositório no GitHub Pages
 ├── template.html         # Template do catálogo web dinâmico (0.9/stable)
 └── README.md             # Documentação oficial do projeto
