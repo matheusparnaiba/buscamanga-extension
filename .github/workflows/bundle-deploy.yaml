@@ -38,6 +38,7 @@ jobs:
             if (fs.existsSync('assets/buscamanga-transparent.png')) fs.copyFileSync('assets/buscamanga-transparent.png', 'bundles/buscamanga-transparent.png');
             if (fs.existsSync('assets/buscamanga-favicon.png')) fs.copyFileSync('assets/buscamanga-favicon.png', 'bundles/buscamanga-favicon.png');
             if (fs.existsSync('assets/apple-touch-icon.png')) fs.copyFileSync('assets/apple-touch-icon.png', 'bundles/apple-touch-icon.png');
+            if (fs.existsSync('assets/buscamanga-rounded.png')) fs.copyFileSync('assets/buscamanga-rounded.png', 'bundles/buscamanga-rounded.png');
             fs.copyFileSync('template.html', 'bundles/index.html');
             const folders = fs.readdirSync('src', { withFileTypes: true }).filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);
             for (const folder of folders) {

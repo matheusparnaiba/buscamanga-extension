@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/buscamanga.png" alt="BuscaMangá Logo" width="180" style="border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
+<img src="assets/buscamanga-rounded.png" alt="BuscaMangá Logo" width="160" />
 
 # BuscaMangá Extension
 
