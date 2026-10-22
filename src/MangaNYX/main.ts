@@ -55,47 +55,76 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
     };
   }
 
-  private async tryUnlockGate(domain: string): Promise<boolean> {
+  private async tryUnlockGate(domain: string, chapter?: Chapter): Promise<boolean> {
     try {
-      const startReq: Request = {
-        url: `${domain}/api/gate/start`,
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          referer: `${domain}/`,
-          accept: "application/json, text/plain, */*",
-        },
-        body: JSON.stringify({ returnTo: "/" }),
-      };
+      const mangaId = chapter?.sourceManga.mangaId || "";
+      const chapNum = chapter?.chapNum != null ? chapter.chapNum : 1;
 
-      const [startRes, startBuf] = await Application.scheduleRequest(startReq);
-      const startData = Application.arrayBufferToUTF8String(startBuf);
-      if (startRes.status !== 200 || startData.trim().startsWith("<")) {
-        return false;
+      const candidates = chapter
+        ? [
+            `/series/${encodeURIComponent(mangaId)}/${chapNum}`,
+            `/manhwa/${encodeURIComponent(mangaId)}/${chapNum}`,
+            `/manga/${encodeURIComponent(mangaId)}/${chapNum}`,
+          ]
+        : ["/series/manga/1"];
+
+      for (const returnTo of candidates) {
+        const unlockReq: Request = {
+          url: `${domain}/api/reader/unlock`,
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            referer: `${domain}${returnTo}`,
+            origin: domain,
+            accept: "application/json, text/plain, */*",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-origin",
+          },
+          body: JSON.stringify({ returnTo }),
+        };
+
+        const [res, buf] = await Application.scheduleRequest(unlockReq);
+        const data = Application.arrayBufferToUTF8String(buf);
+
+        const isSuccess =
+          res.status === 200 &&
+          (data.includes('"ok":true') || (res.cookies && res.cookies.length > 0));
+
+        if (isSuccess) {
+          const parsedCookies: Cookie[] = [];
+
+          if (Array.isArray(res.cookies) && res.cookies.length > 0) {
+            parsedCookies.push(...res.cookies);
+          }
+
+          const rawSetCookie = res.headers?.["set-cookie"] || res.headers?.["Set-Cookie"];
+          if (rawSetCookie) {
+            const cookieLines = Array.isArray(rawSetCookie) ? rawSetCookie : [rawSetCookie];
+            for (const line of cookieLines) {
+              const parts = line.split(";")[0]?.trim();
+              if (parts) {
+                const [cName, ...cValParts] = parts.split("=");
+                if (cName && cValParts.length) {
+                  parsedCookies.push({
+                    name: cName.trim(),
+                    value: cValParts.join("=").trim(),
+                    domain: domain.replace(/^https?:\/\//, ""),
+                    path: "/",
+                  });
+                }
+              }
+            }
+          }
+
+          if (parsedCookies.length > 0) {
+            await this.handleCloudflareBypass(parsedCookies);
+          }
+          return true;
+        }
       }
 
-      const json = JSON.parse(startData);
-      const token = json.data?.token;
-      if (!token || typeof token !== "string") {
-        return false;
-      }
-
-      const cbReq: Request = {
-        url: `${domain}/gate/callback?token=${encodeURIComponent(token)}`,
-        method: "GET",
-        headers: {
-          referer: `${domain}/`,
-          accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        },
-      };
-
-      const [cbRes, _] = await Application.scheduleRequest(cbReq);
-
-      if (cbRes.cookies && Array.isArray(cbRes.cookies)) {
-        await this.handleCloudflareBypass(cbRes.cookies);
-      }
-
-      return true;
+      return false;
     } catch (err) {
       if (err instanceof CloudflareError) {
         throw err;
@@ -104,7 +133,7 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
     }
   }
 
-  private async getKey(v: number, e: number): Promise<string> {
+  private async getKey(v: number, e: number, chapter?: Chapter): Promise<string> {
     const cacheKey = `atfield_key_${v}_${e}`;
 
     if (this.keyCache.has(cacheKey)) {
@@ -117,9 +146,13 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
       return savedKey;
     }
 
-    const domains = ["https://manganyx.com", "https://manganyx.org"];
+    const domains = ["https://manganyx.org", "https://manganyx.com"];
     let cloudflareErrorToThrow: CloudflareError | null = null;
     let lastError: Error | null = null;
+
+    const mangaId = chapter?.sourceManga.mangaId || "";
+    const chapNum = chapter?.chapNum != null ? chapter.chapNum : 1;
+    const chapterPath = chapter ? `/series/${encodeURIComponent(mangaId)}/${chapNum}` : "/";
 
     for (const domain of domains) {
       const url = `${domain}/api/atfield/key?v=${v}&e=${e}`;
@@ -129,7 +162,7 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
           method: "GET",
           headers: {
             accept: "application/json, text/plain, */*",
-            referer: `${domain}/`,
+            referer: `${domain}${chapterPath}`,
             "sec-fetch-dest": "empty",
             "sec-fetch-mode": "cors",
             "sec-fetch-site": "same-origin",
@@ -139,8 +172,8 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
           },
         };
 
-        const [response, buffer] = await Application.scheduleRequest(request);
-        const data = Application.arrayBufferToUTF8String(buffer);
+        let [response, buffer] = await Application.scheduleRequest(request);
+        let data = Application.arrayBufferToUTF8String(buffer);
 
         const cfMitigated =
           response.headers?.["cf-mitigated"] || response.headers?.["Cf-Mitigated"];
@@ -162,30 +195,24 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
           continue;
         }
 
+        // Se a resposta for 403 não-Cloudflare (ex: {"error":"unauthorized"} por falta de gate/cookie),
+        // tenta obter o desbloqueio do leitor via /api/reader/unlock automaticamente
+        if (response.status === 403 && data.includes("unauthorized")) {
+          const unlockSuccess = await this.tryUnlockGate(domain, chapter);
+          if (unlockSuccess) {
+            const [retryRes, retryBuf] = await Application.scheduleRequest(request);
+            response = retryRes;
+            buffer = retryBuf;
+            data = Application.arrayBufferToUTF8String(retryBuf);
+          }
+        }
+
         if (response.status === 200 && !data.trim().startsWith("<")) {
           const json = JSON.parse(data);
           if (json.k && typeof json.k === "string") {
             this.keyCache.set(cacheKey, json.k);
             Application.setState(json.k, cacheKey);
             return json.k;
-          }
-        }
-
-        // Se a resposta for 403 não-Cloudflare (ex: {"error":"unauthorized"} por falta de gate/cookie),
-        // tenta obter o desbloqueio do gate automaticamente
-        if (response.status === 403 && data.includes("unauthorized")) {
-          const unlockSuccess = await this.tryUnlockGate(domain);
-          if (unlockSuccess) {
-            const [retryRes, retryBuf] = await Application.scheduleRequest(request);
-            const retryData = Application.arrayBufferToUTF8String(retryBuf);
-            if (retryRes.status === 200 && !retryData.trim().startsWith("<")) {
-              const retryJson = JSON.parse(retryData);
-              if (retryJson.k && typeof retryJson.k === "string") {
-                this.keyCache.set(cacheKey, retryJson.k);
-                Application.setState(retryJson.k, cacheKey);
-                return retryJson.k;
-              }
-            }
           }
         }
 
@@ -318,8 +345,28 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
     }
 
     if (cleanCookies.length > 0) {
+      const existingHeader = Application.getState("manganyx_cookie_header") as string | undefined;
+      const cookieMap: Record<string, string> = {};
+
+      if (existingHeader) {
+        for (const part of existingHeader.split(";")) {
+          const [k, ...v] = part.trim().split("=");
+          if (k && v.length) {
+            cookieMap[k.trim()] = v.join("=").trim();
+          }
+        }
+      }
+
+      for (const c of cleanCookies) {
+        cookieMap[c.name] = c.value;
+      }
+
+      const mergedHeader = Object.entries(cookieMap)
+        .map(([k, v]) => `${k}=${v}`)
+        .join("; ");
+
       Application.setState(cleanCookies, "manganyx_saved_cookies");
-      Application.setState(headerParts.join("; "), "manganyx_cookie_header");
+      Application.setState(mergedHeader, "manganyx_cookie_header");
     }
   }
 
@@ -583,7 +630,7 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
       const rawUrl = firstEncrypted.imageUrl || firstEncrypted.url;
       try {
         const { v, e } = getParams(rawUrl);
-        key = await this.getKey(v, e);
+        key = await this.getKey(v, e, chapter);
       } catch (err) {
         keyFetchFailed = true;
         if (err instanceof CloudflareError) {
