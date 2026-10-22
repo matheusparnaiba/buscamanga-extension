@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-10-22T23:23:08.239Z",
+  "buildTime": "2026-10-22T23:30:05.469Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -118,9 +118,14 @@
       ],
       "badges": [
         {
+          "label": "HQs & Doujinshis",
+          "textColor": "#ffffff",
+          "backgroundColor": "#ef4444"
+        },
+        {
           "label": "18+",
-          "textColor": "#FFFFFF",
-          "backgroundColor": "#DC2626"
+          "textColor": "#ffffff",
+          "backgroundColor": "#dc2626"
         }
       ],
       "developers": [
@@ -179,9 +184,14 @@
       ],
       "badges": [
         {
+          "label": "Quadrinhos Eróticos",
+          "textColor": "#ffffff",
+          "backgroundColor": "#ef4444"
+        },
+        {
           "label": "18+",
-          "textColor": "#FFFFFF",
-          "backgroundColor": "#DC2626"
+          "textColor": "#ffffff",
+          "backgroundColor": "#dc2626"
         }
       ],
       "developers": [
@@ -209,9 +219,14 @@
       ],
       "badges": [
         {
+          "label": "HQs & Comics",
+          "textColor": "#ffffff",
+          "backgroundColor": "#ef4444"
+        },
+        {
           "label": "18+",
-          "textColor": "#FFFFFF",
-          "backgroundColor": "#DC2626"
+          "textColor": "#ffffff",
+          "backgroundColor": "#dc2626"
         }
       ],
       "developers": [
@@ -565,9 +580,14 @@
       ],
       "badges": [
         {
+          "label": "Mangás & Quadrinhos",
+          "textColor": "#ffffff",
+          "backgroundColor": "#8b5cf6"
+        },
+        {
           "label": "18+",
-          "textColor": "#FFFFFF",
-          "backgroundColor": "#DC2626"
+          "textColor": "#ffffff",
+          "backgroundColor": "#dc2626"
         }
       ],
       "developers": [
@@ -595,9 +615,14 @@
       ],
       "badges": [
         {
+          "label": "Doujinshis & Mangás",
+          "textColor": "#ffffff",
+          "backgroundColor": "#8b5cf6"
+        },
+        {
           "label": "18+",
-          "textColor": "#FFFFFF",
-          "backgroundColor": "#DC2626"
+          "textColor": "#ffffff",
+          "backgroundColor": "#dc2626"
         }
       ],
       "developers": [
@@ -625,9 +650,14 @@
       ],
       "badges": [
         {
+          "label": "Doujinshis & Comics",
+          "textColor": "#ffffff",
+          "backgroundColor": "#f97316"
+        },
+        {
           "label": "18+",
-          "textColor": "#FFFFFF",
-          "backgroundColor": "#DC2626"
+          "textColor": "#ffffff",
+          "backgroundColor": "#dc2626"
         }
       ],
       "developers": [
