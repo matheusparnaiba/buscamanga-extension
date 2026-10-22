@@ -40,7 +40,7 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
   });
 
   cookieStorageInterceptor = new CookieStorageInterceptor({
-    storage: "stateManager",
+    storage: "memory",
   });
 
   mainInterceptor = new MainInterceptor("main");
@@ -49,12 +49,31 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     this.mainRateLimiter.registerInterceptor();
     this.cookieStorageInterceptor.registerInterceptor();
     this.mainInterceptor.registerInterceptor();
+
+    const saved = Application.getState("hipertoon_saved_cookies") as
+      | Array<{ name: string; value: string; domain?: string; path?: string }>
+      | undefined;
+    if (Array.isArray(saved)) {
+      for (const c of saved) {
+        if (c?.name && c?.value) {
+          try {
+            this.cookieStorageInterceptor.setCookie({
+              name: c.name,
+              value: c.value,
+              domain: c.domain || "hipertoon.com",
+              path: c.path || "/",
+              expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+            });
+          } catch {
+            // Ignore any CookieStorageInterceptor issues
+          }
+        }
+      }
+    }
   }
 
   async saveCloudflareBypassCookies(cookies: Cookie[]): Promise<void> {
-    for (const cookie of cookies) {
-      this.cookieStorageInterceptor.setCookie(cookie);
-    }
+    await this.handleCloudflareBypass(cookies);
   }
 
   async cloudflareBypassCompleted(
@@ -62,11 +81,8 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     cookies: Cookie[],
     _localStorage: Record<string, string>,
   ): Promise<void> {
-    for (const cookie of cookies) {
-      this.cookieStorageInterceptor.setCookie(cookie);
-    }
     let ua: string | undefined = undefined;
-    if (request.headers) {
+    if (request?.headers) {
       for (const key of Object.keys(request.headers)) {
         if (key.toLowerCase() === "user-agent") {
           ua = request.headers[key];
@@ -77,6 +93,61 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     if (ua && typeof ua === "string") {
       Application.setState(ua, "cf_user_agent");
     }
+    await this.handleCloudflareBypass(cookies);
+  }
+
+  private async handleCloudflareBypass(cookies: Cookie[]): Promise<void> {
+    if (!cookies || !Array.isArray(cookies)) return;
+
+    const cleanCookies: Array<{ name: string; value: string; domain: string; path: string }> = [];
+    const cookieMap: Record<string, string> = {};
+
+    for (const c of cookies) {
+      if (!c || !c.name || !c.value) continue;
+      const domain = c.domain ? c.domain.replace(/^https?:\/\//, "") : "hipertoon.com";
+      const path = c.path || "/";
+
+      cleanCookies.push({
+        name: c.name,
+        value: c.value,
+        domain,
+        path,
+      });
+
+      cookieMap[c.name] = c.value;
+
+      try {
+        this.cookieStorageInterceptor.setCookie({
+          name: c.name,
+          value: c.value,
+          domain,
+          path,
+          expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        });
+      } catch {
+        // Ignore any CookieStorageInterceptor issues
+      }
+    }
+
+    if (cleanCookies.length > 0) {
+      const headerString = Object.entries(cookieMap)
+        .map(([name, value]) => `${name}=${value}`)
+        .join("; ");
+      Application.setState(cleanCookies, "hipertoon_saved_cookies");
+      Application.setState(headerString, "hipertoon_cookie_header");
+    }
+  }
+
+  private async getCloudflareResolutionRequest(): Promise<Request> {
+    const cfUserAgent = Application.getState("cf_user_agent") as string | undefined;
+    return {
+      url: "https://hipertoon.com/",
+      method: "GET",
+      headers: {
+        "user-agent": cfUserAgent ?? (await Application.getDefaultUserAgent()),
+        referer: "https://hipertoon.com/",
+      },
+    };
   }
 
   private async fetchJson(request: Request): Promise<any> {
@@ -90,15 +161,17 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
       data.includes("_cf_chl_opt") ||
       data.includes("challenges.cloudflare.com")
     ) {
+      const resolutionRequest = await this.getCloudflareResolutionRequest();
       throw new CloudflareError(
-        { url: "https://hipertoon.com/", method: "GET" },
+        resolutionRequest,
         "Proteção Cloudflare ativa no Hipertoon! Toque para resolver.",
       );
     }
 
     if (data.trim().startsWith("<")) {
+      const resolutionRequest = await this.getCloudflareResolutionRequest();
       throw new CloudflareError(
-        { url: "https://hipertoon.com/", method: "GET" },
+        resolutionRequest,
         "Resposta inesperada do Hipertoon (HTML recebido em vez de JSON). Toque para verificar o Cloudflare no navegador.",
       );
     }
