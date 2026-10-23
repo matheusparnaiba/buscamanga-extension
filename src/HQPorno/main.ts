@@ -7,6 +7,7 @@ import {
   type DiscoverSection,
   type DiscoverSectionItem,
   type ExtensionImpl,
+  type Form,
   type JSONValue,
   type PagedResults,
   type SearchQuery,
@@ -17,6 +18,7 @@ import {
 } from "@paperback/types";
 import * as cheerio from "cheerio";
 
+import { SettingsForm } from "./forms";
 import { MainInterceptor } from "./network";
 import type HQPornoConfig from "./pbconfig";
 
@@ -142,6 +144,10 @@ export class HQPornoExtension implements ExtensionImpl<typeof HQPornoConfig> {
   async initialise(): Promise<void> {
     this.mainRateLimiter.registerInterceptor();
     this.mainInterceptor.registerInterceptor();
+  }
+
+  async getSettingsForm(): Promise<Form> {
+    return new SettingsForm();
   }
 
   async getDiscoverSections(): Promise<DiscoverSection[]> {

@@ -10,7 +10,12 @@ import {
   type SearchQuery,
 } from "@paperback/types";
 
-import { GENRE_OPTIONS, ORDER_OPTIONS, type ContentTemplateSearchMetadata } from "./models";
+import {
+  GENRE_OPTIONS,
+  ORDER_OPTIONS,
+  STATUS_OPTIONS,
+  type ContentTemplateSearchMetadata,
+} from "./models";
 
 export class SettingsForm extends Form {
   override getSections() {
@@ -37,11 +42,13 @@ export class SettingsForm extends Form {
 export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
   private orderBy: string;
   private genre: string;
+  private status: string;
 
   constructor(searchQuery: SearchQuery<ContentTemplateSearchMetadata>) {
     super();
     this.orderBy = searchQuery.metadata?.orderBy ?? "views";
     this.genre = searchQuery.metadata?.genre ?? "all";
+    this.status = searchQuery.metadata?.status ?? "all";
   }
 
   override getSections() {
@@ -69,6 +76,17 @@ export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
             "handleGenreChange",
           ),
         }),
+        SelectRow("status", {
+          title: "Status da Obra",
+          value: [this.status],
+          options: STATUS_OPTIONS,
+          minItemCount: 1,
+          maxItemCount: 1,
+          onValueChange: Application.Selector(
+            this as ContentTemplateAdvancedSearchForm,
+            "handleStatusChange",
+          ),
+        }),
       ]),
     ];
   }
@@ -81,7 +99,11 @@ export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
     this.genre = value[0] ?? "all";
   }
 
+  async handleStatusChange(value: string[]): Promise<void> {
+    this.status = value[0] ?? "all";
+  }
+
   override getSearchQueryMetadata(): ContentTemplateSearchMetadata {
-    return { orderBy: this.orderBy, genre: this.genre };
+    return { orderBy: this.orderBy, genre: this.genre, status: this.status };
   }
 }

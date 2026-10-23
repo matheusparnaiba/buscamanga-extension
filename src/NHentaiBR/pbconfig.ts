@@ -8,6 +8,7 @@ export default {
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,
   capabilities: [
+    SourceIntents.SETTINGS_FORM_PROVIDING,
     SourceIntents.DISCOVER_SECTION_PROVIDING,
     SourceIntents.SEARCH_RESULT_PROVIDING,
     SourceIntents.CHAPTER_PROVIDING,

@@ -26,7 +26,14 @@ export const GENRE_OPTIONS: Tag[] = [
   { id: "webtoon", title: "Webtoon" },
 ];
 
+export const STATUS_OPTIONS: Tag[] = [
+  { id: "all", title: "Todos os Status" },
+  { id: "on-going", title: "Em Lançamento" },
+  { id: "end", title: "Completo" },
+];
+
 export type ContentTemplateSearchMetadata = {
   orderBy?: "views" | "latest" | "alphabet" | "rating";
   genre?: string;
+  status?: string;
 };

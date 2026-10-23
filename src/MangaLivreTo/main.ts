@@ -363,12 +363,15 @@ export class MangaLivreToExtension implements ExtensionImpl<typeof ContentTempla
     const genre =
       query.metadata?.genre && query.metadata.genre !== "all" ? query.metadata.genre : "";
     const genreParam = genre ? `&genre[]=${encodeURIComponent(genre)}` : "";
+    const status =
+      query.metadata?.status && query.metadata.status !== "all" ? query.metadata.status : "";
+    const statusParam = status ? `&status[]=${encodeURIComponent(status)}` : "";
     let searchUrl: string;
 
     if (query.title && query.title.trim()) {
-      searchUrl = `${BASE_URL}/?s=${encodeURIComponent(query.title.trim())}&post_type=wp-manga&m_orderby=${encodeURIComponent(orderBy)}${genreParam}`;
+      searchUrl = `${BASE_URL}/?s=${encodeURIComponent(query.title.trim())}&post_type=wp-manga&m_orderby=${encodeURIComponent(orderBy)}${genreParam}${statusParam}`;
     } else {
-      searchUrl = `${BASE_URL}/manga/?m_orderby=${encodeURIComponent(orderBy)}${genreParam}`;
+      searchUrl = `${BASE_URL}/manga/?m_orderby=${encodeURIComponent(orderBy)}${genreParam}${statusParam}`;
     }
 
     const request = { url: searchUrl, method: "GET" };

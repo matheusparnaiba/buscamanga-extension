@@ -367,10 +367,13 @@ export class NinjaScanExtension implements ExtensionImpl<typeof ContentTemplateC
     const genre =
       query.metadata?.genre && query.metadata.genre !== "all" ? query.metadata.genre : "";
     const genreParam = genre ? `&genre[]=${encodeURIComponent(genre)}` : "";
+    const status =
+      query.metadata?.status && query.metadata.status !== "all" ? query.metadata.status : "";
+    const statusParam = status ? `&status[]=${encodeURIComponent(status)}` : "";
 
     const url = title
-      ? `${BASE_URL}/page/${page}/?s=${encodeURIComponent(title)}&post_type=wp-manga&m_orderby=${orderBy}${genreParam}`
-      : `${BASE_URL}/manga/page/${page}/?m_orderby=${orderBy}${genreParam}`;
+      ? `${BASE_URL}/page/${page}/?s=${encodeURIComponent(title)}&post_type=wp-manga&m_orderby=${orderBy}${genreParam}${statusParam}`
+      : `${BASE_URL}/manga/page/${page}/?m_orderby=${orderBy}${genreParam}${statusParam}`;
 
     const request = {
       url,
