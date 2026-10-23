@@ -102,7 +102,7 @@ function parseCards($: cheerio.CheerioAPI): SearchResultItem[] {
       mangaId,
       title: cleanTitle(rawTitle),
       imageUrl: imageFrom($(el).find("img").first()),
-      contentRating: ContentRating.ADULT,
+      contentRating: ContentRating.EVERYONE,
     });
   });
 
@@ -136,7 +136,7 @@ export class MundoHentaiExtension implements ExtensionImpl<typeof MundoHentaiCon
     return SECTIONS.map((s) => ({
       id: s.id,
       title: s.title,
-      type: DiscoverSectionType.simpleCarousel,
+      type: DiscoverSectionType.prominentCarousel,
     }));
   }
 
@@ -150,11 +150,11 @@ export class MundoHentaiExtension implements ExtensionImpl<typeof MundoHentaiCon
 
     const $ = await fetchHtml(pageUrl(def.path, page));
     const items: DiscoverSectionItem[] = parseCards($).map((item) => ({
-      type: "simpleCarouselItem",
+      type: "prominentCarouselItem",
       mangaId: item.mangaId,
       title: item.title,
       imageUrl: item.imageUrl,
-      contentRating: ContentRating.ADULT,
+      contentRating: ContentRating.EVERYONE,
     }));
 
     return { items, metadata: items.length > 0 ? page + 1 : undefined };
@@ -221,7 +221,7 @@ export class MundoHentaiExtension implements ExtensionImpl<typeof MundoHentaiCon
           cover ||
           `https://ui-avatars.com/api/?name=${encodeURIComponent(title || "Mundo Hentai")}&background=random`,
         synopsis: pages ? `${pages} páginas` : "",
-        contentRating: ContentRating.ADULT,
+        contentRating: ContentRating.EVERYONE,
         status: "COMPLETED",
         author: artist,
         tagGroups,

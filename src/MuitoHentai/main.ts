@@ -76,7 +76,7 @@ function parseCards($: cheerio.CheerioAPI): SearchResultItem[] {
       mangaId,
       title,
       imageUrl: img,
-      contentRating: ContentRating.ADULT,
+      contentRating: ContentRating.EVERYONE,
     });
   });
 
@@ -84,7 +84,7 @@ function parseCards($: cheerio.CheerioAPI): SearchResultItem[] {
 }
 
 function pageUrl(path: string, page: number): string {
-  return page > 1 ? `${BASE_URL}${path}/${page}` : `${BASE_URL}${path}/`;
+  return page > 1 ? `${BASE_URL}${path}/${page}/` : `${BASE_URL}${path}/`;
 }
 
 export class MuitoHentaiExtension implements ExtensionImpl<typeof MuitoHentaiConfig> {
@@ -110,7 +110,7 @@ export class MuitoHentaiExtension implements ExtensionImpl<typeof MuitoHentaiCon
     return SECTIONS.map((s) => ({
       id: s.id,
       title: s.title,
-      type: DiscoverSectionType.simpleCarousel,
+      type: DiscoverSectionType.prominentCarousel,
     }));
   }
 
@@ -124,11 +124,11 @@ export class MuitoHentaiExtension implements ExtensionImpl<typeof MuitoHentaiCon
 
     const $ = await fetchHtml(pageUrl(def.path, page));
     const items: DiscoverSectionItem[] = parseCards($).map((item) => ({
-      type: "simpleCarouselItem",
+      type: "prominentCarouselItem",
       mangaId: item.mangaId,
       title: item.title,
       imageUrl: item.imageUrl,
-      contentRating: ContentRating.ADULT,
+      contentRating: ContentRating.EVERYONE,
     }));
 
     return { items, metadata: items.length > 0 ? page + 1 : undefined };
@@ -190,7 +190,7 @@ export class MuitoHentaiExtension implements ExtensionImpl<typeof MuitoHentaiCon
         secondaryTitles: [],
         thumbnailUrl: cover,
         synopsis,
-        contentRating: ContentRating.ADULT,
+        contentRating: ContentRating.EVERYONE,
         status: "COMPLETED",
         author,
         tagGroups: genres.length ? [{ id: "genres", title: "Gêneros", tags: genres }] : [],
@@ -228,8 +228,9 @@ export class MuitoHentaiExtension implements ExtensionImpl<typeof MuitoHentaiCon
   }
 
   async getChapterDetails(chapter: Chapter): Promise<ChapterDetails> {
+    const cleanId = chapter.chapterId.replace(/^\/+|\/+$/g, "");
     const [, buffer] = await Application.scheduleRequest({
-      url: `${BASE_URL}/manga/${chapter.chapterId}`,
+      url: `${BASE_URL}/manga/${cleanId}/`,
       method: "GET",
     });
     const html = Application.arrayBufferToUTF8String(buffer);

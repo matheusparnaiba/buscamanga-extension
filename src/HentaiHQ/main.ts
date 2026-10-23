@@ -98,7 +98,7 @@ function parseCards($: cheerio.CheerioAPI): SearchResultItem[] {
       mangaId,
       title,
       imageUrl: imageFrom($img),
-      contentRating: ContentRating.ADULT,
+      contentRating: ContentRating.EVERYONE,
     });
   };
 
@@ -143,7 +143,7 @@ export class HentaiHQExtension implements ExtensionImpl<typeof HentaiHQConfig> {
     return SECTIONS.map((s) => ({
       id: s.id,
       title: s.title,
-      type: DiscoverSectionType.simpleCarousel,
+      type: DiscoverSectionType.prominentCarousel,
     }));
   }
 
@@ -157,11 +157,11 @@ export class HentaiHQExtension implements ExtensionImpl<typeof HentaiHQConfig> {
 
     const $ = await fetchHtml(pageUrl(def.path, page));
     const items: DiscoverSectionItem[] = parseCards($).map((item) => ({
-      type: "simpleCarouselItem",
+      type: "prominentCarouselItem",
       mangaId: item.mangaId,
       title: item.title,
       imageUrl: item.imageUrl,
-      contentRating: ContentRating.ADULT,
+      contentRating: ContentRating.EVERYONE,
     }));
 
     return { items, metadata: items.length > 0 ? page + 1 : undefined };
@@ -208,7 +208,7 @@ export class HentaiHQExtension implements ExtensionImpl<typeof HentaiHQConfig> {
           cover ||
           `https://ui-avatars.com/api/?name=${encodeURIComponent(title || "Hentai HQ")}&background=random`,
         synopsis,
-        contentRating: ContentRating.ADULT,
+        contentRating: ContentRating.EVERYONE,
         status: "COMPLETED",
         tagGroups: tags.length > 0 ? [{ id: "tags", title: "Tags", tags }] : [],
         shareUrl: url,

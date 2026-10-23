@@ -4,10 +4,10 @@ export default {
   name: "Hentai HQ",
   description:
     'Extensão do "https://hentaihq.net" (HQs de sexo e quadrinhos eróticos em português, conteúdo adulto +18)',
-  version: "1.0.1",
+  version: "1.0.2",
   icon: "icon.png",
   language: "pt-br",
-  contentRating: ContentRating.ADULT,
+  contentRating: ContentRating.EVERYONE,
   capabilities: [
     SourceIntents.DISCOVER_SECTION_PROVIDING,
     SourceIntents.SEARCH_RESULT_PROVIDING,
