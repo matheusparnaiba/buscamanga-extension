@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-10-23T03:39:59.728Z",
+  "buildTime": "2026-10-23T04:03:23.013Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -14,7 +14,7 @@
     {
       "name": "Arthur Scan",
       "description": "Extensão oficial da Arthur Scan com foco em manhwas, cultivação e ação.",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -76,7 +76,7 @@
     {
       "name": "Fliptru",
       "description": "Extensão do \"https://fliptru.com.br\"",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -142,7 +142,7 @@
     {
       "name": "HQ Now",
       "description": "Extensão do \"https://www.hq-now.com\"",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -311,7 +311,7 @@
     {
       "name": "Leitura Manga",
       "description": "Extensão do \"https://leituramanga.net\"",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -373,7 +373,7 @@
     {
       "name": "MangaLivre Blog",
       "description": "Extensão do \"https://mangalivre.blog\"",
-      "version": "1.0.10",
+      "version": "1.0.11",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -404,7 +404,7 @@
     {
       "name": "MangaLivre To",
       "description": "Extensão do \"https://mangalivre.to\"",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -538,7 +538,7 @@
     {
       "name": "Manhastro",
       "description": "Extensão do \"https://manhastro.com\"",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -674,7 +674,7 @@
     {
       "name": "Nebulosa Scan",
       "description": "Extensão do \"https://nebulosascan.com\"",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -705,7 +705,7 @@
     {
       "name": "Ninja Scan",
       "description": "Extensão oficial da Ninja Scan com traduções de manhwas e manhuas de combate e fantasia.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -736,7 +736,7 @@
     {
       "name": "Tao Sect",
       "description": "Extensão oficial da scanlator Tao Sect focada em mangás de artes marciais e seinen.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -767,7 +767,7 @@
     {
       "name": "Yuri on Air",
       "description": "Extensão oficial do portal Yuri on Air com mangás, manhwas e webcomics Yuri e Shoujo Ai.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
