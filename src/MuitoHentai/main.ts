@@ -25,11 +25,19 @@ declare const App: any;
 const BASE_URL = "https://www.muitohentai.com";
 
 /** `page` é a página atual (1-based); o site pagina com `/<path>/N`. */
-const SECTIONS: { id: string; title: string; path: string }[] = [
-  { id: "mangas", title: "Mangás", path: "/mangas" },
-  { id: "colegial", title: "Colegial", path: "/mangas/genero/colegial" },
-  { id: "creampie", title: "Creampie", path: "/mangas/genero/creampie" },
-  { id: "peitos-grandes", title: "Peitos Grandes", path: "/mangas/genero/peitos-grandes" },
+const SECTIONS: { id: string; title: string; path: string; type: DiscoverSectionType }[] = [
+  {
+    id: "updates",
+    title: "Últimas Atualizações",
+    path: "/mangas",
+    type: DiscoverSectionType.chapterUpdates,
+  },
+  {
+    id: "popular",
+    title: "Mais Lidos",
+    path: "/mangas/genero/creampie",
+    type: DiscoverSectionType.prominentCarousel,
+  },
 ];
 
 function normalize(text: string): string {
@@ -110,7 +118,7 @@ export class MuitoHentaiExtension implements ExtensionImpl<typeof MuitoHentaiCon
     return SECTIONS.map((s) => ({
       id: s.id,
       title: s.title,
-      type: DiscoverSectionType.prominentCarousel,
+      type: s.type,
     }));
   }
 
@@ -123,13 +131,27 @@ export class MuitoHentaiExtension implements ExtensionImpl<typeof MuitoHentaiCon
     if (!def) return { items: [] };
 
     const $ = await fetchHtml(pageUrl(def.path, page));
-    const items: DiscoverSectionItem[] = parseCards($).map((item) => ({
-      type: "prominentCarouselItem",
-      mangaId: item.mangaId,
-      title: item.title,
-      imageUrl: item.imageUrl,
-      contentRating: ContentRating.EVERYONE,
-    }));
+    const cards = parseCards($);
+    const items: DiscoverSectionItem[] = cards.map((item) => {
+      if (section.type === DiscoverSectionType.chapterUpdates) {
+        return {
+          type: "chapterUpdatesCarouselItem",
+          mangaId: item.mangaId,
+          chapterId: item.mangaId,
+          title: item.title,
+          subtitle: "Capítulo Único",
+          imageUrl: item.imageUrl,
+          contentRating: ContentRating.EVERYONE,
+        };
+      }
+      return {
+        type: "prominentCarouselItem",
+        mangaId: item.mangaId,
+        title: item.title,
+        imageUrl: item.imageUrl,
+        contentRating: ContentRating.EVERYONE,
+      };
+    });
 
     return { items, metadata: items.length > 0 ? page + 1 : undefined };
   }

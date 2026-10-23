@@ -209,15 +209,31 @@ export class HentaiHQExtension implements ExtensionImpl<typeof HentaiHQConfig> {
     const title = cleanTitle($("h1").first().text());
     const cover = $("meta[property='og:image']").attr("content") || undefined;
 
+    const tagGroups: { id: string; title: string; tags: Tag[] }[] = [];
+    const categories: Tag[] = [];
     const tags: Tag[] = [];
+    const seenCat = new Set<string>();
     const seenTags = new Set<string>();
-    $(".post-footer .post-tags a").each((_, el) => {
+
+    $(".post-categorias a, .categoria a").each((_, el) => {
+      const text = $(el).text().replace(/\s+/g, " ").trim();
+      const id = sanitizeTagId(text);
+      if (!text || seenCat.has(id)) return;
+      seenCat.add(id);
+      categories.push({ id, title: text });
+    });
+
+    $(".post-footer .post-tags a, .post-tags a").each((_, el) => {
       const text = $(el).text().replace(/\s+/g, " ").trim();
       const id = sanitizeTagId(text);
       if (!text || seenTags.has(id)) return;
       seenTags.add(id);
       tags.push({ id, title: text });
     });
+
+    if (categories.length > 0)
+      tagGroups.push({ id: "categories", title: "Categorias", tags: categories });
+    if (tags.length > 0) tagGroups.push({ id: "tags", title: "Tags", tags });
 
     const synopsis = cleanTitle($(".post-texto p").first().text());
 
@@ -232,7 +248,7 @@ export class HentaiHQExtension implements ExtensionImpl<typeof HentaiHQConfig> {
         synopsis,
         contentRating: ContentRating.EVERYONE,
         status: "COMPLETED",
-        tagGroups: tags.length > 0 ? [{ id: "tags", title: "Tags", tags }] : [],
+        tagGroups,
         shareUrl: url,
       },
     };
