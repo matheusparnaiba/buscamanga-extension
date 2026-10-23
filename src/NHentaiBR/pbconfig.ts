@@ -3,7 +3,7 @@ import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/typ
 export default {
   name: "NHentai BR",
   description: 'Extensão do "https://nhentaibr.com" (conteúdo adulto +18)',
-  version: "1.0.3",
+  version: "1.0.4",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

@@ -113,6 +113,7 @@ function parseCards($: cheerio.CheerioAPI): SearchResultItem[] {
       title: cleanTitle(rawTitle),
       imageUrl: imageFrom($(el).find("img").first()),
       contentRating: ContentRating.EVERYONE,
+      subtitle: "18+",
     });
   });
 

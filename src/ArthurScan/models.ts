@@ -8,6 +8,25 @@ export const ORDER_OPTIONS: Tag[] = [
   { id: "rating", title: "Melhor Avaliados" },
 ];
 
+export const GENRE_OPTIONS: Tag[] = [
+  { id: "all", title: "Todos os Gêneros" },
+  { id: "acao", title: "Ação" },
+  { id: "artes-marciais", title: "Artes Marciais" },
+  { id: "aventura", title: "Aventura" },
+  { id: "comedia", title: "Comédia" },
+  { id: "cultivacao", title: "Cultivação" },
+  { id: "drama", title: "Drama" },
+  { id: "fantasia", title: "Fantasia" },
+  { id: "isekai", title: "Isekai" },
+  { id: "reencarnacao", title: "Reencarnação" },
+  { id: "romance", title: "Romance" },
+  { id: "seinen", title: "Seinen" },
+  { id: "shounen", title: "Shounen" },
+  { id: "sobrenatural", title: "Sobrenatural" },
+  { id: "webtoon", title: "Webtoon" },
+];
+
 export type ContentTemplateSearchMetadata = {
   orderBy?: "views" | "latest" | "alphabet" | "rating";
+  genre?: string;
 };

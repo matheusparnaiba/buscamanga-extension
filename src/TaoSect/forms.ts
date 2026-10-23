@@ -1,20 +1,45 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
-import { AdvancedSearchForm, Form, Section, SelectRow, type SearchQuery } from "@paperback/types";
+import {
+  AdvancedSearchForm,
+  Form,
+  LabelRow,
+  Section,
+  SelectRow,
+  type SearchQuery,
+} from "@paperback/types";
 
-import { ORDER_OPTIONS, type ContentTemplateSearchMetadata } from "./models";
+import { GENRE_OPTIONS, ORDER_OPTIONS, type ContentTemplateSearchMetadata } from "./models";
 
 export class SettingsForm extends Form {
   override getSections() {
-    return [];
+    return [
+      Section("info", [
+        LabelRow("source_info", {
+          title: "Fonte Oficial",
+          value: "taosect.com",
+        }),
+        LabelRow("status_info", {
+          title: "Status da Scan",
+          value: { text: "Operacional", style: "success" },
+        }),
+        LabelRow("repo_info", {
+          title: "BuscaMangá Extension",
+          subtitle: "Repositório mantido pela comunidade brasileira",
+          value: "v0.9/stable",
+        }),
+      ]),
+    ];
   }
 }
 
 export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
   private orderBy: string;
+  private genre: string;
 
   constructor(searchQuery: SearchQuery<ContentTemplateSearchMetadata>) {
     super();
     this.orderBy = searchQuery.metadata?.orderBy ?? "modified";
+    this.genre = searchQuery.metadata?.genre ?? "all";
   }
 
   override getSections() {
@@ -31,6 +56,17 @@ export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
             "handleOrderChange",
           ),
         }),
+        SelectRow("genre", {
+          title: "Filtrar por Gênero",
+          value: [this.genre],
+          options: GENRE_OPTIONS,
+          minItemCount: 1,
+          maxItemCount: 1,
+          onValueChange: Application.Selector(
+            this as ContentTemplateAdvancedSearchForm,
+            "handleGenreChange",
+          ),
+        }),
       ]),
     ];
   }
@@ -39,7 +75,11 @@ export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
     this.orderBy = value[0] ?? "modified";
   }
 
+  async handleGenreChange(value: string[]): Promise<void> {
+    this.genre = value[0] ?? "all";
+  }
+
   override getSearchQueryMetadata(): ContentTemplateSearchMetadata {
-    return { orderBy: this.orderBy };
+    return { orderBy: this.orderBy, genre: this.genre };
   }
 }

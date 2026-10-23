@@ -3,7 +3,7 @@ import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/typ
 export default {
   name: "Boruto Explorer",
   description: "Extensão da comunidade Boruto Explorer com foco no universo de Naruto e Boruto.",
-  version: "1.0.0",
+  version: "1.0.1",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

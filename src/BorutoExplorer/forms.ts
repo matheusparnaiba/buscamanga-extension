@@ -1,11 +1,34 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
-import { AdvancedSearchForm, Form, Section, SelectRow, type SearchQuery } from "@paperback/types";
+import {
+  AdvancedSearchForm,
+  Form,
+  LabelRow,
+  Section,
+  SelectRow,
+  type SearchQuery,
+} from "@paperback/types";
 
 import { MODE_OPTIONS, type ContentTemplateSearchMetadata } from "./models";
 
 export class SettingsForm extends Form {
   override getSections() {
-    return [];
+    return [
+      Section("info", [
+        LabelRow("source_info", {
+          title: "Fonte Oficial",
+          value: "leitor.borutoexplorer.com.br",
+        }),
+        LabelRow("status_info", {
+          title: "Status da Scan",
+          value: { text: "Operacional", style: "success" },
+        }),
+        LabelRow("repo_info", {
+          title: "BuscaMangá Extension",
+          subtitle: "Repositório mantido pela comunidade brasileira",
+          value: "v0.9/stable",
+        }),
+      ]),
+    ];
   }
 }
 

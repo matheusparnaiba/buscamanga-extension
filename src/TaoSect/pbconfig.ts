@@ -4,7 +4,7 @@ export default {
   name: "Tao Sect",
   description:
     "Extensão oficial da scanlator Tao Sect focada em mangás de artes marciais e seinen.",
-  version: "1.0.1",
+  version: "1.0.2",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

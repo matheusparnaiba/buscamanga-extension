@@ -3,7 +3,7 @@ import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/typ
 export default {
   name: "Arthur Scan",
   description: "Extensão oficial da Arthur Scan com foco em manhwas, cultivação e ação.",
-  version: "1.0.2",
+  version: "1.0.3",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

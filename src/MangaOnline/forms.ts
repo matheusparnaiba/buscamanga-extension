@@ -1,138 +1,87 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 /* Copyright © 2025 Inkdex */
 
-// TODO:
-// - Add extension specific settings
-
 import {
   AdvancedSearchForm,
-  ButtonRow,
   Form,
-  InputRow,
   LabelRow,
-  NavigationRow,
   Section,
   SelectRow,
-  ToggleRow,
   type SearchQuery,
 } from "@paperback/types";
 
-import { MODE_OPTIONS, type ContentTemplateSearchMetadata } from "./models";
+import { GENRE_OPTIONS, ORDER_OPTIONS, type ContentTemplateSearchMetadata } from "./models";
 
 export class SettingsForm extends Form {
   override getSections() {
     return [
-      Section("playground", [
-        NavigationRow("playground", {
-          title: "SourceUI Playground",
-          form: new SourceUIPlaygroundForm(),
+      Section("info", [
+        LabelRow("source_info", {
+          title: "Fonte Oficial",
+          value: "mangaonline.love",
+        }),
+        LabelRow("status_info", {
+          title: "Status da Scan",
+          value: { text: "Operacional", style: "success" },
+        }),
+        LabelRow("repo_info", {
+          title: "BuscaMangá Extension",
+          subtitle: "Repositório mantido pela comunidade brasileira",
+          value: "v0.9/stable",
         }),
       ]),
     ];
-  }
-}
-
-class SourceUIPlaygroundForm extends Form {
-  private inputValue = "";
-  private rowsVisible = false;
-  private items: string[] = [];
-
-  override getSections() {
-    return [
-      Section("hideStuff", [
-        ToggleRow("toggle", {
-          title: "Toggles can hide rows",
-          value: this.rowsVisible,
-          onValueChange: Application.Selector(
-            this as SourceUIPlaygroundForm,
-            "handleRowsVisibleChange",
-          ),
-        }),
-      ]),
-
-      ...(this.rowsVisible
-        ? [
-            Section("hiddenSection", [
-              InputRow("input", {
-                title: "Dynamic Input",
-                value: this.inputValue,
-                onValueChange: Application.Selector(
-                  this as SourceUIPlaygroundForm,
-                  "handleInputChange",
-                ),
-              }),
-
-              LabelRow("boundLabel", {
-                title: "Bound label to input",
-                subtitle: "This label updates with the input",
-                value: this.inputValue,
-              }),
-            ]),
-
-            Section("items", [
-              ...this.items.map((item) =>
-                LabelRow(item, {
-                  title: item,
-                }),
-              ),
-
-              ButtonRow("addNewItem", {
-                title: "Add New Item",
-                onSelect: Application.Selector(this as SourceUIPlaygroundForm, "addNewItem"),
-              }),
-            ]),
-          ]
-        : []),
-    ];
-  }
-
-  async handleRowsVisibleChange(value: boolean): Promise<void> {
-    this.rowsVisible = value;
-    this.reloadForm();
-  }
-
-  async handleInputChange(value: string): Promise<void> {
-    this.inputValue = value;
-    this.reloadForm();
-  }
-
-  async addNewItem(): Promise<void> {
-    this.items.push("Item " + (this.items.length + 1));
-    this.reloadForm();
   }
 }
 
 export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
-  private mode: "include" | "exclude";
+  private orderBy: string;
+  private genre: string;
 
   constructor(searchQuery: SearchQuery<ContentTemplateSearchMetadata>) {
     super();
-    this.mode = searchQuery.metadata?.mode ?? "include";
+    this.orderBy = searchQuery.metadata?.orderBy ?? "views";
+    this.genre = searchQuery.metadata?.genre ?? "all";
   }
 
   override getSections() {
     return [
-      Section("filter", [
-        SelectRow("mode", {
-          title: "Search Filter Template",
-          value: [this.mode],
-          options: MODE_OPTIONS,
+      Section("filters", [
+        SelectRow("orderBy", {
+          title: "Ordenar Por",
+          value: [this.orderBy],
+          options: ORDER_OPTIONS,
           minItemCount: 1,
           maxItemCount: 1,
           onValueChange: Application.Selector(
             this as ContentTemplateAdvancedSearchForm,
-            "handleModeChange",
+            "handleOrderChange",
+          ),
+        }),
+        SelectRow("genre", {
+          title: "Filtrar por Gênero",
+          value: [this.genre],
+          options: GENRE_OPTIONS,
+          minItemCount: 1,
+          maxItemCount: 1,
+          onValueChange: Application.Selector(
+            this as ContentTemplateAdvancedSearchForm,
+            "handleGenreChange",
           ),
         }),
       ]),
     ];
   }
 
-  async handleModeChange(value: string[]): Promise<void> {
-    this.mode = value[0] === "exclude" ? "exclude" : "include";
+  async handleOrderChange(value: string[]): Promise<void> {
+    this.orderBy = value[0] ?? "views";
+  }
+
+  async handleGenreChange(value: string[]): Promise<void> {
+    this.genre = value[0] ?? "all";
   }
 
   override getSearchQueryMetadata(): ContentTemplateSearchMetadata {
-    return { mode: this.mode };
+    return { orderBy: this.orderBy, genre: this.genre };
   }
 }

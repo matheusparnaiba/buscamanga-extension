@@ -54,6 +54,90 @@ function sanitizeTagId(raw: string): string {
   );
 }
 
+function parsePortugueseDate(dateStr: string | null | undefined): Date | undefined {
+  if (!dateStr) return undefined;
+  const str = dateStr
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+  const now = new Date();
+
+  const minMatch = str.match(/ha\s*(\d+)\s*min/);
+  if (minMatch?.[1]) return new Date(now.getTime() - parseInt(minMatch[1], 10) * 60 * 1000);
+
+  const hourMatch = str.match(/ha\s*(\d+)\s*hora/);
+  if (hourMatch?.[1]) return new Date(now.getTime() - parseInt(hourMatch[1], 10) * 3600 * 1000);
+
+  if (str.includes("ontem")) return new Date(now.getTime() - 86400 * 1000);
+
+  const dayMatch = str.match(/ha\s*(\d+)\s*dia/);
+  if (dayMatch?.[1]) return new Date(now.getTime() - parseInt(dayMatch[1], 10) * 86400 * 1000);
+
+  const weekMatch = str.match(/ha\s*(\d+)\s*semana/);
+  if (weekMatch?.[1])
+    return new Date(now.getTime() - parseInt(weekMatch[1], 10) * 7 * 86400 * 1000);
+
+  const monthMatch = str.match(/ha\s*(\d+)\s*mes/);
+  if (monthMatch?.[1])
+    return new Date(now.getTime() - parseInt(monthMatch[1], 10) * 30 * 86400 * 1000);
+
+  const MONTHS_PT: Record<string, number> = {
+    janeiro: 0,
+    jan: 0,
+    fevereiro: 1,
+    fev: 1,
+    marco: 2,
+    mar: 2,
+    abril: 3,
+    abr: 3,
+    maio: 4,
+    mai: 4,
+    junho: 5,
+    jun: 5,
+    julho: 6,
+    jul: 6,
+    agosto: 7,
+    ago: 7,
+    setembro: 8,
+    set: 8,
+    outubro: 9,
+    out: 9,
+    novembro: 10,
+    nov: 10,
+    dezembro: 11,
+    dez: 11,
+  };
+
+  const mdyMatch = str.match(/([a-z]+)\s+(\d{1,2}),?\s+(\d{4})/);
+  if (mdyMatch?.[1] && mdyMatch[2] && mdyMatch[3]) {
+    const mIdx = MONTHS_PT[mdyMatch[1]];
+    if (mIdx !== undefined) {
+      return new Date(parseInt(mdyMatch[3], 10), mIdx, parseInt(mdyMatch[2], 10));
+    }
+  }
+
+  const dmyMatch = str.match(/(\d{1,2})\s*(?:de)?\s*([a-z]+)\s*(?:de)?,?\s*(\d{4})/);
+  if (dmyMatch?.[1] && dmyMatch[2] && dmyMatch[3]) {
+    const mIdx = MONTHS_PT[dmyMatch[2]];
+    if (mIdx !== undefined) {
+      return new Date(parseInt(dmyMatch[3], 10), mIdx, parseInt(dmyMatch[1], 10));
+    }
+  }
+
+  const slashMatch = str.match(/(\d{1,2})[/-](\d{1,2})[/-](\d{4})/);
+  if (slashMatch?.[1] && slashMatch[2] && slashMatch[3]) {
+    return new Date(
+      parseInt(slashMatch[3], 10),
+      parseInt(slashMatch[2], 10) - 1,
+      parseInt(slashMatch[1], 10),
+    );
+  }
+
+  const parsed = new Date(dateStr);
+  return isNaN(parsed.getTime()) ? undefined : parsed;
+}
+
 export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemplateConfig> {
   constructor(public cheerioInstance?: any) {
     this.getHomePageSections = this.getHomePageSections.bind(this);
@@ -434,6 +518,13 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
         const numMatch = name.match(/[\d.]+/);
         const chapNum = numMatch ? parseFloat(numMatch[0]) : 0;
 
+        const rawDate = $root(el)
+          .find(".chapter-date, .chapter-release-date, i, time, span.date")
+          .first()
+          .text()
+          .trim();
+        const publishDate = parsePortugueseDate(rawDate);
+
         chapters.push({
           chapterId: href,
           sourceManga,
@@ -441,6 +532,7 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
           chapNum,
           title: name,
           volume: 0,
+          publishDate,
         });
       });
     };

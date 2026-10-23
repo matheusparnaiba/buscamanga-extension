@@ -107,6 +107,7 @@ function parseCards($: cheerio.CheerioAPI): SearchResultItem[] {
       title,
       imageUrl: imageFrom($img),
       contentRating: ContentRating.EVERYONE,
+      subtitle: "18+",
     });
   };
 

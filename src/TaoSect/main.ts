@@ -174,10 +174,13 @@ export class TaoSectExtension implements ExtensionImpl<typeof ContentTemplateCon
     const titleQuery = query.title?.trim() ?? "";
     const orderBy = query.metadata?.orderBy ?? "modified";
     const order = orderBy === "title" ? "asc" : "desc";
+    const genre =
+      query.metadata?.genre && query.metadata.genre !== "all" ? query.metadata.genre : "";
+    const genreParam = genre ? `&generos=${encodeURIComponent(genre)}` : "";
 
     const url = titleQuery
-      ? `${API_BASE}/projetos?search=${encodeURIComponent(titleQuery)}&per_page=20&page=${page}&_fields=id,slug,title,thumbnail`
-      : `${API_BASE}/projetos?orderby=${orderBy}&order=${order}&per_page=20&page=${page}&_fields=id,slug,title,thumbnail`;
+      ? `${API_BASE}/projetos?search=${encodeURIComponent(titleQuery)}&per_page=20&page=${page}&_fields=id,slug,title,thumbnail${genreParam}`
+      : `${API_BASE}/projetos?orderby=${orderBy}&order=${order}&per_page=20&page=${page}&_fields=id,slug,title,thumbnail${genreParam}`;
 
     const req = { url, method: "GET" };
 
@@ -422,7 +425,7 @@ export class TaoSectExtension implements ExtensionImpl<typeof ContentTemplateCon
   async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
     return new ContentTemplateAdvancedSearchForm({
       title: "",
-      metadata: { orderBy: "modified" },
+      metadata: { orderBy: "modified", genre: "all" },
     });
   }
 }

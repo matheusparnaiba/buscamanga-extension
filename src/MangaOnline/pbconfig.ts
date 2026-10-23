@@ -6,7 +6,7 @@ import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/typ
 export default {
   name: "Manga Online",
   description: 'Extensão do "https://mangaonline.love"',
-  version: "1.0.17",
+  version: "1.0.18",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,
