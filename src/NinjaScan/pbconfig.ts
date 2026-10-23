@@ -4,7 +4,7 @@ export default {
   name: "Ninja Scan",
   description:
     "Extensão oficial da Ninja Scan com traduções de manhwas e manhuas de combate e fantasia.",
-  version: "1.0.2",
+  version: "1.0.3",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

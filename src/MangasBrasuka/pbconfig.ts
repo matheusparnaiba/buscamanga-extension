@@ -3,7 +3,7 @@ import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/typ
 export default {
   name: "Mangás Brasuka",
   description: 'Extensão do "https://mangasbrasuka.com.br"',
-  version: "1.0.17",
+  version: "1.0.18",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

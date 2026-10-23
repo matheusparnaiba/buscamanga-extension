@@ -3,7 +3,7 @@ import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/typ
 export default {
   name: "Muito Hentai",
   description: 'Extensão do "https://www.muitohentai.com" (conteúdo adulto +18)',
-  version: "1.0.4",
+  version: "1.0.5",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,
