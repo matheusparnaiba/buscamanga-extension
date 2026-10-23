@@ -334,7 +334,7 @@ export class NinjaScanExtension implements ExtensionImpl<typeof ContentTemplateC
         contentRating: ContentRating.EVERYONE,
         status,
         author,
-        tagGroups: [{ id: "genres", title: "Genres", tags: genres }],
+        tagGroups: [{ id: "genres", title: "Gêneros", tags: genres }],
         artworkUrls: image ? [image] : [thumbnailUrl],
         shareUrl: url,
       },

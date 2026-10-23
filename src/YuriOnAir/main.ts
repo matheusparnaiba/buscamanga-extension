@@ -210,7 +210,7 @@ export class YuriOnAirExtension implements ExtensionImpl<typeof ContentTemplateC
   async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
     return new ContentTemplateAdvancedSearchForm({
       title: "",
-      metadata: { mode: "include" },
+      metadata: { orderBy: "views" },
     });
   }
 
@@ -221,10 +221,11 @@ export class YuriOnAirExtension implements ExtensionImpl<typeof ContentTemplateC
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata ?? 1;
     const title = query.title?.trim() ?? "";
+    const orderBy = query.metadata?.orderBy ?? "views";
 
     const url = title
-      ? `${BASE_URL}/page/${page}/?s=${encodeURIComponent(title)}&post_type=wp-manga`
-      : `${BASE_URL}/manga/page/${page}/?m_orderby=views`;
+      ? `${BASE_URL}/page/${page}/?s=${encodeURIComponent(title)}&post_type=wp-manga&m_orderby=${encodeURIComponent(orderBy)}`
+      : `${BASE_URL}/manga/page/${page}/?m_orderby=${encodeURIComponent(orderBy)}`;
 
     const request = {
       url,
@@ -333,7 +334,7 @@ export class YuriOnAirExtension implements ExtensionImpl<typeof ContentTemplateC
         contentRating: ContentRating.EVERYONE,
         status,
         author,
-        tagGroups: [{ id: "genres", title: "Genres", tags: genres }],
+        tagGroups: [{ id: "genres", title: "Gêneros", tags: genres }],
         artworkUrls: image ? [image] : [thumbnailUrl],
         shareUrl: url,
       },

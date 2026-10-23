@@ -3,7 +3,7 @@
 
 import { AdvancedSearchForm, Form, Section, SelectRow, type SearchQuery } from "@paperback/types";
 
-import { MODE_OPTIONS, type ContentTemplateSearchMetadata } from "./models";
+import { ORDER_OPTIONS, type ContentTemplateSearchMetadata } from "./models";
 
 export class SettingsForm extends Form {
   override getSections() {
@@ -12,36 +12,36 @@ export class SettingsForm extends Form {
 }
 
 export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
-  private mode: "include" | "exclude";
+  private orderBy: string;
 
   constructor(searchQuery: SearchQuery<ContentTemplateSearchMetadata>) {
     super();
-    this.mode = searchQuery.metadata?.mode ?? "include";
+    this.orderBy = searchQuery.metadata?.orderBy ?? "all";
   }
 
   override getSections() {
     return [
-      Section("filter", [
-        SelectRow("mode", {
-          title: "Search Filter",
-          value: [this.mode],
-          options: MODE_OPTIONS,
+      Section("filters", [
+        SelectRow("orderBy", {
+          title: "Ordenar Por",
+          value: [this.orderBy],
+          options: ORDER_OPTIONS,
           minItemCount: 1,
           maxItemCount: 1,
           onValueChange: Application.Selector(
             this as ContentTemplateAdvancedSearchForm,
-            "handleModeChange",
+            "handleOrderChange",
           ),
         }),
       ]),
     ];
   }
 
-  async handleModeChange(value: string[]): Promise<void> {
-    this.mode = value[0] === "exclude" ? "exclude" : "include";
+  async handleOrderChange(value: string[]): Promise<void> {
+    this.orderBy = value[0] ?? "all";
   }
 
   override getSearchQueryMetadata(): ContentTemplateSearchMetadata {
-    return { mode: this.mode };
+    return { orderBy: this.orderBy };
   }
 }

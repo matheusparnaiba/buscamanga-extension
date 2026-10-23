@@ -208,9 +208,10 @@ export class ManhastroExtension implements ExtensionImpl<typeof ContentTemplateC
     return { items: [], metadata: undefined };
   }
 
-  async getSearchFilters(): Promise<AdvancedSearchForm> {
+  async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
     const query: SearchQuery<ContentTemplateSearchMetadata> = {
       title: "",
+      metadata: { orderBy: "views" },
     };
     return new ContentTemplateAdvancedSearchForm(query);
   }
@@ -221,12 +222,13 @@ export class ManhastroExtension implements ExtensionImpl<typeof ContentTemplateC
     _sortingOption?: SortingOption,
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata ?? 1;
+    const orderBy = query.metadata?.orderBy ?? "views";
     let url: string;
 
     if (query.title && query.title.trim()) {
       url = `${API_BASE}/dados?nome=${encodeURIComponent(query.title.trim())}&page=${page}`;
     } else {
-      url = `${API_BASE}/dados?page=${page}&sort=views&order=desc`;
+      url = `${API_BASE}/dados?page=${page}&sort=${encodeURIComponent(orderBy)}&order=desc`;
     }
 
     const request = { url, method: "GET" };
@@ -301,7 +303,7 @@ export class ManhastroExtension implements ExtensionImpl<typeof ContentTemplateC
         contentRating: item.adulta ? ContentRating.ADULT : ContentRating.EVERYONE,
         status,
         author: item.autor || item.author || "Desconhecido",
-        tagGroups: [{ id: "genres", title: "Genres", tags: genres }],
+        tagGroups: [{ id: "genres", title: "Gêneros", tags: genres }],
         artworkUrls: [imageUrl],
         shareUrl: `${SITE_BASE}/manga/${mangaId}`,
       },

@@ -396,7 +396,7 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
         contentRating: ContentRating.EVERYONE,
         status: statusMap[manga.status] || "UNKNOWN",
         author: manga.authors?.[0] || "Desconhecido",
-        tagGroups: [{ id: "genres", title: "Genres", tags: genres }],
+        tagGroups: [{ id: "genres", title: "Gêneros", tags: genres }],
         artworkUrls: manga.coverUrl ? [manga.coverUrl] : [thumbnailUrl],
         shareUrl: `https://hipertoon.com/manga/${actualSlug}`,
       },

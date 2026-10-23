@@ -204,9 +204,10 @@ export class MangaLivreToExtension implements ExtensionImpl<typeof ContentTempla
     return { items, metadata: undefined };
   }
 
-  async getSearchFilters(): Promise<AdvancedSearchForm> {
+  async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
     const query: SearchQuery<ContentTemplateSearchMetadata> = {
       title: "",
+      metadata: { orderBy: "views" },
     };
     return new ContentTemplateAdvancedSearchForm(query);
   }
@@ -216,12 +217,13 @@ export class MangaLivreToExtension implements ExtensionImpl<typeof ContentTempla
     _metadata?: number,
     _sortingOption?: SortingOption,
   ): Promise<PagedResults<SearchResultItem>> {
+    const orderBy = query.metadata?.orderBy ?? "views";
     let searchUrl: string;
 
     if (query.title && query.title.trim()) {
-      searchUrl = `${BASE_URL}/?s=${encodeURIComponent(query.title.trim())}&post_type=wp-manga`;
+      searchUrl = `${BASE_URL}/?s=${encodeURIComponent(query.title.trim())}&post_type=wp-manga&m_orderby=${encodeURIComponent(orderBy)}`;
     } else {
-      searchUrl = `${BASE_URL}/manga/?m_orderby=views`;
+      searchUrl = `${BASE_URL}/manga/?m_orderby=${encodeURIComponent(orderBy)}`;
     }
 
     const request = { url: searchUrl, method: "GET" };
@@ -339,7 +341,7 @@ export class MangaLivreToExtension implements ExtensionImpl<typeof ContentTempla
         contentRating: ContentRating.EVERYONE,
         status,
         author,
-        tagGroups: [{ id: "genres", title: "Genres", tags: genres }],
+        tagGroups: [{ id: "genres", title: "Gêneros", tags: genres }],
         artworkUrls: image ? [image] : [thumbnailUrl],
         shareUrl: url,
       },

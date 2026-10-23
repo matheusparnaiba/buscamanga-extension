@@ -162,9 +162,10 @@ export class LeituraMangaExtension implements ExtensionImpl<typeof ContentTempla
     };
   }
 
-  async getSearchFilters(): Promise<AdvancedSearchForm> {
+  async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
     const query: SearchQuery<ContentTemplateSearchMetadata> = {
       title: "",
+      metadata: { orderBy: "view" },
     };
     return new ContentTemplateAdvancedSearchForm(query);
   }
@@ -175,12 +176,13 @@ export class LeituraMangaExtension implements ExtensionImpl<typeof ContentTempla
     _sortingOption?: SortingOption,
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata ?? 1;
+    const orderBy = query.metadata?.orderBy ?? "view";
     let url: string;
 
     if (query.title && query.title.trim()) {
       url = `${API_BASE}/api/manga/?keyword=${encodeURIComponent(query.title.trim())}&limit=24&page=${page}`;
     } else {
-      url = `${API_BASE}/api/manga/?sort=view&limit=24&page=${page}`;
+      url = `${API_BASE}/api/manga/?sort=${encodeURIComponent(orderBy)}&limit=24&page=${page}`;
     }
 
     const request = { url, method: "GET" };
@@ -278,7 +280,7 @@ export class LeituraMangaExtension implements ExtensionImpl<typeof ContentTempla
         contentRating: ContentRating.EVERYONE,
         status,
         author,
-        tagGroups: [{ id: "genres", title: "Genres", tags: genres }],
+        tagGroups: [{ id: "genres", title: "Gêneros", tags: genres }],
         artworkUrls: [thumbnailUrl],
         shareUrl: url,
       },

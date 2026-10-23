@@ -174,9 +174,10 @@ export class FliptruExtension implements ExtensionImpl<typeof ContentTemplateCon
     return { items: [], metadata: undefined };
   }
 
-  async getSearchFilters(): Promise<AdvancedSearchForm> {
+  async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
     const query: SearchQuery<ContentTemplateSearchMetadata> = {
       title: "",
+      metadata: { orderBy: "all" },
     };
     return new ContentTemplateAdvancedSearchForm(query);
   }
@@ -187,6 +188,7 @@ export class FliptruExtension implements ExtensionImpl<typeof ContentTemplateCon
     _sortingOption?: SortingOption,
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata ?? 1;
+    const orderBy = query.metadata?.orderBy ?? "all";
 
     if (query.title && query.title.trim()) {
       if (page > 1) return { items: [], metadata: undefined };
@@ -229,7 +231,16 @@ export class FliptruExtension implements ExtensionImpl<typeof ContentTemplateCon
     }
 
     // Default browse
-    const url = page === 1 ? `${BASE_URL}/comics/all` : `${BASE_URL}/comics/all?page=${page}`;
+    if (orderBy === "popular" && page > 1) {
+      return { items: [], metadata: undefined };
+    }
+
+    const url =
+      orderBy === "popular"
+        ? `${BASE_URL}/most_popular_list/`
+        : page === 1
+          ? `${BASE_URL}/comics/all`
+          : `${BASE_URL}/comics/all?page=${page}`;
     const request = { url, method: "GET" };
 
     const [_, buffer] = await Application.scheduleRequest(request);
@@ -316,7 +327,7 @@ export class FliptruExtension implements ExtensionImpl<typeof ContentTemplateCon
         contentRating: ContentRating.EVERYONE,
         status: "ONGOING",
         author,
-        tagGroups: [{ id: "genres", title: "Genres", tags: genres }],
+        tagGroups: [{ id: "genres", title: "Gêneros", tags: genres }],
         artworkUrls: [thumbnailUrl],
         shareUrl: url,
       },

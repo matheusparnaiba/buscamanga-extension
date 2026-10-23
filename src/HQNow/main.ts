@@ -194,9 +194,10 @@ export class HQNowExtension implements ExtensionImpl<typeof ContentTemplateConfi
     return { items: [], metadata: undefined };
   }
 
-  async getSearchFilters(): Promise<AdvancedSearchForm> {
+  async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
     const query: SearchQuery<ContentTemplateSearchMetadata> = {
       title: "",
+      metadata: { orderBy: "popular" },
     };
     return new ContentTemplateAdvancedSearchForm(query);
   }
@@ -225,6 +226,19 @@ export class HQNowExtension implements ExtensionImpl<typeof ContentTemplateConfi
           name: query.title.trim(),
         },
         operationName: "getHqsByName",
+      });
+    } else if (query.metadata?.orderBy === "updates") {
+      body = JSON.stringify({
+        query: `query getRecentlyUpdatedHqs {
+          getRecentlyUpdatedHqs {
+            id
+            name
+            hqCover
+            synopsis
+            updatedAt
+          }
+        }`,
+        operationName: "getRecentlyUpdatedHqs",
       });
     } else {
       body = JSON.stringify({
@@ -259,7 +273,11 @@ export class HQNowExtension implements ExtensionImpl<typeof ContentTemplateConfi
     const json = cleanJson(data);
     const items: SearchResultItem[] = [];
 
-    const list = json.data?.getHqsByName || json.data?.getHqsByFilters || [];
+    const list =
+      json.data?.getHqsByName ||
+      json.data?.getRecentlyUpdatedHqs ||
+      json.data?.getHqsByFilters ||
+      [];
     for (const hq of list) {
       const mangaId = String(hq.id);
       const title = hq.name || mangaId;
@@ -330,7 +348,20 @@ export class HQNowExtension implements ExtensionImpl<typeof ContentTemplateConfi
         contentRating: ContentRating.EVERYONE,
         status,
         author,
-        tagGroups: [],
+        tagGroups: hq.publisherName
+          ? [
+              {
+                id: "publisher",
+                title: "Editora",
+                tags: [
+                  {
+                    id: hq.publisherName.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+                    title: hq.publisherName,
+                  },
+                ],
+              },
+            ]
+          : [],
         artworkUrls: [imageUrl],
         shareUrl: `${SITE_URL}/hq/${mangaId}`,
       },

@@ -208,9 +208,10 @@ export class NebulosaScanExtension implements ExtensionImpl<typeof ContentTempla
     return { items, metadata: undefined };
   }
 
-  async getSearchFilters(): Promise<AdvancedSearchForm> {
+  async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
     const query: SearchQuery<ContentTemplateSearchMetadata> = {
       title: "",
+      metadata: { orderBy: "views" },
     };
     return new ContentTemplateAdvancedSearchForm(query);
   }
@@ -221,18 +222,19 @@ export class NebulosaScanExtension implements ExtensionImpl<typeof ContentTempla
     _sortingOption?: SortingOption,
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata ?? 1;
+    const orderBy = query.metadata?.orderBy ?? "views";
     let searchUrl: string;
 
     if (query.title && query.title.trim()) {
       searchUrl =
         page === 1
-          ? `${BASE_URL}/?s=${encodeURIComponent(query.title.trim())}&post_type=wp-manga`
-          : `${BASE_URL}/page/${page}/?s=${encodeURIComponent(query.title.trim())}&post_type=wp-manga`;
+          ? `${BASE_URL}/?s=${encodeURIComponent(query.title.trim())}&post_type=wp-manga&m_orderby=${encodeURIComponent(orderBy)}`
+          : `${BASE_URL}/page/${page}/?s=${encodeURIComponent(query.title.trim())}&post_type=wp-manga&m_orderby=${encodeURIComponent(orderBy)}`;
     } else {
       searchUrl =
         page === 1
-          ? `${BASE_URL}/manga/?m_orderby=views`
-          : `${BASE_URL}/manga/page/${page}/?m_orderby=views`;
+          ? `${BASE_URL}/manga/?m_orderby=${encodeURIComponent(orderBy)}`
+          : `${BASE_URL}/manga/page/${page}/?m_orderby=${encodeURIComponent(orderBy)}`;
     }
 
     const request = { url: searchUrl, method: "GET" };
@@ -368,7 +370,7 @@ export class NebulosaScanExtension implements ExtensionImpl<typeof ContentTempla
         contentRating: ContentRating.EVERYONE,
         status,
         author,
-        tagGroups: [{ id: "genres", title: "Genres", tags: genres }],
+        tagGroups: [{ id: "genres", title: "Gêneros", tags: genres }],
         artworkUrls: image ? [image] : [thumbnailUrl],
         shareUrl: url,
       },

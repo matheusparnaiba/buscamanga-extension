@@ -3,11 +3,14 @@
 
 import type { Tag } from "@paperback/types";
 
-export const MODE_OPTIONS: Tag[] = [
-  { id: "include", title: "Include" },
-  { id: "exclude", title: "Exclude" },
+export const ORDER_OPTIONS: Tag[] = [
+  { id: "views", title: "Mais Vistos" },
+  { id: "latest", title: "Últimas Atualizações" },
+  { id: "alphabet", title: "Ordem Alfabética" },
+  { id: "rating", title: "Melhor Avaliados" },
+  { id: "new-manga", title: "Novos Mangás" },
 ];
 
 export type ContentTemplateSearchMetadata = {
-  mode?: "include" | "exclude";
+  orderBy?: string;
 };

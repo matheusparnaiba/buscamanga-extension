@@ -85,6 +85,11 @@ export class TaoSectExtension implements ExtensionImpl<typeof ContentTemplateCon
   async getDiscoverSections(): Promise<DiscoverSection[]> {
     return [
       {
+        id: "updates",
+        title: "Últimas Atualizações",
+        type: DiscoverSectionType.chapterUpdates,
+      },
+      {
         id: "projects",
         title: "Obras em Destaque",
         type: DiscoverSectionType.prominentCarousel,
@@ -103,8 +108,17 @@ export class TaoSectExtension implements ExtensionImpl<typeof ContentTemplateCon
   ): Promise<PagedResults<DiscoverSectionItem>> {
     const page = metadata ?? 1;
 
+    let url: string;
+    if (section.id === "updates") {
+      url = `${API_BASE}/projetos?orderby=modified&order=desc&per_page=20&page=${page}&_fields=id,slug,title,thumbnail`;
+    } else if (section.id === "projects") {
+      url = `${API_BASE}/projetos?per_page=15&page=1&_fields=id,slug,title,thumbnail`;
+    } else {
+      url = `${API_BASE}/projetos?per_page=20&page=${page}&_fields=id,slug,title,thumbnail`;
+    }
+
     const req = {
-      url: `${API_BASE}/projetos?per_page=20&page=${page}&_fields=id,slug,title,thumbnail`,
+      url,
       method: "GET",
     };
 
@@ -117,13 +131,27 @@ export class TaoSectExtension implements ExtensionImpl<typeof ContentTemplateCon
         for (const item of list) {
           const title = cleanHtml(item.title?.rendered || "Sem título");
           const mangaId = String(item.id);
-          items.push({
-            mangaId,
-            title,
-            imageUrl: getCoverUrl(item.thumbnail, title),
-            type: section.id === "projects" ? "prominentCarouselItem" : "simpleCarouselItem",
-            contentRating: ContentRating.EVERYONE,
-          });
+          const imageUrl = getCoverUrl(item.thumbnail, title);
+
+          if (section.id === "updates") {
+            items.push({
+              mangaId,
+              chapterId: mangaId,
+              title,
+              subtitle: "Atualizado recentemente",
+              imageUrl,
+              type: "chapterUpdatesCarouselItem",
+              contentRating: ContentRating.EVERYONE,
+            });
+          } else {
+            items.push({
+              mangaId,
+              title,
+              imageUrl,
+              type: section.id === "projects" ? "prominentCarouselItem" : "simpleCarouselItem",
+              contentRating: ContentRating.EVERYONE,
+            });
+          }
         }
       }
 
@@ -144,10 +172,12 @@ export class TaoSectExtension implements ExtensionImpl<typeof ContentTemplateCon
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata ?? 1;
     const titleQuery = query.title?.trim() ?? "";
+    const orderBy = query.metadata?.orderBy ?? "modified";
+    const order = orderBy === "title" ? "asc" : "desc";
 
     const url = titleQuery
       ? `${API_BASE}/projetos?search=${encodeURIComponent(titleQuery)}&per_page=20&page=${page}&_fields=id,slug,title,thumbnail`
-      : `${API_BASE}/projetos?per_page=20&page=${page}&_fields=id,slug,title,thumbnail`;
+      : `${API_BASE}/projetos?orderby=${orderBy}&order=${order}&per_page=20&page=${page}&_fields=id,slug,title,thumbnail`;
 
     const req = { url, method: "GET" };
 
@@ -191,31 +221,53 @@ export class TaoSectExtension implements ExtensionImpl<typeof ContentTemplateCon
     const imageUrl = getCoverUrl(item.thumbnail, title);
     const synopsis = cleanHtml(item.content?.rendered || "");
     const info = item.informacoes ?? {};
-    const author = info.autor || info.artista || "Tao Sect";
+    const author = info.roteiro || info.autor || "Tao Sect";
+    const artist = info.arte || info.artista || author;
 
-    const tags: Tag[] = [];
+    const genreTags: Tag[] = [];
     if (Array.isArray(info.generos)) {
       for (const g of info.generos) {
-        if (typeof g === "string" && g.trim()) {
-          tags.push({
-            id: sanitizeTagId(g),
-            title: g.trim(),
-          });
+        const name = typeof g === "string" ? g.trim() : (g?.nome || g?.name || "").trim();
+        const id = typeof g === "object" && g?.id ? String(g.id) : sanitizeTagId(name);
+        if (name) {
+          genreTags.push({ id, title: name });
         }
       }
+    }
+
+    const tagGroups = [];
+    if (genreTags.length > 0) {
+      tagGroups.push({ id: "genres", title: "Gêneros", tags: genreTags });
+    }
+    if (info.pais?.nome) {
+      tagGroups.push({
+        id: "country",
+        title: "País de Origem",
+        tags: [{ id: sanitizeTagId(info.pais.nome), title: info.pais.nome }],
+      });
+    }
+    if (info.status_scan?.nome) {
+      tagGroups.push({
+        id: "scan_status",
+        title: "Status da Scan",
+        tags: [{ id: sanitizeTagId(info.status_scan.nome), title: info.status_scan.nome }],
+      });
     }
 
     return {
       mangaId,
       mangaInfo: {
         primaryTitle: title,
-        secondaryTitles: [],
+        secondaryTitles: info.titulo_pais_origem ? [info.titulo_pais_origem] : [],
         thumbnailUrl: imageUrl,
         synopsis,
-        contentRating: ContentRating.EVERYONE,
-        status: info.status?.toLowerCase().includes("completo") ? "completed" : "ongoing",
+        contentRating: info.mais_18 ? ContentRating.MATURE : ContentRating.EVERYONE,
+        status: info.status_scan?.nome?.toLowerCase().includes("completo")
+          ? "completed"
+          : "ongoing",
         author,
-        tagGroups: [{ id: "genres", title: "Gêneros", tags }],
+        artist,
+        tagGroups,
         artworkUrls: [imageUrl],
         shareUrl: `${SITE_BASE}/projeto/${item.slug || mangaId}/`,
       },
@@ -370,7 +422,7 @@ export class TaoSectExtension implements ExtensionImpl<typeof ContentTemplateCon
   async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
     return new ContentTemplateAdvancedSearchForm({
       title: "",
-      metadata: { mode: "include" },
+      metadata: { orderBy: "modified" },
     });
   }
 }

@@ -3,11 +3,11 @@
 
 import type { Tag } from "@paperback/types";
 
-export const MODE_OPTIONS: Tag[] = [
-  { id: "include", title: "Include" },
-  { id: "exclude", title: "Exclude" },
+export const ORDER_OPTIONS: Tag[] = [
+  { id: "view", title: "Mais Lidos (Populares)" },
+  { id: "time", title: "Últimas Atualizações" },
 ];
 
 export type ContentTemplateSearchMetadata = {
-  mode?: "include" | "exclude";
+  orderBy?: string;
 };

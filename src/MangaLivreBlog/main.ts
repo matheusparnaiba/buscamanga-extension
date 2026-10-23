@@ -255,9 +255,11 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
     return { items: [], metadata: undefined };
   }
 
-  async getAdvancedSearchForm(
-    query: SearchQuery<ContentTemplateSearchMetadata>,
-  ): Promise<AdvancedSearchForm> {
+  async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
+    const query: SearchQuery<ContentTemplateSearchMetadata> = {
+      title: "",
+      metadata: { orderBy: "recentes" },
+    };
     return new ContentTemplateAdvancedSearchForm(query);
   }
 
@@ -267,7 +269,17 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
     _sortingOption?: SortingOption,
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata ?? 1;
-    const searchUrl = `${BASE_URL}/page/${page}/?s=${encodeURIComponent(query.title)}`;
+    const orderBy = query.metadata?.orderBy ?? "recentes";
+    let searchUrl: string;
+
+    if (query.title && query.title.trim()) {
+      searchUrl = `${BASE_URL}/page/${page}/?s=${encodeURIComponent(query.title.trim())}`;
+    } else {
+      searchUrl =
+        page === 1
+          ? `${BASE_URL}/manga/?ordem=${encodeURIComponent(orderBy)}`
+          : `${BASE_URL}/manga/page/${page}/?ordem=${encodeURIComponent(orderBy)}`;
+    }
 
     const request = { url: searchUrl, method: "GET" };
     const [_, buffer] = await Application.scheduleRequest(request);
@@ -390,7 +402,7 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
         contentRating: ContentRating.EVERYONE,
         status,
         author: author || "Desconhecido",
-        tagGroups: [{ id: "genres", title: "Genres", tags: genres }],
+        tagGroups: [{ id: "genres", title: "Gêneros", tags: genres }],
         artworkUrls: image ? [image] : [thumbnailUrl],
         shareUrl: url,
       },
