@@ -26,13 +26,19 @@ const BASE_URL = "https://www.hqporno.net";
 const IMAGE_FILTER = "";
 const STRIP_THUMB_SUFFIX = false;
 
-const SECTIONS: { id: string; title: string; path: string }[] = [
-  { id: "latest", title: "Atualizações", path: "" },
-  { id: "futanari", title: "Futanari", path: "/category/futanari" },
-  { id: "incesto", title: "Incesto", path: "/category/incesto" },
-  { id: "interracial", title: "Interracial", path: "/category/interracial" },
-  { id: "parodia", title: "Paródia Pornô", path: "/category/parodia-porno" },
-  { id: "pb", title: "Preto e Branco", path: "/category/preto-e-branco" },
+const SECTIONS: { id: string; title: string; path: string; type: DiscoverSectionType }[] = [
+  {
+    id: "updates",
+    title: "Últimas Atualizações",
+    path: "",
+    type: DiscoverSectionType.chapterUpdates,
+  },
+  {
+    id: "popular",
+    title: "Mais Lidos",
+    path: "/popular",
+    type: DiscoverSectionType.prominentCarousel,
+  },
 ];
 
 function sanitizeTagId(raw: string): string {
@@ -54,16 +60,15 @@ function cleanTitle(raw: string): string {
 /** Retorna o slug se o link pertence ao próprio site e tem um único segmento (/slug/). */
 function slugFromUrl(href: string | undefined): string | undefined {
   if (!href) return undefined;
-  try {
-    const url = new URL(href, BASE_URL);
-    if (url.host.replace(/^www\./, "") !== new URL(BASE_URL).host.replace(/^www\./, "")) {
-      return undefined;
+  const match = href.match(/https?:\/\/[^/]+\/([^/?#]+)\/?$/);
+  if (match?.[1]) {
+    const slug = match[1];
+    if (!["category", "tag", "page", "author", "delivery", "games", "animadas"].includes(slug)) {
+      return slug;
     }
-    const path = url.pathname.replace(/^\/+|\/+$/g, "");
-    return path && !path.includes("/") ? path : undefined;
-  } catch {
-    return undefined;
   }
+  const clean = href.replace(/\/+$/, "").split("/").pop();
+  return clean && !clean.includes("?") && !clean.includes("#") ? clean : undefined;
 }
 
 function imageFrom($img: cheerio.Cheerio<any>): string {
@@ -105,7 +110,8 @@ function parseCards($: cheerio.CheerioAPI): SearchResultItem[] {
     });
   };
 
-  $("article.entry-tpl-grid").each((_, el) => {
+  $("article.entry-tpl-grid, article.entry-tpl-list-fancy, article.post").each((_, el) => {
+    if ($(el).hasClass("type-page")) return;
     const a = $(el).find(".entry-title a, a.g1-frame, a").first();
     const img = $(el).find("img").first();
     push(a.attr("href"), $(el).find(".entry-title").first().text() || a.attr("title"), img);
@@ -141,7 +147,7 @@ export class HQPornoExtension implements ExtensionImpl<typeof HQPornoConfig> {
     return SECTIONS.map((s) => ({
       id: s.id,
       title: s.title,
-      type: DiscoverSectionType.prominentCarousel,
+      type: s.type,
     }));
   }
 
@@ -154,13 +160,27 @@ export class HQPornoExtension implements ExtensionImpl<typeof HQPornoConfig> {
     if (!def) return { items: [] };
 
     const $ = await fetchHtml(pageUrl(def.path, page));
-    const items: DiscoverSectionItem[] = parseCards($).map((item) => ({
-      type: "prominentCarouselItem",
-      mangaId: item.mangaId,
-      title: item.title,
-      imageUrl: item.imageUrl,
-      contentRating: ContentRating.EVERYONE,
-    }));
+    const cards = parseCards($);
+    const items: DiscoverSectionItem[] = cards.map((item) => {
+      if (section.type === DiscoverSectionType.chapterUpdates) {
+        return {
+          type: "chapterUpdatesCarouselItem",
+          mangaId: item.mangaId,
+          chapterId: item.mangaId,
+          title: item.title,
+          subtitle: "Capítulo Único",
+          imageUrl: item.imageUrl,
+          contentRating: ContentRating.EVERYONE,
+        };
+      }
+      return {
+        type: "prominentCarouselItem",
+        mangaId: item.mangaId,
+        title: item.title,
+        imageUrl: item.imageUrl,
+        contentRating: ContentRating.EVERYONE,
+      };
+    });
 
     return { items, metadata: items.length > 0 ? page + 1 : undefined };
   }

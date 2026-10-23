@@ -24,13 +24,19 @@ declare const App: any;
 
 const BASE_URL = "https://mundohentaioficial.com";
 
-const SECTIONS: { id: string; title: string; path: string }[] = [
-  { id: "latest", title: "Atualizações", path: "" },
-  { id: "doujinshi", title: "Doujinshi", path: "/category/doujinshi" },
-  { id: "manga-hentai", title: "Mangá Hentai", path: "/category/manga-hentai" },
-  { id: "one-shot", title: "One-Shot", path: "/category/one-shot" },
-  { id: "sem-censura", title: "Hentai Sem Censura", path: "/category/hentai-sem-censura" },
-  { id: "comics", title: "Comics", path: "/category/comics" },
+const SECTIONS: { id: string; title: string; path: string; type: DiscoverSectionType }[] = [
+  {
+    id: "updates",
+    title: "Últimas Atualizações",
+    path: "",
+    type: DiscoverSectionType.chapterUpdates,
+  },
+  {
+    id: "popular",
+    title: "Mais Lidos",
+    path: "/category/doujinshi",
+    type: DiscoverSectionType.prominentCarousel,
+  },
 ];
 
 function sanitizeTagId(raw: string): string {
@@ -55,13 +61,17 @@ function cleanTitle(raw: string): string {
   );
 }
 
-function slugFromUrl(href: string): string | undefined {
-  try {
-    const path = new URL(href, BASE_URL).pathname.replace(/^\/+|\/+$/g, "");
-    return path && !path.includes("/") ? path : undefined;
-  } catch {
-    return undefined;
+function slugFromUrl(href: string | undefined): string | undefined {
+  if (!href) return undefined;
+  const match = href.match(/https?:\/\/[^/]+\/([^/?#]+)\/?$/);
+  if (match?.[1]) {
+    const slug = match[1];
+    if (!["category", "tag", "page", "author", "delivery", "games", "animadas"].includes(slug)) {
+      return slug;
+    }
   }
+  const clean = href.replace(/\/+$/, "").split("/").pop();
+  return clean && !clean.includes("?") && !clean.includes("#") ? clean : undefined;
 }
 
 function imageFrom($img: cheerio.Cheerio<any>): string {
@@ -136,7 +146,7 @@ export class MundoHentaiExtension implements ExtensionImpl<typeof MundoHentaiCon
     return SECTIONS.map((s) => ({
       id: s.id,
       title: s.title,
-      type: DiscoverSectionType.prominentCarousel,
+      type: s.type,
     }));
   }
 
@@ -149,13 +159,27 @@ export class MundoHentaiExtension implements ExtensionImpl<typeof MundoHentaiCon
     if (!def) return { items: [] };
 
     const $ = await fetchHtml(pageUrl(def.path, page));
-    const items: DiscoverSectionItem[] = parseCards($).map((item) => ({
-      type: "prominentCarouselItem",
-      mangaId: item.mangaId,
-      title: item.title,
-      imageUrl: item.imageUrl,
-      contentRating: ContentRating.EVERYONE,
-    }));
+    const cards = parseCards($);
+    const items: DiscoverSectionItem[] = cards.map((item) => {
+      if (section.type === DiscoverSectionType.chapterUpdates) {
+        return {
+          type: "chapterUpdatesCarouselItem",
+          mangaId: item.mangaId,
+          chapterId: item.mangaId,
+          title: item.title,
+          subtitle: "Capítulo Único",
+          imageUrl: item.imageUrl,
+          contentRating: ContentRating.EVERYONE,
+        };
+      }
+      return {
+        type: "prominentCarouselItem",
+        mangaId: item.mangaId,
+        title: item.title,
+        imageUrl: item.imageUrl,
+        contentRating: ContentRating.EVERYONE,
+      };
+    });
 
     return { items, metadata: items.length > 0 ? page + 1 : undefined };
   }

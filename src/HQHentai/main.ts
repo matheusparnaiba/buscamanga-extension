@@ -26,10 +26,19 @@ const BASE_URL = "https://hqhentai.net";
 const IMAGE_FILTER = "/wp-content/uploads/";
 const STRIP_THUMB_SUFFIX = true;
 
-const SECTIONS: { id: string; title: string; path: string }[] = [
-  { id: "latest", title: "Atualizações", path: "" },
-  { id: "doujinshi", title: "Doujinshi", path: "/category/doujinshi" },
-  { id: "hentai", title: "Hentai", path: "/category/hentai" },
+const SECTIONS: { id: string; title: string; path: string; type: DiscoverSectionType }[] = [
+  {
+    id: "updates",
+    title: "Últimas Atualizações",
+    path: "",
+    type: DiscoverSectionType.chapterUpdates,
+  },
+  {
+    id: "popular",
+    title: "Mais Lidos",
+    path: "/category/doujinshi",
+    type: DiscoverSectionType.prominentCarousel,
+  },
 ];
 
 function sanitizeTagId(raw: string): string {
@@ -51,16 +60,15 @@ function cleanTitle(raw: string): string {
 /** Retorna o slug se o link pertence ao próprio site e tem um único segmento (/slug/). */
 function slugFromUrl(href: string | undefined): string | undefined {
   if (!href) return undefined;
-  try {
-    const url = new URL(href, BASE_URL);
-    if (url.host.replace(/^www\./, "") !== new URL(BASE_URL).host.replace(/^www\./, "")) {
-      return undefined;
+  const match = href.match(/https?:\/\/[^/]+\/([^/?#]+)\/?$/);
+  if (match?.[1]) {
+    const slug = match[1];
+    if (!["category", "tag", "page", "author", "delivery", "games", "animadas"].includes(slug)) {
+      return slug;
     }
-    const path = url.pathname.replace(/^\/+|\/+$/g, "");
-    return path && !path.includes("/") ? path : undefined;
-  } catch {
-    return undefined;
   }
+  const clean = href.replace(/\/+$/, "").split("/").pop();
+  return clean && !clean.includes("?") && !clean.includes("#") ? clean : undefined;
 }
 
 function imageFrom($img: cheerio.Cheerio<any>): string {
@@ -102,11 +110,11 @@ function parseCards($: cheerio.CheerioAPI): SearchResultItem[] {
     });
   };
 
-  $(".novo-card-container").each((_, el) => {
-    const a = $(el).find("a.novo-card-link-img, a").first();
+  $(".novo-card-container, .thumb-conteudo").each((_, el) => {
+    const a = $(el).find("a.novo-card-link-img, a[href]:not(.thumbParodiaNome), a").first();
     const title =
       $(el)
-        .find(".novo-card-titulo a, .novo-card-titulo")
+        .find(".novo-card-titulo a, .novo-card-titulo, .thumb-titulo a, .thumb-titulo")
         .first()
         .text()
         .replace(/\s+/g, " ")
@@ -146,7 +154,7 @@ export class HQHentaiExtension implements ExtensionImpl<typeof HQHentaiConfig> {
     return SECTIONS.map((s) => ({
       id: s.id,
       title: s.title,
-      type: DiscoverSectionType.prominentCarousel,
+      type: s.type,
     }));
   }
 
@@ -159,13 +167,27 @@ export class HQHentaiExtension implements ExtensionImpl<typeof HQHentaiConfig> {
     if (!def) return { items: [] };
 
     const $ = await fetchHtml(pageUrl(def.path, page));
-    const items: DiscoverSectionItem[] = parseCards($).map((item) => ({
-      type: "prominentCarouselItem",
-      mangaId: item.mangaId,
-      title: item.title,
-      imageUrl: item.imageUrl,
-      contentRating: ContentRating.EVERYONE,
-    }));
+    const cards = parseCards($);
+    const items: DiscoverSectionItem[] = cards.map((item) => {
+      if (section.type === DiscoverSectionType.chapterUpdates) {
+        return {
+          type: "chapterUpdatesCarouselItem",
+          mangaId: item.mangaId,
+          chapterId: item.mangaId,
+          title: item.title,
+          subtitle: "Capítulo Único",
+          imageUrl: item.imageUrl,
+          contentRating: ContentRating.EVERYONE,
+        };
+      }
+      return {
+        type: "prominentCarouselItem",
+        mangaId: item.mangaId,
+        title: item.title,
+        imageUrl: item.imageUrl,
+        contentRating: ContentRating.EVERYONE,
+      };
+    });
 
     return { items, metadata: items.length > 0 ? page + 1 : undefined };
   }
