@@ -52,9 +52,11 @@ var source=(function(e){Object.defineProperty(e,Symbol.toStringTag,{value:`Modul
             name
             id
             number
+            createdAt
+            updatedAt
           }
         }
-      }`,variables:{id:n},operationName:`getHqsById`})},[i,a]=await Application.scheduleRequest(r),o=k(Application.arrayBufferToUTF8String(a)),s=[],c=o.data?.getHqsById?.[0]?.capitulos||[];for(let t of c){let n=String(t.id),r=String(t.number||`0`),i=parseFloat(r)||0,a=t.name?`#${r} - ${t.name}`:`Edição #${r}`;s.push({chapterId:n,sourceManga:e,langCode:`PT-BR`,chapNum:i,title:a,volume:0})}return s}async getChapterDetails(e){let t=parseInt(e.chapterId,10),n={url:O,method:`POST`,headers:{"Content-Type":`application/json`},body:JSON.stringify({query:`query getChapterById($chapterId: Int!) {
+      }`,variables:{id:n},operationName:`getHqsById`})},[i,a]=await Application.scheduleRequest(r),o=k(Application.arrayBufferToUTF8String(a)),s=[],c=o.data?.getHqsById?.[0]?.capitulos||[];for(let t of c){let n=String(t.id),r=String(t.number||`0`),i=parseFloat(r)||0,a=t.name?`#${r} - ${t.name}`:`Edição #${r}`,o=t.createdAt||t.updatedAt,c;if(o){let e=new Date(o);isNaN(e.getTime())||(c=e)}s.push({chapterId:n,sourceManga:e,langCode:`PT-BR`,chapNum:i,title:a,volume:0,publishDate:c})}return s}async getChapterDetails(e){let t=parseInt(e.chapterId,10),n={url:O,method:`POST`,headers:{"Content-Type":`application/json`},body:JSON.stringify({query:`query getChapterById($chapterId: Int!) {
         getChapterById(chapterId: $chapterId) {
           pictures {
             pictureUrl
