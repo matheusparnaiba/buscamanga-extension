@@ -210,7 +210,7 @@ export class NinjaScanExtension implements ExtensionImpl<typeof ContentTemplateC
   async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
     return new ContentTemplateAdvancedSearchForm({
       title: "",
-      metadata: { mode: "include" },
+      metadata: { orderBy: "views" },
     });
   }
 
@@ -221,10 +221,11 @@ export class NinjaScanExtension implements ExtensionImpl<typeof ContentTemplateC
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata ?? 1;
     const title = query.title?.trim() ?? "";
+    const orderBy = query.metadata?.orderBy ?? "views";
 
     const url = title
       ? `${BASE_URL}/page/${page}/?s=${encodeURIComponent(title)}&post_type=wp-manga`
-      : `${BASE_URL}/manga/page/${page}/?m_orderby=views`;
+      : `${BASE_URL}/manga/page/${page}/?m_orderby=${orderBy}`;
 
     const request = {
       url,
