@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-10-23T21:01:04.661Z",
+  "buildTime": "2026-10-23T21:40:58.778Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -14,7 +14,7 @@
     {
       "name": "Arthur Scan",
       "description": "Extensão oficial da Arthur Scan com foco em manhwas, cultivação e ação.",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -45,7 +45,7 @@
     {
       "name": "Boruto Explorer",
       "description": "Extensão da comunidade Boruto Explorer com foco no universo de Naruto e Boruto.",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -107,7 +107,7 @@
     {
       "name": "HQ Hentai",
       "description": "Extensão do \"https://hqhentai.net\" (HQs e doujinshis hentai em português, conteúdo adulto +18)",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -283,7 +283,7 @@
     {
       "name": "Kami Sama Explorer",
       "description": "Extensão da Kami Sama Explorer dedicada às obras de Akira Toriyama, Dragon Ball e clássicos shonen.",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -376,7 +376,7 @@
     {
       "name": "MangaLivre Blog",
       "description": "Extensão do \"https://mangalivre.blog\"",
-      "version": "1.0.13",
+      "version": "1.0.14",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -407,7 +407,7 @@
     {
       "name": "MangaLivre To",
       "description": "Extensão do \"https://mangalivre.to\"",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -475,7 +475,7 @@
     {
       "name": "Manga Online",
       "description": "Extensão do \"https://mangaonline.love\"",
-      "version": "1.0.19",
+      "version": "1.0.20",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -572,7 +572,7 @@
     {
       "name": "Muito Hentai",
       "description": "Extensão do \"https://www.muitohentai.com\" (conteúdo adulto +18)",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -680,7 +680,7 @@
     {
       "name": "Nebulosa Scan",
       "description": "Extensão do \"https://nebulosascan.com\"",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -711,7 +711,7 @@
     {
       "name": "Ninja Scan",
       "description": "Extensão oficial da Ninja Scan com traduções de manhwas e manhuas de combate e fantasia.",
-      "version": "1.0.3",
+      "version": "1.0.4",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -773,7 +773,7 @@
     {
       "name": "Yuri on Air",
       "description": "Extensão oficial do portal Yuri on Air com mangás, manhwas e webcomics Yuri e Shoujo Ai.",
-      "version": "1.0.3",
+      "version": "1.0.4",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
