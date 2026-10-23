@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-10-22T23:59:22.948Z",
+  "buildTime": "2026-10-23T00:18:31.520Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -107,10 +107,10 @@
     {
       "name": "HQ Hentai",
       "description": "Extensão do \"https://hqhentai.net\" (HQs e doujinshis hentai em português, conteúdo adulto +18)",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "icon": "icon.png",
       "language": "pt-br",
-      "contentRating": "ADULT",
+      "contentRating": "SAFE",
       "capabilities": [
         4,
         64,
@@ -208,10 +208,10 @@
     {
       "name": "Hentai HQ",
       "description": "Extensão do \"https://hentaihq.net\" (HQs de sexo e quadrinhos eróticos em português, conteúdo adulto +18)",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "icon": "icon.png",
       "language": "pt-br",
-      "contentRating": "ADULT",
+      "contentRating": "SAFE",
       "capabilities": [
         4,
         64,
@@ -569,10 +569,10 @@
     {
       "name": "Muito Hentai",
       "description": "Extensão do \"https://www.muitohentai.com\" (conteúdo adulto +18)",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "icon": "icon.png",
       "language": "pt-br",
-      "contentRating": "ADULT",
+      "contentRating": "SAFE",
       "capabilities": [
         4,
         64,
@@ -604,10 +604,10 @@
     {
       "name": "Mundo Hentai",
       "description": "Extensão do \"https://mundohentaioficial.com\" (conteúdo adulto +18)",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "icon": "icon.png",
       "language": "pt-br",
-      "contentRating": "ADULT",
+      "contentRating": "SAFE",
       "capabilities": [
         4,
         64,
@@ -639,10 +639,10 @@
     {
       "name": "NHentai BR",
       "description": "Extensão do \"https://nhentaibr.com\" (conteúdo adulto +18)",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "icon": "icon.png",
       "language": "pt-br",
-      "contentRating": "ADULT",
+      "contentRating": "SAFE",
       "capabilities": [
         4,
         64,
