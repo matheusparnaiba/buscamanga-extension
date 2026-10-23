@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-10-23T00:33:04.488Z",
+  "buildTime": "2026-10-23T03:18:39.922Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -107,7 +107,7 @@
     {
       "name": "HQ Hentai",
       "description": "Extensão do \"https://hqhentai.net\" (HQs e doujinshis hentai em português, conteúdo adulto +18)",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -173,7 +173,7 @@
     {
       "name": "HQ Porno",
       "description": "Extensão do \"https://www.hqporno.net\" (Quadrinhos eróticos, hentai e HQs em português, conteúdo adulto +18)",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -208,7 +208,7 @@
     {
       "name": "Hentai HQ",
       "description": "Extensão do \"https://hentaihq.net\" (HQs de sexo e quadrinhos eróticos em português, conteúdo adulto +18)",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -604,7 +604,7 @@
     {
       "name": "Mundo Hentai",
       "description": "Extensão do \"https://mundohentaioficial.com\" (conteúdo adulto +18)",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -639,7 +639,7 @@
     {
       "name": "NHentai BR",
       "description": "Extensão do \"https://nhentaibr.com\" (conteúdo adulto +18)",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
