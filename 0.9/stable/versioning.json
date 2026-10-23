@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-10-23T20:45:14.153Z",
+  "buildTime": "2026-10-23T21:01:04.661Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -112,6 +112,7 @@
       "language": "pt-br",
       "contentRating": "SAFE",
       "capabilities": [
+        32,
         4,
         64,
         1
@@ -178,6 +179,7 @@
       "language": "pt-br",
       "contentRating": "SAFE",
       "capabilities": [
+        32,
         4,
         64,
         1
@@ -213,6 +215,7 @@
       "language": "pt-br",
       "contentRating": "SAFE",
       "capabilities": [
+        32,
         4,
         64,
         1
@@ -574,6 +577,7 @@
       "language": "pt-br",
       "contentRating": "SAFE",
       "capabilities": [
+        32,
         4,
         64,
         1
@@ -609,6 +613,7 @@
       "language": "pt-br",
       "contentRating": "SAFE",
       "capabilities": [
+        32,
         4,
         64,
         1
@@ -644,6 +649,7 @@
       "language": "pt-br",
       "contentRating": "SAFE",
       "capabilities": [
+        32,
         4,
         64,
         1
