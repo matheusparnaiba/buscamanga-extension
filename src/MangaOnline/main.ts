@@ -224,19 +224,19 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
   async getDiscoverSections(): Promise<DiscoverSection[]> {
     return [
       {
-        id: "latest",
-        title: "Lançamentos",
-        type: DiscoverSectionType.featured,
-      },
-      {
         id: "updates",
         title: "Últimas Atualizações",
         type: DiscoverSectionType.chapterUpdates,
       },
       {
         id: "ranking",
-        title: "Ranking Geral",
+        title: "Mais Lidos (Populares)",
         type: DiscoverSectionType.prominentCarousel,
+      },
+      {
+        id: "latest",
+        title: "Destaques da Semana",
+        type: DiscoverSectionType.featured,
       },
     ];
   }
@@ -298,9 +298,16 @@ export class BuscaMangaExtension implements ExtensionImpl<typeof ContentTemplate
     }
 
     if (section.id === "updates") {
-      $(
-        ".home-latest-grid article.home-manga-card, .home-latest article.home-manga-card, article.home-manga-card, .es-upd-card",
-      ).each((_, el) => {
+      let updates = $(
+        ".home-latest-grid article, .home-latest article, .home-latest .home-manga-card",
+      );
+      if (updates.length === 0) {
+        updates = $("article.home-manga-card, article").not(
+          ".home-popular article, .home-popular-track article, .home-featured-track article, .home-featured article",
+        );
+      }
+
+      updates.each((_, el) => {
         const title = $(el)
           .find(".home-card-body h3 a, .es-upd-title, h3 a, h3")
           .first()

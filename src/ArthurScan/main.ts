@@ -267,10 +267,12 @@ export class ArthurScanExtension implements ExtensionImpl<typeof ContentTemplate
 
     const url =
       section.id === "popular"
-        ? `${BASE_URL}/manga/?m_orderby=views`
+        ? page === 1
+          ? `${BASE_URL}/manga/?m_orderby=views`
+          : `${BASE_URL}/manga/page/${page}/?m_orderby=views`
         : page === 1
-          ? `${BASE_URL}/`
-          : `${BASE_URL}/page/${page}/`;
+          ? `${BASE_URL}/manga/?m_orderby=latest`
+          : `${BASE_URL}/manga/page/${page}/?m_orderby=latest`;
 
     const request = {
       url,
@@ -284,48 +286,42 @@ export class ArthurScanExtension implements ExtensionImpl<typeof ContentTemplate
     const seenIds = new Set<string>();
 
     if (section.id === "popular") {
-      $(".manga__item, .page-item-detail, .c-tabs-item__content, .slider__item, .manga-item").each(
-        (_, el) => {
-          const titleEl = $(el)
-            .find(
-              ".post-title h2 a, .post-title h3 a, .post-title a, .slider__content h4 a, h2 a, h3 a, h4 a, h5 a",
-            )
-            .first();
-          const title = titleEl.text().replace(/\s+/g, " ").trim();
-          const linkEl = $(el)
-            .find(".post-title h2 a, .post-title a, a[href*='/manga/'], a")
-            .first();
-          const href = linkEl.attr("href");
-          const img = getImageSrc($(el).find("img").first());
+      $(".page-item-detail, .c-tabs-item__content, .manga__item, .manga-item").each((_, el) => {
+        const titleEl = $(el)
+          .find(
+            ".post-title h2 a, .post-title h3 a, .post-title a, .slider__content h4 a, h2 a, h3 a, h4 a, h5 a",
+          )
+          .first();
+        const title = titleEl.text().replace(/\s+/g, " ").trim();
+        const linkEl = $(el).find(".post-title h2 a, .post-title a, a[href*='/manga/'], a").first();
+        const href = linkEl.attr("href");
+        const img = getImageSrc($(el).find("img").first());
 
-          if (href && title) {
-            const idMatch = href.match(/\/manga\/([^/]+)/);
-            const mangaId = idMatch ? (idMatch[1] as string) : href;
+        if (href && title) {
+          const idMatch = href.match(/\/manga\/([^/]+)/);
+          const mangaId = idMatch ? (idMatch[1] as string) : href;
 
-            if (!seenIds.has(mangaId)) {
-              seenIds.add(mangaId);
-              items.push({
-                mangaId,
-                title,
-                imageUrl:
-                  img ||
-                  "https://ui-avatars.com/api/?name=" +
-                    encodeURIComponent(title) +
-                    "&background=random",
-                type: "prominentCarouselItem",
-                contentRating: ContentRating.EVERYONE,
-              });
-            }
+          if (!seenIds.has(mangaId)) {
+            seenIds.add(mangaId);
+            items.push({
+              mangaId,
+              title,
+              imageUrl:
+                img ||
+                "https://ui-avatars.com/api/?name=" +
+                  encodeURIComponent(title) +
+                  "&background=random",
+              type: "prominentCarouselItem",
+              contentRating: ContentRating.EVERYONE,
+            });
           }
-        },
-      );
+        }
+      });
       return { items, metadata: undefined };
     }
 
     if (section.id === "updates") {
-      $(
-        ".manga__item, .page-item-detail, .c-tabs-item__content, .manga-item, .col-6.col-md-2, .col-12.col-md-6",
-      ).each((_, el) => {
+      $(".page-item-detail, .c-tabs-item__content, .manga__item, .manga-item").each((_, el) => {
         const titleEl = $(el)
           .find(
             ".post-title h2 a, .post-title h3 a, .post-title a, .item-title a, h2 a, h3 a, h4 a, h5 a",

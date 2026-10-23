@@ -261,9 +261,10 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
     const items: DiscoverSectionItem[] = [];
 
     if (section.id === "popular") {
-      let populars = $(
-        ".home-popular article.home-manga-card, .home-popular .home-manga-card, .manga-card-modern, .sidebar .popular-item-wrap, .popular-item-wrap",
-      );
+      const popContainer = $(".home-popular, .home-popular-track");
+      const populars = popContainer.length
+        ? popContainer.find("article, .home-manga-card")
+        : $(".home-popular article, .sidebar .popular-item-wrap, .popular-item-wrap");
 
       populars.toArray().forEach((el) => {
         const title = $(el)
@@ -308,9 +309,14 @@ export class MangaLivreBlogExtension implements ExtensionImpl<typeof ContentTemp
     }
 
     if (section.id === "updates") {
-      const updates = $(
-        ".home-latest article.home-manga-card, .home-latest .home-manga-card, article.home-manga-card, .manga-card-modern",
+      let updates = $(
+        ".home-latest-grid article, .home-latest article, .home-latest .home-manga-card",
       );
+      if (updates.length === 0) {
+        updates = $("article.home-manga-card, article").not(
+          ".home-popular article, .home-popular-track article, .home-featured-track article, .home-featured article",
+        );
+      }
 
       updates.each((_, el) => {
         const title = $(el)

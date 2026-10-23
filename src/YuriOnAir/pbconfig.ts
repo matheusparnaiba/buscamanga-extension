@@ -4,7 +4,7 @@ export default {
   name: "Yuri on Air",
   description:
     "Extensão oficial do portal Yuri on Air com mangás, manhwas e webcomics Yuri e Shoujo Ai.",
-  version: "1.0.3",
+  version: "1.0.4",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

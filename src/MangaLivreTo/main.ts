@@ -248,10 +248,12 @@ export class MangaLivreToExtension implements ExtensionImpl<typeof ContentTempla
 
     const url =
       section.id === "popular"
-        ? `${BASE_URL}/manga/?m_orderby=views`
+        ? page === 1
+          ? `${BASE_URL}/manga/?m_orderby=views`
+          : `${BASE_URL}/manga/page/${page}/?m_orderby=views`
         : page === 1
-          ? `${BASE_URL}/`
-          : `${BASE_URL}/page/${page}/`;
+          ? `${BASE_URL}/manga/?m_orderby=latest`
+          : `${BASE_URL}/manga/page/${page}/?m_orderby=latest`;
 
     const request = {
       url,

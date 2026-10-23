@@ -37,7 +37,7 @@ const SECTIONS: { id: string; title: string; path: string; type: DiscoverSection
   {
     id: "popular",
     title: "Mais Lidos",
-    path: "/mangas/genero/creampie",
+    path: "/mais-vistos",
     type: DiscoverSectionType.prominentCarousel,
   },
 ];

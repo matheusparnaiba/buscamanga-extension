@@ -4,7 +4,7 @@ export default {
   name: "Kami Sama Explorer",
   description:
     "Extensão da Kami Sama Explorer dedicada às obras de Akira Toriyama, Dragon Ball e clássicos shonen.",
-  version: "1.0.2",
+  version: "1.0.3",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

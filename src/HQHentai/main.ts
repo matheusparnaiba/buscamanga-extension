@@ -24,7 +24,7 @@ import type HQHentaiConfig from "./pbconfig";
 
 declare const App: any;
 
-const BASE_URL = "https://hqhentai.net";
+const BASE_URL = "https://hqhentai.online";
 const IMAGE_FILTER = "/wp-content/uploads/";
 const STRIP_THUMB_SUFFIX = true;
 
@@ -38,7 +38,7 @@ const SECTIONS: { id: string; title: string; path: string; type: DiscoverSection
   {
     id: "popular",
     title: "Mais Lidos",
-    path: "/category/doujinshi",
+    path: "/hq-de-sexo",
     type: DiscoverSectionType.prominentCarousel,
   },
 ];
