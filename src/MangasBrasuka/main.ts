@@ -812,12 +812,19 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
       for (const ch of list) {
         if (!ch) continue;
         const num = ch.number != null ? ch.number : 0;
+        const rawDate = ch.publishedAt || ch.createdAt || ch.releaseDate;
+        let publishDate: Date | undefined;
+        if (rawDate) {
+          const d = new Date(rawDate);
+          if (!isNaN(d.getTime())) publishDate = d;
+        }
+
         chapters.push({
           chapterId: ch.id ? String(ch.id) : String(num),
           sourceManga,
           title: ch.title ? `${ch.title}` : `Capítulo ${num}`,
           chapNum: Number(num) || 0,
-          publishDate: ch.publishedAt ? new Date(ch.publishedAt) : undefined,
+          publishDate,
           langCode: "PT-BR",
           volume: 0,
         });

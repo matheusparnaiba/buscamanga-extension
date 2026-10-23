@@ -331,8 +331,10 @@ export class LeituraMangaExtension implements ExtensionImpl<typeof ContentTempla
       const chapterId = `${slug}:::${num}`;
 
       let publishDate: Date | undefined;
-      if (item.releaseDate) {
-        publishDate = new Date(item.releaseDate);
+      const rawDate = item.releaseDate || item.createdAt || item.updatedAt || item.created_at;
+      if (rawDate) {
+        const d = new Date(rawDate);
+        if (!isNaN(d.getTime())) publishDate = d;
       }
 
       chapters.push({

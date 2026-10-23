@@ -259,6 +259,21 @@ export class HQHentaiExtension implements ExtensionImpl<typeof HQHentaiConfig> {
   }
 
   async getChapters(sourceManga: SourceManga, _sinceDate?: Date): Promise<Chapter[]> {
+    let publishDate: Date | undefined;
+    try {
+      const $ = await fetchHtml(`${BASE_URL}/${sourceManga.mangaId}/`);
+      const published =
+        $("meta[property='article:modified_time']").attr("content") ||
+        $("meta[property='article:published_time']").attr("content") ||
+        $("time").first().attr("datetime");
+      if (published) {
+        const d = new Date(published);
+        if (!isNaN(d.getTime())) publishDate = d;
+      }
+    } catch {
+      // Ignora erro e prossegue com fallback
+    }
+
     return [
       {
         chapterId: sourceManga.mangaId,
@@ -267,6 +282,7 @@ export class HQHentaiExtension implements ExtensionImpl<typeof HQHentaiConfig> {
         chapNum: 1,
         title: "Capítulo Único",
         volume: 0,
+        publishDate,
       },
     ];
   }

@@ -237,6 +237,17 @@ export class MuitoHentaiExtension implements ExtensionImpl<typeof MuitoHentaiCon
       seen.add(chapterId);
 
       const num = parseFloat((match[2] ?? "").replace("-", "."));
+      const itemEl = $(a).closest("li, tr, div, p");
+      const rawDate =
+        itemEl.find(".date, time, .created-at, small, span").first().text().trim() ||
+        $("meta[property='article:modified_time']").attr("content") ||
+        $("meta[property='article:published_time']").attr("content");
+      let publishDate: Date | undefined;
+      if (rawDate) {
+        const d = new Date(rawDate);
+        if (!isNaN(d.getTime())) publishDate = d;
+      }
+
       chapters.push({
         chapterId,
         sourceManga,
@@ -244,6 +255,7 @@ export class MuitoHentaiExtension implements ExtensionImpl<typeof MuitoHentaiCon
         chapNum: Number.isNaN(num) ? chapters.length + 1 : num,
         title: $(a).text().replace(/\s+/g, " ").trim() || `Capítulo ${match[2]}`,
         volume: 0,
+        publishDate,
       });
     });
 

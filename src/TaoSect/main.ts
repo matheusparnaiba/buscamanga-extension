@@ -294,7 +294,12 @@ export class TaoSectExtension implements ExtensionImpl<typeof ContentTemplateCon
         const name = ch.nome_capitulo || `Capítulo ${ch.sequencia || ""}`;
         const numMatch = name.match(/[\d.]+/);
         const chapNum = numMatch ? parseFloat(numMatch[0]) : parseFloat(ch.sequencia) || 0;
-        const publishDate = ch.data_insercao ? new Date(ch.data_insercao) : undefined;
+        const rawDate = ch.data_insercao || ch.created_at || ch.createdAt;
+        let publishDate: Date | undefined;
+        if (rawDate) {
+          const d = new Date(rawDate);
+          if (!isNaN(d.getTime())) publishDate = d;
+        }
 
         chapters.push({
           chapterId: id,

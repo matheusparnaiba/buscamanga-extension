@@ -379,6 +379,8 @@ export class HQNowExtension implements ExtensionImpl<typeof ContentTemplateConfi
             name
             id
             number
+            createdAt
+            updatedAt
           }
         }
       }`,
@@ -408,6 +410,12 @@ export class HQNowExtension implements ExtensionImpl<typeof ContentTemplateConfi
       const numStr = String(c.number || "0");
       const num = parseFloat(numStr) || 0;
       const title = c.name ? `#${numStr} - ${c.name}` : `Edição #${numStr}`;
+      const rawDate = c.createdAt || c.updatedAt;
+      let publishDate: Date | undefined;
+      if (rawDate) {
+        const d = new Date(rawDate);
+        if (!isNaN(d.getTime())) publishDate = d;
+      }
 
       chapters.push({
         chapterId: chapId,
@@ -416,6 +424,7 @@ export class HQNowExtension implements ExtensionImpl<typeof ContentTemplateConfi
         chapNum: num,
         title,
         volume: 0,
+        publishDate,
       });
     }
 

@@ -290,7 +290,12 @@ export class MangaFlixExtension implements ExtensionImpl<typeof ContentTemplateC
     for (const ch of chaptersList) {
       const num = typeof ch.number === "number" ? ch.number : parseFloat(ch.number) || 0;
       const title = ch.name ? `Capítulo ${num} - ${ch.name}` : `Capítulo ${num}`;
-      const publishDate = ch.iso_date ? new Date(ch.iso_date) : undefined;
+      const rawDate = ch.iso_date || ch.createdAt || ch.created_at || ch.releaseDate;
+      let publishDate: Date | undefined;
+      if (rawDate) {
+        const d = new Date(rawDate);
+        if (!isNaN(d.getTime())) publishDate = d;
+      }
 
       chapters.push({
         chapterId: ch._id,

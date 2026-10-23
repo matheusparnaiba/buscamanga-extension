@@ -332,7 +332,8 @@ export class ManhastroExtension implements ExtensionImpl<typeof ContentTemplateC
       let time: Date | undefined;
       const dateStr = item.capitulo_data || item.capituloData;
       if (dateStr) {
-        time = new Date(dateStr);
+        const d = new Date(dateStr);
+        if (!isNaN(d.getTime())) time = d;
       }
 
       chapters.push({

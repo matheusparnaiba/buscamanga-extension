@@ -420,6 +420,13 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     for (const ch of chaptersData) {
       if (!ch) continue;
       const num = ch.number != null ? ch.number : 0;
+      const rawDate = ch.publishedAt || ch.createdAt || ch.releaseDate || ch.updatedAt || ch.date;
+      let publishDate: Date | undefined;
+      if (rawDate) {
+        const d = new Date(rawDate);
+        if (!isNaN(d.getTime())) publishDate = d;
+      }
+
       chapters.push({
         chapterId: String(num),
         sourceManga,
@@ -427,6 +434,7 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
         chapNum: Number(num) || 0,
         langCode: "PT-BR",
         volume: 0,
+        publishDate,
       });
     }
 

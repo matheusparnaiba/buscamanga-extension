@@ -257,8 +257,11 @@ export class NHentaiBRExtension implements ExtensionImpl<typeof NHentaiBRConfig>
 
   async getChapters(sourceManga: SourceManga, _sinceDate?: Date): Promise<Chapter[]> {
     const $ = await fetchHtml(`${BASE_URL}/${sourceManga.mangaId}/`);
-    const published = $("meta[property='article:modified_time']").attr("content");
-    const publishDate = published ? new Date(published) : undefined;
+    const published =
+      $("meta[property='article:modified_time']").attr("content") ||
+      $("meta[property='article:published_time']").attr("content");
+    const d = published ? new Date(published) : undefined;
+    const publishDate = d && !isNaN(d.getTime()) ? d : undefined;
 
     const tabs = $("div.galeriaTab");
     if (tabs.length === 0) {

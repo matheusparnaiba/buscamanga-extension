@@ -66,50 +66,93 @@ function parsePortugueseDate(dateStr: string | null | undefined): Date | undefin
     .replace(/[\u0300-\u036f]/g, "");
   const now = new Date();
 
-  const minMatch = str.match(/ha\s*(\d+)\s*min/);
-  if (minMatch?.[1]) return new Date(now.getTime() - parseInt(minMatch[1], 10) * 60 * 1000);
+  if (
+    str.includes("agora") ||
+    str.includes("just now") ||
+    str.includes("segundo") ||
+    str.includes("second") ||
+    str === "hoje" ||
+    str === "today"
+  ) {
+    return now;
+  }
 
-  const hourMatch = str.match(/ha\s*(\d+)\s*hora/);
-  if (hourMatch?.[1]) return new Date(now.getTime() - parseInt(hourMatch[1], 10) * 3600 * 1000);
+  if (str.includes("ontem") || str.includes("yesterday")) {
+    return new Date(now.getTime() - 86400 * 1000);
+  }
 
-  if (str.includes("ontem")) return new Date(now.getTime() - 86400 * 1000);
+  const minMatch = str.match(/(?:ha\s*)?(\d+)\s*(?:minutos?|mins?|minutes?)(?:\s*(?:atras|ago))?/);
+  if (minMatch?.[1]) {
+    return new Date(now.getTime() - parseInt(minMatch[1], 10) * 60 * 1000);
+  }
 
-  const dayMatch = str.match(/ha\s*(\d+)\s*dia/);
-  if (dayMatch?.[1]) return new Date(now.getTime() - parseInt(dayMatch[1], 10) * 86400 * 1000);
+  const hourMatch = str.match(/(?:ha\s*)?(\d+)\s*(?:horas?|hours?|\bh\b)(?:\s*(?:atras|ago))?/);
+  if (hourMatch?.[1]) {
+    return new Date(now.getTime() - parseInt(hourMatch[1], 10) * 3600 * 1000);
+  }
 
-  const weekMatch = str.match(/ha\s*(\d+)\s*semana/);
-  if (weekMatch?.[1])
+  const dayMatch = str.match(/(?:ha\s*)?(\d+)\s*(?:dias?|days?)(?:\s*(?:atras|ago))?/);
+  if (dayMatch?.[1]) {
+    return new Date(now.getTime() - parseInt(dayMatch[1], 10) * 86400 * 1000);
+  }
+
+  const weekMatch = str.match(/(?:ha\s*)?(\d+)\s*(?:semanas?|weeks?)(?:\s*(?:atras|ago))?/);
+  if (weekMatch?.[1]) {
     return new Date(now.getTime() - parseInt(weekMatch[1], 10) * 7 * 86400 * 1000);
+  }
 
-  const monthMatch = str.match(/ha\s*(\d+)\s*mes/);
-  if (monthMatch?.[1])
+  const monthMatch = str.match(/(?:ha\s*)?(\d+)\s*(?:mes|meses|months?)(?:\s*(?:atras|ago))?/);
+  if (monthMatch?.[1]) {
     return new Date(now.getTime() - parseInt(monthMatch[1], 10) * 30 * 86400 * 1000);
+  }
+
+  const yearMatch = str.match(/(?:ha\s*)?(\d+)\s*(?:anos?|years?)(?:\s*(?:atras|ago))?/);
+  if (yearMatch?.[1]) {
+    return new Date(now.getTime() - parseInt(yearMatch[1], 10) * 365 * 86400 * 1000);
+  }
 
   const MONTHS_PT: Record<string, number> = {
     janeiro: 0,
     jan: 0,
+    january: 0,
     fevereiro: 1,
     fev: 1,
+    february: 1,
+    feb: 1,
     marco: 2,
     mar: 2,
+    march: 2,
     abril: 3,
     abr: 3,
+    april: 3,
+    apr: 3,
     maio: 4,
     mai: 4,
+    may: 4,
     junho: 5,
     jun: 5,
+    june: 5,
     julho: 6,
     jul: 6,
+    july: 6,
     agosto: 7,
     ago: 7,
+    august: 7,
     setembro: 8,
     set: 8,
+    september: 8,
+    sep: 8,
     outubro: 9,
     out: 9,
+    october: 9,
+    oct: 9,
     novembro: 10,
     nov: 10,
+    november: 10,
     dezembro: 11,
     dez: 11,
+    december: 11,
+    dec: 11,
   };
 
   const mdyMatch = str.match(/([a-z]+)\s+(\d{1,2}),?\s+(\d{4})/);
@@ -135,6 +178,21 @@ function parsePortugueseDate(dateStr: string | null | undefined): Date | undefin
       parseInt(slashMatch[2], 10) - 1,
       parseInt(slashMatch[1], 10),
     );
+  }
+
+  const ymdMatch = str.match(/(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
+  if (ymdMatch?.[1] && ymdMatch[2] && ymdMatch[3]) {
+    return new Date(
+      parseInt(ymdMatch[1], 10),
+      parseInt(ymdMatch[2], 10) - 1,
+      parseInt(ymdMatch[3], 10),
+    );
+  }
+
+  const shortYearMatch = str.match(/(\d{1,2})[/-](\d{1,2})[/-](\d{2})/);
+  if (shortYearMatch?.[1] && shortYearMatch[2] && shortYearMatch[3]) {
+    const yr = 2000 + parseInt(shortYearMatch[3], 10);
+    return new Date(yr, parseInt(shortYearMatch[2], 10) - 1, parseInt(shortYearMatch[1], 10));
   }
 
   const parsed = new Date(dateStr);
