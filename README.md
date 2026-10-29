@@ -9,7 +9,7 @@
 Coleção otimizada de fontes para leitura de mangás, manhwas, manhuas e quadrinhos nacionais diretamente no aplicativo Paperback.
 
 [![Paperback v0.9+](https://img.shields.io/badge/Paperback-v0.9+-F97316?style=for-the-badge&logo=apple&logoColor=white)](https://paperback.moe/)
-[![Fontes Disponíveis](https://img.shields.io/badge/Fontes-25%20Dispon%C3%ADveis-10B981?style=for-the-badge&logo=safari&logoColor=white)](#-fontes-disponíveis)
+[![Fontes Disponíveis](https://img.shields.io/badge/Fontes-27%20Dispon%C3%ADveis-10B981?style=for-the-badge&logo=safari&logoColor=white)](#-fontes-disponíveis)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](LICENSE)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Ativo-success?style=for-the-badge&logo=github)](https://matheusparnaiba.github.io/buscamanga-extension/)
@@ -32,10 +32,11 @@ O **BuscaMangá Extension** é um repositório desenvolvido para suprir a demand
 
 ## 📦 Fontes Disponíveis
 
-Todas as 25 extensões estão catalogadas e sincronizadas no GitHub Pages:
+Todas as 27 extensões estão catalogadas e sincronizadas no GitHub Pages:
 
 |                                            Ícone                                            | Nome                   |  Versão  | Site Oficial                                                         | Categoria / Recurso                     |   Status    |
 | :-----------------------------------------------------------------------------------------: | :--------------------- | :------: | :------------------------------------------------------------------- | :-------------------------------------- | :---------: |
+|          <img src="src/MangaDex/icon.png" width="28" height="28" alt="MangaDex" />          | **MangaDex**           | `1.0.0`  | [mangadex.org](https://mangadex.org)                                 | Catálogo Global • `API Oficial v5` 🌐   |  🟢 Ativo   |
 |        <img src="src/MangaFlix/icon.png" width="28" height="28" alt="Manga Flix" />         | **Manga Flix**         | `1.0.2`  | [mangaflix.net](https://mangaflix.net)                               | Mangás & Manhwas                        |  🟢 Ativo   |
 |          <img src="src/TaoSect/icon.png" width="28" height="28" alt="Tao Sect" />           | **Tao Sect**           | `1.0.3`  | [taosect.com](https://taosect.com)                                   | Artes Marciais & Seinen                 |  🟢 Ativo   |
 |       <img src="src/ArthurScan/icon.png" width="28" height="28" alt="Arthur Scan" />        | **Arthur Scan**        | `1.0.5`  | [arthurscan.xyz](https://arthurscan.xyz)                             | Ação & Cultivação                       |  🟢 Ativo   |
@@ -44,6 +45,7 @@ Todas as 25 extensões estão catalogadas e sincronizadas no GitHub Pages:
 |   <img src="src/BorutoExplorer/icon.png" width="28" height="28" alt="Boruto Explorer" />    | **Boruto Explorer**    | `1.0.3`  | [leitor.borutoexplorer.com.br](https://leitor.borutoexplorer.com.br) | Naruto & Boruto                         |  🟢 Ativo   |
 |        <img src="src/YuriOnAir/icon.png" width="28" height="28" alt="Yuri on Air" />        | **Yuri on Air**        | `1.0.4`  | [yurionair.top](https://yurionair.top)                               | Yuri & Shoujo Ai                        |  🟢 Ativo   |
 |     <img src="src/AcervoHentai/icon.png" width="28" height="28" alt="Acervo Hentai" />      | **Acervo Hentai**      | `1.0.0`  | [acervohentai.com](https://acervohentai.com)                         | Pornhwa & Manhwa Adulto • +18           |  🟢 Ativo   |
+|     <img src="src/BrasilHentai/icon.png" width="28" height="28" alt="Brasil Hentai" />      | **Brasil Hentai**      | `1.0.0`  | [brasilhentai.com](https://brasilhentai.com)                         | Doujinshis & Mangás • +18               |  🟢 Ativo   |
 |        <img src="src/NHentaiBR/icon.png" width="28" height="28" alt="NHentai BR" />         | **NHentai BR**         | `1.0.5`  | [nhentaibr.com](https://nhentaibr.com)                               | Hentai & Doujinshi • +18                |  🟢 Ativo   |
 |      <img src="src/MundoHentai/icon.png" width="28" height="28" alt="Mundo Hentai" />       | **Mundo Hentai**       | `1.0.5`  | [mundohentaioficial.com](https://mundohentaioficial.com)             | Hentai & Doujinshi • +18                |  🟢 Ativo   |
 |      <img src="src/MuitoHentai/icon.png" width="28" height="28" alt="Muito Hentai" />       | **Muito Hentai**       | `1.0.6`  | [muitohentai.com](https://www.muitohentai.com)                       | Hentai Mangá • +18                      |  🟢 Ativo   |
