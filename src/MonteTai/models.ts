@@ -1,0 +1,44 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+import type { Tag } from "@paperback/types";
+
+export const ORDER_OPTIONS: Tag[] = [
+  { id: "views", title: "Mais Vistos" },
+  { id: "latest", title: "Últimas Atualizações" },
+  { id: "alphabet", title: "Ordem Alfabética" },
+  { id: "rating", title: "Melhor Avaliados" },
+];
+
+export const GENRE_OPTIONS: Tag[] = [
+  { id: "all", title: "Todos os Gêneros" },
+  { id: "acao", title: "Ação" },
+  { id: "artes-marciais", title: "Artes Marciais" },
+  { id: "aventura", title: "Aventura" },
+  { id: "comedia", title: "Comédia" },
+  { id: "cultivacao", title: "Cultivação" },
+  { id: "drama", title: "Drama" },
+  { id: "fantasia", title: "Fantasia" },
+  { id: "harem", title: "Harém" },
+  { id: "isekai", title: "Isekai" },
+  { id: "magia", title: "Magia" },
+  { id: "manhua", title: "Manhua" },
+  { id: "manhwa", title: "Manhwa" },
+  { id: "reencarnacao", title: "Reencarnação" },
+  { id: "romance", title: "Romance" },
+  { id: "shounen", title: "Shounen" },
+  { id: "sobrenatural", title: "Sobrenatural" },
+  { id: "wuxia", title: "Wuxia" },
+  { id: "xianxia", title: "Xianxia" },
+  { id: "xuanhuan", title: "Xuanhuan" },
+];
+
+export const STATUS_OPTIONS: Tag[] = [
+  { id: "all", title: "Todos os Status" },
+  { id: "on-going", title: "Em Lançamento" },
+  { id: "end", title: "Completo" },
+];
+
+export type ContentTemplateSearchMetadata = {
+  orderBy?: "views" | "latest" | "alphabet" | "rating";
+  genre?: string;
+  status?: string;
+};

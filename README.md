@@ -9,7 +9,7 @@
 Coleção otimizada de fontes para leitura de mangás, manhwas, manhuas e quadrinhos nacionais diretamente no aplicativo Paperback.
 
 [![Paperback v0.9+](https://img.shields.io/badge/Paperback-v0.9+-F97316?style=for-the-badge&logo=apple&logoColor=white)](https://paperback.moe/)
-[![Fontes Disponíveis](https://img.shields.io/badge/Fontes-27%20Dispon%C3%ADveis-10B981?style=for-the-badge&logo=safari&logoColor=white)](#-fontes-disponíveis)
+[![Fontes Disponíveis](https://img.shields.io/badge/Fontes-62%20Dispon%C3%ADveis-10B981?style=for-the-badge&logo=safari&logoColor=white)](#-fontes-disponíveis)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](LICENSE)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Ativo-success?style=for-the-badge&logo=github)](https://matheusparnaiba.github.io/buscamanga-extension/)
@@ -32,7 +32,7 @@ O **BuscaMangá Extension** é um repositório desenvolvido para suprir a demand
 
 ## 📦 Fontes Disponíveis
 
-Todas as 27 extensões estão catalogadas e sincronizadas no GitHub Pages:
+Todas as 62 extensões estão catalogadas e sincronizadas no GitHub Pages:
 
 |                                            Ícone                                            | Nome                   |  Versão  | Site Oficial                                                         | Categoria / Recurso                     |   Status    |
 | :-----------------------------------------------------------------------------------------: | :--------------------- | :------: | :------------------------------------------------------------------- | :-------------------------------------- | :---------: |
@@ -63,6 +63,41 @@ Todas as 27 extensões estão catalogadas e sincronizadas no GitHub Pages:
 |     <img src="src/NebulosaScan/icon.png" width="28" height="28" alt="Nebulosa Scan" />      | **Nebulosa Scan**      | `1.0.5`  | [nebulosascan.com](https://nebulosascan.com)                         | Scans Exclusivas                        |  🟢 Ativo   |
 |           <img src="src/Fliptru/icon.png" width="28" height="28" alt="Fliptru" />           | **Fliptru**            | `1.0.3`  | [fliptru.com.br](https://fliptru.com.br)                             | Quadrinhos Nacionais Independentes      |  🟢 Ativo   |
 |            <img src="src/HQNow/icon.png" width="28" height="28" alt="HQ Now" />             | **HQ Now**             | `1.0.3`  | [hq-now.com](https://www.hq-now.com)                                 | Quadrinhos Ocidentais & HQs             |  🟢 Ativo   |
+|        <img src="src/Azuretoons/icon.png" width="28" height="28" alt="Azuretoons" />        | **Azuretoons**         | `1.0.0`  | [azuretoons.com](https://azuretoons.com)                             | Manhwas & Ação                          |  🟢 Ativo   |
+|         <img src="src/MonteTai/icon.png" width="28" height="28" alt="Monte Tai" />          | **Monte Tai**          | `1.0.0`  | [montetaiscanlator.xyz](https://montetaiscanlator.xyz)               | Cultivação & Manhuas                    |  🟢 Ativo   |
+|      <img src="src/FlowerManga/icon.png" width="28" height="28" alt="Flower Mangas" />      | **Flower Mangas**      | `1.0.0`  | [flowermangas.net](https://flowermangas.net)                         | Mangás & Manhwas                        |  🟢 Ativo   |
+|        <img src="src/CovenScan/icon.png" width="28" height="28" alt="Coven Scan" />         | **Coven Scan**         | `1.0.0`  | [covendasbruxonas.com](https://covendasbruxonas.com)                 | Manhwas Adultos • +18                   |  🟢 Ativo   |
+|     <img src="src/TankouHentai/icon.png" width="28" height="28" alt="Tankou Hentai" />      | **Tankou Hentai**      | `1.0.0`  | [tankouhentai.com](https://tankouhentai.com)                         | Tankoubon & Hentai • +18                |  🟢 Ativo   |
+|     <img src="src/HentaiSeason/icon.png" width="28" height="28" alt="Hentai Season" />      | **Hentai Season**      | `1.0.0`  | [hentaiseason.com](https://hentaiseason.com)                         | Doujinshis & Packs • +18                |  🟢 Ativo   |
+|      <img src="src/HentaiTokyo/icon.png" width="28" height="28" alt="Hentai Tokyo" />       | **Hentai Tokyo**       | `1.0.0`  | [hentaitokyo.net](https://hentaitokyo.net)                           | Quadrinhos Eróticos • +18               |  🟢 Ativo   |
+|       <img src="src/HoraHentai/icon.png" width="28" height="28" alt="Hora Hentai" />        | **Hora Hentai**        | `1.0.0`  | [horahentai.com](https://horahentai.com)                             | Mangás Hentai • +18                     |  🟢 Ativo   |
+|           <img src="src/ZettaHQ/icon.png" width="28" height="28" alt="ZettaHQ" />           | **ZettaHQ**            | `1.0.0`  | [zettahq.com](https://zettahq.com)                                   | Hentai 3D & Comics • +18                |  🟢 Ativo   |
+|   <img src="src/BlackoutComics/icon.png" width="28" height="28" alt="Blackout Comics" />    | **Blackout Comics**    | `1.0.0`  | [blackoutcomics.com](https://blackoutcomics.com)                     | Comics Adultos • +18                    |  🟢 Ativo   |
+|         <img src="src/Capitoons/icon.png" width="28" height="28" alt="Capitoons" />         | **Capitoons**          | `1.0.0`  | [capitoons.com](https://capitoons.com)                               | Webtoons & Manhwas                      |  🟢 Ativo   |
+| <img src="src/MugiwarasOficial/icon.png" width="28" height="28" alt="Mugiwaras Oficial" />  | **Mugiwaras Oficial**  | `1.0.0`  | [mugiwarasoficial.org](https://mugiwarasoficial.org)                 | Shonen & Ação                           |  🟢 Ativo   |
+|     <img src="src/PizzariaScan/icon.png" width="28" height="28" alt="Pizzaria Scan" />      | **Pizzaria Scan**      | `1.0.0`  | [pizzariacomics.com](https://pizzariacomics.com)                     | Mangás & Webtoons                       |  🟢 Ativo   |
+|       <img src="src/KuroMangas/icon.png" width="28" height="28" alt="Kuro Mangás" />        | **Kuro Mangás**        | `1.0.0`  | [kuromangas.com](https://kuromangas.com)                             | Catálogo Geral • API                    |  🟢 Ativo   |
+|      <img src="src/NexusMangas/icon.png" width="28" height="28" alt="Nexus Mangás" />       | **Nexus Mangás**       | `1.0.0`  | [nexusmangas.com](https://www.nexusmangas.com)                       | Manhwas & Mangás • Supabase             |  🟢 Ativo   |
+|  <img src="src/TraducoesDoLipe/icon.png" width="28" height="28" alt="Traduções do Lipe" />  | **Traduções do Lipe**  | `1.0.0`  | [traducoesdolipe.blogspot.com](https://traducoesdolipe.blogspot.com) | Mangás Clássicos & Retrô                |  🟢 Ativo   |
+|      <img src="src/ApenasUmaFa/icon.png" width="28" height="28" alt="Apenas Uma Fã" />      | **Apenas Uma Fã**      | `1.0.0`  | [apenasuma-fa.blogspot.com](https://apenasuma-fa.blogspot.com)       | Obras Independentes                     |  🟢 Ativo   |
+|       <img src="src/GalaxScans/icon.png" width="28" height="28" alt="GALAX Scans" />        | **GALAX Scans**        | `1.0.0`  | [galaxscanlator.blogspot.com](https://galaxscanlator.blogspot.com)   | Shonen & Fantasia                       |  🟢 Ativo   |
+|     <img src="src/HanmokkuScan/icon.png" width="28" height="28" alt="Hanmokku Scan" />      | **Hanmokku Scan**      | `1.0.0`  | [hanmokkuscan.blogspot.com](https://hanmokkuscan.blogspot.com)       | Mangás Shonen                           |  🟢 Ativo   |
+|           <img src="src/Ler999/icon.png" width="28" height="28" alt="Ler 999" />            | **Ler 999**            | `1.0.0`  | [ler999.blogspot.com](https://ler999.blogspot.com)                   | Comics Ocidentais                       |  🟢 Ativo   |
+|         <img src="src/EgoToons/icon.png" width="28" height="28" alt="Ego Toons" />          | **Ego Toons**          | `1.0.0`  | [egotoons.com](https://egotoons.com)                                 | Manhwas & Webtoons (API)                |  🟢 Ativo   |
+|        <img src="src/Astratoons/icon.png" width="28" height="28" alt="AstraToons" />        | **AstraToons**         | `1.0.0`  | [new.astratoons.com](https://new.astratoons.com)                     | Webtoons & Mangás                       |  🟢 Ativo   |
+|      <img src="src/PlumaComics/icon.png" width="28" height="28" alt="Pluma Comics" />       | **Pluma Comics**       | `1.0.0`  | [plumacomics.cloud](https://plumacomics.cloud)                       | Manhuas & Cultivação                    |  🟢 Ativo   |
+|     <img src="src/RFDragonScan/icon.png" width="28" height="28" alt="RF Dragon Scan" />     | **RF Dragon Scan**     | `1.0.0`  | [rfdragonscan.net](https://rfdragonscan.net)                         | Manhwas de Ação & Fantasia              |  🟢 Ativo   |
+|      <img src="src/GeassComics/icon.png" width="28" height="28" alt="Geass Comics" />       | **Geass Comics**       | `1.0.0`  | [geasscomics.xyz](https://geasscomics.xyz)                           | Manhwas & Shonen                        |  🟢 Ativo   |
+|         <img src="src/Vegitoons/icon.png" width="28" height="28" alt="Vegitoons" />         | **Vegitoons**          | `1.0.0`  | [vegitoons.black](https://vegitoons.black)                           | Manhwas & Webtoons                      |  🟢 Ativo   |
+|         <img src="src/Hipercool/icon.png" width="28" height="28" alt="Hipercool" />         | **HipercooL**          | `1.0.0`  | [lerhentais.com](https://lerhentais.com)                             | Adulto, Pornhwa & Doujinshi • +18       |  🟢 Ativo   |
+|         <img src="src/MangaDash/icon.png" width="28" height="28" alt="MangaDash" />         | **MangaDash**          | `1.0.0`  | [mangadash.net](https://mangadash.net)                               | Mangás & Agregador Ágil                 |  🟢 Ativo   |
+|         <img src="src/OneReader/icon.png" width="28" height="28" alt="OneReader" />         | **OneReader**          | `1.0.0`  | [onereader.net](https://onereader.net)                               | Leitor Diário de Mangás                 |  🟢 Ativo   |
+|           <img src="src/Roxinha/icon.png" width="28" height="28" alt="Roxinha" />           | **Roxinha**            | `1.0.0`  | [roxinha.online](https://roxinha.online)                             | Agregador de Mangás                     |  🟢 Ativo   |
+|       <img src="src/YomuComics/icon.png" width="28" height="28" alt="Yomu Comics" />        | **Yomu Comics**        | `1.0.0`  | [yomu.com.br](https://yomu.com.br)                                   | Mangás, Manhwas & Novels                |  🟢 Ativo   |
+|      <img src="src/TaimuMangas/icon.png" width="28" height="28" alt="Taimu Mangás" />       | **Taimu Mangás**       | `1.0.0`  | [beta.taimumangas.com](https://beta.taimumangas.com)                 | Plataforma Moderna de Mangás            |  🟢 Ativo   |
+|             <img src="src/Taiyo/icon.png" width="28" height="28" alt="Taiyō" />             | **Taiyō**              | `1.0.0`  | [taiyo.moe](https://taiyo.moe)                                       | Plataforma Comunitária (Meilisearch)    |  🟢 Ativo   |
+|            <img src="src/ToonBr/icon.png" width="28" height="28" alt="ToonBr" />            | **ToonBr**             | `1.0.0`  | [beta.toonbr.com](https://beta.toonbr.com)                           | Leitura Digital de Quadrinhos           |  🟢 Ativo   |
+|           <img src="src/BRScans/icon.png" width="28" height="28" alt="BRScans" />           | **BRScans**            | `1.0.0`  | [brscans.vercel.app](https://brscans.vercel.app)                     | Leitor Ágil na Vercel                   |  🟢 Ativo   |
 
 > ℹ️ _Sites protegidos por Cloudflare utilizam rotinas de bypass compatíveis com o ambiente de execução do Paperback._
 >
