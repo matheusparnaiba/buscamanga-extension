@@ -5078,6 +5078,109 @@
                 </p>
               </div>
             </details>
+
+            <!-- FAQ 7: Envio de Nova Fonte -->
+            <details
+              class="theme-card group bg-white dark:bg-[#18181b] border border-zinc-200/80 dark:border-white/10 rounded-2xl p-6 [&_summary::-webkit-details-marker]:hidden cursor-pointer shadow-sm"
+            >
+              <summary
+                class="theme-text-title flex items-center justify-between gap-4 font-heading font-bold text-zinc-900 dark:text-white text-base"
+              >
+                <span>Como sugerir ou enviar uma nova fonte para o repositório?</span>
+                <span class="text-orange-500 group-open:rotate-180 transition-transform">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </span>
+              </summary>
+              <div
+                class="theme-text-muted mt-4 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed space-y-2"
+              >
+                <p>
+                  O <strong>BuscaMangá</strong> é um projeto comunitário e aberto a contribuições.
+                  Você pode sugerir ou enviar novas fontes de duas formas:
+                </p>
+                <ul class="list-disc list-inside space-y-2 pl-1">
+                  <li>
+                    <strong>Sugerir uma fonte (sem programar):</strong> Abra uma sugestão na aba de
+                    <a
+                      href="https://github.com/matheusparnaiba/buscamanga-extension/issues/new?title=%5BSugest%C3%A3o%5D+Nova+Fonte%3A+&labels=enhancement"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-orange-600 dark:text-orange-400 underline font-medium"
+                      >Issues do GitHub</a
+                    >. Informe o nome do site, link oficial e os gêneros que ele publica. A
+                    comunidade analisará a viabilidade e desenvolverá a extensão.
+                  </li>
+                  <li>
+                    <strong>Enviar uma extensão pronta (Desenvolvedores):</strong> Faça um fork do
+                    repositório, implemente a fonte na pasta <code>src/NomeDaFonte/</code> no padrão
+                    Paperback v0.9, valide os testes com <code>npm run conformance</code> e abra um
+                    <strong>Pull Request</strong>. Após revisão técnica, ela será incluída no
+                    catálogo.
+                  </li>
+                </ul>
+              </div>
+            </details>
+
+            <!-- FAQ 8: Solicitação de Remoção por Donos de Sites -->
+            <details
+              class="theme-card group bg-white dark:bg-[#18181b] border border-zinc-200/80 dark:border-white/10 rounded-2xl p-6 [&_summary::-webkit-details-marker]:hidden cursor-pointer shadow-sm"
+            >
+              <summary
+                class="theme-text-title flex items-center justify-between gap-4 font-heading font-bold text-zinc-900 dark:text-white text-base"
+              >
+                <span>Sou dono ou administrador de um site/scan, como solicitar a remoção?</span>
+                <span class="text-orange-500 group-open:rotate-180 transition-transform">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </span>
+              </summary>
+              <div
+                class="theme-text-muted mt-4 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed space-y-2"
+              >
+                <p>
+                  Respeitamos integralmente o trabalho e as decisões de autores, tradutores e
+                  administradores de plataformas. Vale ressaltar que o repositório
+                  <strong>não armazena, hospeda ou redistribui imagens ou arquivos</strong>; as
+                  extensões funcionam apenas como um navegador direcionador que lê o conteúdo já
+                  público na web.
+                </p>
+                <p>
+                  Caso você seja o proprietário legal ou mantenedor de um site/scan e prefira que
+                  sua fonte não seja indexada ou disponibilizada no BuscaMangá:
+                </p>
+                <ol class="list-decimal list-inside space-y-1.5 pl-1">
+                  <li>
+                    Abra uma issue no nosso
+                    <a
+                      href="https://github.com/matheusparnaiba/buscamanga-extension/issues"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-orange-600 dark:text-orange-400 underline font-medium"
+                      >GitHub Issues</a
+                    >
+                    com o título <code>[Remoção / Takedown] Nome da Fonte</code> comprovando a
+                    titularidade ou administração do domínio.
+                  </li>
+                  <li>
+                    A solicitação será tratada com total prioridade e a extensão será imediatamente
+                    descontinuada e removida do catálogo público e das compilações do repositório.
+                  </li>
+                </ol>
+              </div>
+            </details>
           </div>
         </div>
       </section>
