@@ -57,57 +57,68 @@ jobs:
               v.repository.website = 'https://github.com/matheusparnaiba';
             }
             const CATEGORIES = {
+              AcervoHentai: [{ label: 'Pornhwas', textColor: '#ffffff', backgroundColor: '#8b5cf6' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
+              ApenasUmaFa: [{ label: 'Manhwas & Romances', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
               ArthurScan: [{ label: 'Ação & Cultivação', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
+              Astratoons: [{ label: 'Manhwas & Webtoons', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
+              Azuretoons: [{ label: 'Webtoons & Ação', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
+              BlackoutComics: [{ label: 'Comics Adultas', textColor: '#ffffff', backgroundColor: '#ef4444' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
               BorutoExplorer: [{ label: 'Naruto & Boruto', textColor: '#ffffff', backgroundColor: '#f97316' }],
+              BrasilHentai: [{ label: 'Doujinshis & Mangás', textColor: '#ffffff', backgroundColor: '#8b5cf6' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
+              BRScans: [{ label: 'Manhwas & Webtoons', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
+              Capitoons: [{ label: 'Webtoons & Shonen', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
+              CovenScan: [{ label: 'Webtoons +18', textColor: '#ffffff', backgroundColor: '#ec4899' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
+              EgoToons: [{ label: 'Manhwas & Manhuas', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
               Fliptru: [{ label: 'Quadrinhos Nacionais', textColor: '#ffffff', backgroundColor: '#10b981' }],
-              HentaiHQ: [
-                { label: 'HQs & Comics', textColor: '#ffffff', backgroundColor: '#ef4444' },
-                { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }
-              ],
-              Hipertoon: [
-                { label: 'Manhwas', textColor: '#ffffff', backgroundColor: '#8b5cf6' },
-                { label: 'Cloudflare', textColor: '#000000', backgroundColor: '#f59e0b' }
-              ],
-              HQHentai: [
-                { label: 'HQs & Doujinshis', textColor: '#ffffff', backgroundColor: '#ef4444' },
-                { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }
-              ],
+              FlowerManga: [{ label: 'Shoujo & Romance', textColor: '#ffffff', backgroundColor: '#ec4899' }],
+              GalaxScans: [{ label: 'Mangás de Ação', textColor: '#ffffff', backgroundColor: '#3b82f6' }],
+              GeassComics: [{ label: 'Manhwas & Ação', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
+              HanmokkuScan: [{ label: 'Cultivação & Artes Marciais', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
+              HentaiHQ: [{ label: 'HQs & Comics', textColor: '#ffffff', backgroundColor: '#ef4444' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
+              HentaiSeason: [{ label: 'Doujinshis', textColor: '#ffffff', backgroundColor: '#8b5cf6' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
+              HentaiTokyo: [{ label: 'Mangás Hentai', textColor: '#ffffff', backgroundColor: '#8b5cf6' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
+              Hipercool: [{ label: 'Mangás & Webtoons', textColor: '#ffffff', backgroundColor: '#8b5cf6' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
+              Hipertoon: [{ label: 'Manhwas', textColor: '#ffffff', backgroundColor: '#8b5cf6' }, { label: 'Cloudflare', textColor: '#000000', backgroundColor: '#f59e0b' }],
+              HoraHentai: [{ label: 'Mangás & Doujins', textColor: '#ffffff', backgroundColor: '#8b5cf6' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
+              HQHentai: [{ label: 'HQs & Doujinshis', textColor: '#ffffff', backgroundColor: '#ef4444' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
               HQNow: [{ label: 'HQs & Comics', textColor: '#ffffff', backgroundColor: '#ef4444' }],
-              HQPorno: [
-                { label: 'Quadrinhos Eróticos', textColor: '#ffffff', backgroundColor: '#ef4444' },
-                { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }
-              ],
+              HQPorno: [{ label: 'Quadrinhos Eróticos', textColor: '#ffffff', backgroundColor: '#ef4444' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
               KamiSamaExplorer: [{ label: 'Dragon Ball & Shonen', textColor: '#ffffff', backgroundColor: '#f59e0b' }],
+              KuroMangas: [{ label: 'Mangás Tradicionais', textColor: '#ffffff', backgroundColor: '#3b82f6' }],
               LeituraManga: [{ label: 'Mangás & Manhuas', textColor: '#ffffff', backgroundColor: '#3b82f6' }],
+              Ler999: [{ label: 'Manhuas & Cultivação', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
+              MangaDash: [{ label: 'Shonen & Seinen', textColor: '#ffffff', backgroundColor: '#3b82f6' }],
+              MangaDex: [{ label: 'API Oficial PT-BR', textColor: '#ffffff', backgroundColor: '#f97316' }, { label: 'Global', textColor: '#ffffff', backgroundColor: '#10b981' }],
               MangaFlix: [{ label: 'Mangás & Manhwas', textColor: '#ffffff', backgroundColor: '#3b82f6' }],
               MangaLivreBlog: [{ label: 'Mangás Diversos', textColor: '#ffffff', backgroundColor: '#3b82f6' }],
               MangaLivreTo: [{ label: 'Mangás Populares', textColor: '#ffffff', backgroundColor: '#3b82f6' }],
-              MangaNYX: [
-                { label: 'Catálogo Geral', textColor: '#ffffff', backgroundColor: '#6366f1' },
-                { label: 'Cloudflare', textColor: '#000000', backgroundColor: '#f59e0b' }
-              ],
+              MangaNYX: [{ label: 'Catálogo Geral', textColor: '#ffffff', backgroundColor: '#6366f1' }, { label: 'Cloudflare', textColor: '#000000', backgroundColor: '#f59e0b' }],
               MangaOnline: [{ label: 'Mangás & Manhwas', textColor: '#ffffff', backgroundColor: '#3b82f6' }],
-              MangasBrasuka: [
-                { label: 'Mangás & Scans', textColor: '#ffffff', backgroundColor: '#06b6d4' },
-                { label: 'Cloudflare', textColor: '#000000', backgroundColor: '#f59e0b' }
-              ],
+              MangasBrasuka: [{ label: 'Mangás & Scans', textColor: '#ffffff', backgroundColor: '#06b6d4' }, { label: 'Cloudflare', textColor: '#000000', backgroundColor: '#f59e0b' }],
               Manhastro: [{ label: 'Manhwas & Ação', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
-              MuitoHentai: [
-                { label: 'Mangás & Quadrinhos', textColor: '#ffffff', backgroundColor: '#8b5cf6' },
-                { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }
-              ],
-              MundoHentai: [
-                { label: 'Doujinshis & Mangás', textColor: '#ffffff', backgroundColor: '#8b5cf6' },
-                { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }
-              ],
+              MonteTai: [{ label: 'Cultivação Oriental', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
+              MugiwarasOficial: [{ label: 'One Piece & Shonen', textColor: '#ffffff', backgroundColor: '#f97316' }],
+              MuitoHentai: [{ label: 'Mangás & Quadrinhos', textColor: '#ffffff', backgroundColor: '#8b5cf6' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
+              MundoHentai: [{ label: 'Doujinshis & Mangás', textColor: '#ffffff', backgroundColor: '#8b5cf6' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
               NebulosaScan: [{ label: 'Scans Exclusivas', textColor: '#ffffff', backgroundColor: '#ec4899' }],
-              NHentaiBR: [
-                { label: 'Doujinshis & Comics', textColor: '#ffffff', backgroundColor: '#f97316' },
-                { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }
-              ],
+              NexusMangas: [{ label: 'Manhwas & Webtoons', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
+              NHentaiBR: [{ label: 'Doujinshis & Comics', textColor: '#ffffff', backgroundColor: '#f97316' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
               NinjaScan: [{ label: 'Manhwas & Fantasia', textColor: '#ffffff', backgroundColor: '#06b6d4' }],
+              OneReader: [{ label: 'Mangás Diários', textColor: '#ffffff', backgroundColor: '#3b82f6' }],
+              PizzariaScan: [{ label: 'Comédia & Ecchi', textColor: '#ffffff', backgroundColor: '#f59e0b' }],
+              PlumaComics: [{ label: 'Cultivação & Manhuas', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
+              RFDragonScan: [{ label: 'Manhwas de Ação', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
+              Roxinha: [{ label: 'Catálogo Variado', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
+              TaimuMangas: [{ label: 'Mangás & Manhwas', textColor: '#ffffff', backgroundColor: '#3b82f6' }],
+              Taiyo: [{ label: 'Comunidade Aberta', textColor: '#ffffff', backgroundColor: '#10b981' }],
+              TankouHentai: [{ label: 'Tankoubon Sem Censura', textColor: '#ffffff', backgroundColor: '#8b5cf6' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
               TaoSect: [{ label: 'Artes Marciais & Seinen', textColor: '#ffffff', backgroundColor: '#ef4444' }],
-              YuriOnAir: [{ label: 'Yuri & Shoujo Ai', textColor: '#ffffff', backgroundColor: '#ec4899' }]
+              ToonBr: [{ label: 'Webtoons Modernos', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
+              TraducoesDoLipe: [{ label: 'Clássicos & Retrô', textColor: '#ffffff', backgroundColor: '#64748b' }],
+              Vegitoons: [{ label: 'Manhwas & Comics', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
+              YomuComics: [{ label: 'Next.js & Acervo', textColor: '#ffffff', backgroundColor: '#6366f1' }],
+              YuriOnAir: [{ label: 'Yuri & Shoujo Ai', textColor: '#ffffff', backgroundColor: '#ec4899' }],
+              ZettaHQ: [{ label: 'Hentai 3D & Comics', textColor: '#ffffff', backgroundColor: '#ef4444' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }]
             };
             v.sources = v.sources.map(s => {
               s.author = (s.developers && s.developers[0]) ? s.developers[0].name : 'matheusparnaiba';
