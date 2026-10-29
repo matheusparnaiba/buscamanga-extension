@@ -53,7 +53,7 @@
       .animate-marquee-infinite {
         display: flex;
         width: max-content;
-        animation: marquee-drift 55s linear infinite;
+        animation: marquee-drift 160s linear infinite;
       }
       .animate-marquee-infinite:hover {
         animation-play-state: paused;
@@ -4594,7 +4594,7 @@
               if (!isAutoPlaying || isFullGridView) return;
               autoPlayTimer = setInterval(function () {
                 nextCarouselPage();
-              }, 4200);
+              }, 7500);
             }
 
             function pauseAutoPlay() {
