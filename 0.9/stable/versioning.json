@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-10-29T21:40:44.692Z",
+  "buildTime": "2026-10-29T21:50:57.846Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -102,6 +102,37 @@
       "id": "BorutoExplorer",
       "author": "matheusparnaiba",
       "desc": "Extensão da comunidade Boruto Explorer com foco no universo de Naruto e Boruto.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Brasil Hentai",
+      "description": "Extensão do Brasil Hentai com foco em doujinshis, mangás e quadrinhos adultos (+18).",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [
+        {
+          "label": "18+",
+          "textColor": "#FFFFFF",
+          "backgroundColor": "#DC2626"
+        }
+      ],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "BrasilHentai",
+      "author": "matheusparnaiba",
+      "desc": "Extensão do Brasil Hentai com foco em doujinshis, mangás e quadrinhos adultos (+18).",
       "website": "https://github.com/matheusparnaiba"
     },
     {
@@ -371,6 +402,37 @@
       "id": "LeituraManga",
       "author": "matheusparnaiba",
       "desc": "Extensão do \"https://leituramanga.net\"",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "MangaDex",
+      "description": "Extensão do MangaDex com catálogo de mangás e capítulos traduzidos em Português (PT-BR).",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [
+        {
+          "label": "PT-BR",
+          "textColor": "#FFFFFF",
+          "backgroundColor": "#10B981"
+        }
+      ],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "MangaDex",
+      "author": "matheusparnaiba",
+      "desc": "Extensão do MangaDex com catálogo de mangás e capítulos traduzidos em Português (PT-BR).",
       "website": "https://github.com/matheusparnaiba"
     },
     {
