@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-10-29T21:54:36.674Z",
+  "buildTime": "2026-10-29T23:01:14.989Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -43,6 +43,31 @@
       "website": "https://github.com/matheusparnaiba"
     },
     {
+      "name": "Apenas Uma Fã",
+      "description": "Extensão oficial da Apenas Uma Fã com foco em manhwas, webtoons e romances.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "ApenasUmaFa",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial da Apenas Uma Fã com foco em manhwas, webtoons e romances.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
       "name": "Arthur Scan",
       "description": "Extensão oficial da Arthur Scan com foco em manhwas, cultivação e ação.",
       "version": "1.0.5",
@@ -71,6 +96,112 @@
       "id": "ArthurScan",
       "author": "matheusparnaiba",
       "desc": "Extensão oficial da Arthur Scan com foco em manhwas, cultivação e ação.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Astratoons",
+      "description": "Extensão oficial do Astratoons com grande catálogo de manhwas, manhuas e webtoons.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-BR",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "Astratoons",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial do Astratoons com grande catálogo de manhwas, manhuas e webtoons.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Azuretoons",
+      "description": "Extensão oficial da Azuretoons com foco em manhwas, webtoons e mangás traduzidos em português.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "Azuretoons",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial da Azuretoons com foco em manhwas, webtoons e mangás traduzidos em português.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "BR Scans",
+      "description": "Extensão oficial da BR Scans com foco em manhwas e webtoons com múltiplas variantes de leitura.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-BR",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "BRScans",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial da BR Scans com foco em manhwas e webtoons com múltiplas variantes de leitura.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Blackout Comics",
+      "description": "Extensão oficial do Blackout Comics com acervo de pornhwas, webtoons e quadrinhos adultos (+18).",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [
+        {
+          "label": "18+",
+          "textColor": "#FFFFFF",
+          "backgroundColor": "#DC2626"
+        }
+      ],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "BlackoutComics",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial do Blackout Comics com acervo de pornhwas, webtoons e quadrinhos adultos (+18).",
       "website": "https://github.com/matheusparnaiba"
     },
     {
@@ -136,6 +267,87 @@
       "website": "https://github.com/matheusparnaiba"
     },
     {
+      "name": "Capitoons",
+      "description": "Extensão do Capitoons com foco em manhwas, webtoons e shonen.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "Capitoons",
+      "author": "matheusparnaiba",
+      "desc": "Extensão do Capitoons com foco em manhwas, webtoons e shonen.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Coven Scan",
+      "description": "Extensão da Coven Scan focada em webtoons, manhwas e conteúdo adulto (+18).",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [
+        {
+          "label": "18+",
+          "textColor": "#FFFFFF",
+          "backgroundColor": "#DC2626"
+        }
+      ],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "CovenScan",
+      "author": "matheusparnaiba",
+      "desc": "Extensão da Coven Scan focada em webtoons, manhwas e conteúdo adulto (+18).",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "EgoToons",
+      "description": "Extensão oficial do EgoToons com foco em manhwas, manhuas e webtoons em português.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-BR",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "EgoToons",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial do EgoToons com foco em manhwas, manhuas e webtoons em português.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
       "name": "Fliptru",
       "description": "Extensão do \"https://fliptru.com.br\"",
       "version": "1.0.3",
@@ -164,6 +376,81 @@
       "id": "Fliptru",
       "author": "matheusparnaiba",
       "desc": "Extensão do \"https://fliptru.com.br\"",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Flower Mangas",
+      "description": "Extensão oficial da Flower Mangas com foco em shoujo, romance, manhwas e mangás traduzidos.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "FlowerManga",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial da Flower Mangas com foco em shoujo, romance, manhwas e mangás traduzidos.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "GALAX Scans",
+      "description": "Extensão oficial da GALAX Scans com foco em mangás, manhwas e ação.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "GalaxScans",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial da GALAX Scans com foco em mangás, manhwas e ação.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Geass Comics",
+      "description": "Extensão oficial da Geass Comics com manhwas, manhuas e webtoons traduzidos em português.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-BR",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "GeassComics",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial da Geass Comics com manhwas, manhuas e webtoons traduzidos em português.",
       "website": "https://github.com/matheusparnaiba"
     },
     {
@@ -270,6 +557,31 @@
       "website": "https://github.com/matheusparnaiba"
     },
     {
+      "name": "Hanmokku Scan",
+      "description": "Extensão oficial da Hanmokku Scan com foco em manhuas, cultivação e ação.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "HanmokkuScan",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial da Hanmokku Scan com foco em manhuas, cultivação e ação.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
       "name": "Hentai HQ",
       "description": "Extensão do \"https://hentaihq.net\" (HQs de sexo e quadrinhos eróticos em português, conteúdo adulto +18)",
       "version": "1.0.5",
@@ -303,6 +615,99 @@
       "id": "HentaiHQ",
       "author": "matheusparnaiba",
       "desc": "Extensão do \"https://hentaihq.net\" (HQs de sexo e quadrinhos eróticos em português, conteúdo adulto +18)",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Hentai Season",
+      "description": "Extensão oficial da Hentai Season com foco em doujinshis, quadrinhos e hentai em português (+18).",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [
+        {
+          "label": "18+",
+          "textColor": "#FFFFFF",
+          "backgroundColor": "#DC2626"
+        }
+      ],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "HentaiSeason",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial da Hentai Season com foco em doujinshis, quadrinhos e hentai em português (+18).",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Hentai Tokyo",
+      "description": "Extensão oficial do Hentai Tokyo com acervo completo de mangás, doujinshis e quadrinhos adultos (+18).",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [
+        {
+          "label": "18+",
+          "textColor": "#FFFFFF",
+          "backgroundColor": "#DC2626"
+        }
+      ],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "HentaiTokyo",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial do Hentai Tokyo com acervo completo de mangás, doujinshis e quadrinhos adultos (+18).",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Hipercool",
+      "description": "Extensão adulta oficial da LerHentais / Hipercool (\"https://lerhentais.com\") com acervo de mangás e quadrinhos adultos.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-BR",
+      "contentRating": "ADULT",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [
+        {
+          "label": "+18",
+          "textColor": "#ffffff",
+          "backgroundColor": "#dc3545"
+        }
+      ],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "Hipercool",
+      "author": "matheusparnaiba",
+      "desc": "Extensão adulta oficial da LerHentais / Hipercool (\"https://lerhentais.com\") com acervo de mangás e quadrinhos adultos.",
       "website": "https://github.com/matheusparnaiba"
     },
     {
@@ -343,6 +748,37 @@
       "website": "https://github.com/matheusparnaiba"
     },
     {
+      "name": "Hora Hentai",
+      "description": "Extensão oficial do Hora Hentai com acervo de mangás hentai, doujinshis, quadrinhos e traduzidos (+18).",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [
+        {
+          "label": "18+",
+          "textColor": "#FFFFFF",
+          "backgroundColor": "#DC2626"
+        }
+      ],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "HoraHentai",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial do Hora Hentai com acervo de mangás hentai, doujinshis, quadrinhos e traduzidos (+18).",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
       "name": "Kami Sama Explorer",
       "description": "Extensão da Kami Sama Explorer dedicada às obras de Akira Toriyama, Dragon Ball e clássicos shonen.",
       "version": "1.0.3",
@@ -374,6 +810,31 @@
       "website": "https://github.com/matheusparnaiba"
     },
     {
+      "name": "Kuro Mangás",
+      "description": "Extensão oficial do Kuro Mangás com catálogo diversificado de mangás, manhwas e novels.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "KuroMangas",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial do Kuro Mangás com catálogo diversificado de mangás, manhwas e novels.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
       "name": "Leitura Manga",
       "description": "Extensão do \"https://leituramanga.net\"",
       "version": "1.0.3",
@@ -402,6 +863,56 @@
       "id": "LeituraManga",
       "author": "matheusparnaiba",
       "desc": "Extensão do \"https://leituramanga.net\"",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Ler 999",
+      "description": "Extensão oficial da Ler 999 com foco em manhuas, cultivação e fantasia.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "Ler999",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial da Ler 999 com foco em manhuas, cultivação e fantasia.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "MangaDash",
+      "description": "Extensão oficial do MangaDash (\"https://mangadash.net\") com acervo completo de mangás, manhwas e quadrinhos.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-BR",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "MangaDash",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial do MangaDash (\"https://mangadash.net\") com acervo completo de mangás, manhwas e quadrinhos.",
       "website": "https://github.com/matheusparnaiba"
     },
     {
@@ -663,6 +1174,56 @@
       "website": "https://github.com/matheusparnaiba"
     },
     {
+      "name": "Monte Tai",
+      "description": "Extensão da Monte Tai Scanlator com foco em manhwas, manhuas e cultivação.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "MonteTai",
+      "author": "matheusparnaiba",
+      "desc": "Extensão da Monte Tai Scanlator com foco em manhwas, manhuas e cultivação.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Mugiwaras Oficial",
+      "description": "Extensão oficial da Mugiwaras com foco em shonens, mangás, manhwas e lançamentos.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "MugiwarasOficial",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial da Mugiwaras com foco em shonens, mangás, manhwas e lançamentos.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
       "name": "Muito Hentai",
       "description": "Extensão do \"https://www.muitohentai.com\" (conteúdo adulto +18)",
       "version": "1.0.6",
@@ -802,6 +1363,31 @@
       "website": "https://github.com/matheusparnaiba"
     },
     {
+      "name": "Nexus Mangás",
+      "description": "Extensão oficial do Nexus Mangás com acervo de manhwas, webtoons e mangás modernos.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "NexusMangas",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial do Nexus Mangás com acervo de manhwas, webtoons e mangás modernos.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
       "name": "Ninja Scan",
       "description": "Extensão oficial da Ninja Scan com traduções de manhwas e manhuas de combate e fantasia.",
       "version": "1.0.4",
@@ -830,6 +1416,212 @@
       "id": "NinjaScan",
       "author": "matheusparnaiba",
       "desc": "Extensão oficial da Ninja Scan com traduções de manhwas e manhuas de combate e fantasia.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "OneReader",
+      "description": "Extensão oficial do OneReader (\"https://onereader.net\") com acervo de mangás, manhwas e manhuas.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-BR",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "OneReader",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial do OneReader (\"https://onereader.net\") com acervo de mangás, manhwas e manhuas.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Pizzaria Scan",
+      "description": "Extensão oficial da Pizzaria Scan com foco em comédia, ecchi, manhwas e mangás variados.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "MATURE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "PizzariaScan",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial da Pizzaria Scan com foco em comédia, ecchi, manhwas e mangás variados.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Pluma Comics",
+      "description": "Extensão oficial da Pluma Comics com manhwas, manhuas e webtoons traduzidos em português.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-BR",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "PlumaComics",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial da Pluma Comics com manhwas, manhuas e webtoons traduzidos em português.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "RF Dragon Scan",
+      "description": "Extensão oficial da RF Dragon Scan especializada em manhwas, manhuas e webtoons.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-BR",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "RFDragonScan",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial da RF Dragon Scan especializada em manhwas, manhuas e webtoons.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Roxinha",
+      "description": "Extensão oficial da Roxinha (\"https://roxinha.online\") com catálogo diversificado de obras traduzidas.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-BR",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "Roxinha",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial da Roxinha (\"https://roxinha.online\") com catálogo diversificado de obras traduzidas.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Taimu Mangás",
+      "description": "Extensão oficial da Taimu Mangás com catálogo completo de mangás, manhwas e manhuas em português.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-BR",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "TaimuMangas",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial da Taimu Mangás com catálogo completo de mangás, manhwas e manhuas em português.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Taiyo",
+      "description": "Extensão oficial do Taiyo com suporte a catálogo e leitor moderno de mangás e webtoons.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-BR",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "Taiyo",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial do Taiyo com suporte a catálogo e leitor moderno de mangás e webtoons.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Tankou Hentai",
+      "description": "Extensão da Tankou Hentai com foco em mangás e doujins adultos (+18).",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [
+        {
+          "label": "18+",
+          "textColor": "#FFFFFF",
+          "backgroundColor": "#DC2626"
+        }
+      ],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "TankouHentai",
+      "author": "matheusparnaiba",
+      "desc": "Extensão da Tankou Hentai com foco em mangás e doujins adultos (+18).",
       "website": "https://github.com/matheusparnaiba"
     },
     {
@@ -864,6 +1656,106 @@
       "website": "https://github.com/matheusparnaiba"
     },
     {
+      "name": "ToonBr",
+      "description": "Extensão oficial do ToonBr com ampla biblioteca de webtoons e manhwas traduzidos.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-BR",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "ToonBr",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial do ToonBr com ampla biblioteca de webtoons e manhwas traduzidos.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Traduções do Lipe",
+      "description": "Extensão oficial da Traduções do Lipe com foco em mangás clássicos, nostálgicos e alternativos.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "TraducoesDoLipe",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial da Traduções do Lipe com foco em mangás clássicos, nostálgicos e alternativos.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Vegitoons",
+      "description": "Extensão oficial da Vegitoons com acervo de mangás, manhwas e manhuas em português.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-BR",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "Vegitoons",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial da Vegitoons com acervo de mangás, manhwas e manhuas em português.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "Yomu Comics",
+      "description": "Extensão oficial do Yomu Comics / Yomu Mangás para leitura de mangás, manhwas e novels em português.",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-BR",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "YomuComics",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial do Yomu Comics / Yomu Mangás para leitura de mangás, manhwas e novels em português.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
       "name": "Yuri on Air",
       "description": "Extensão oficial do portal Yuri on Air com mangás, manhwas e webcomics Yuri e Shoujo Ai.",
       "version": "1.0.4",
@@ -892,6 +1784,37 @@
       "id": "YuriOnAir",
       "author": "matheusparnaiba",
       "desc": "Extensão oficial do portal Yuri on Air com mangás, manhwas e webcomics Yuri e Shoujo Ai.",
+      "website": "https://github.com/matheusparnaiba"
+    },
+    {
+      "name": "ZettaHQ",
+      "description": "Extensão oficial do ZettaHQ com foco em Hentai PT-BR, Comic Hentai, Hentai 3D e quadrinhos adultos (+18).",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [
+        {
+          "label": "18+",
+          "textColor": "#FFFFFF",
+          "backgroundColor": "#DC2626"
+        }
+      ],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "ZettaHQ",
+      "author": "matheusparnaiba",
+      "desc": "Extensão oficial do ZettaHQ com foco em Hentai PT-BR, Comic Hentai, Hentai 3D e quadrinhos adultos (+18).",
       "website": "https://github.com/matheusparnaiba"
     }
   ]
