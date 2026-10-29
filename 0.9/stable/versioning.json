@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-10-27T20:19:53.209Z",
+  "buildTime": "2026-10-29T21:40:44.692Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -11,6 +11,37 @@
     "website": "https://github.com/matheusparnaiba"
   },
   "sources": [
+    {
+      "name": "Acervo Hentai",
+      "description": "Extensão do Acervo Hentai focada em pornhwas e manhwas adultos (+18).",
+      "version": "1.0.0",
+      "icon": "icon.png",
+      "language": "pt-br",
+      "contentRating": "SAFE",
+      "capabilities": [
+        32,
+        4,
+        64,
+        1
+      ],
+      "badges": [
+        {
+          "label": "18+",
+          "textColor": "#FFFFFF",
+          "backgroundColor": "#DC2626"
+        }
+      ],
+      "developers": [
+        {
+          "name": "matheusparnaiba",
+          "github": "https://github.com/matheusparnaiba"
+        }
+      ],
+      "id": "AcervoHentai",
+      "author": "matheusparnaiba",
+      "desc": "Extensão do Acervo Hentai focada em pornhwas e manhwas adultos (+18).",
+      "website": "https://github.com/matheusparnaiba"
+    },
     {
       "name": "Arthur Scan",
       "description": "Extensão oficial da Arthur Scan com foco em manhwas, cultivação e ação.",
