@@ -2,11 +2,12 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 
 /**
- * BuscaMangá Extension - Health Check das 24 Fontes
+ * BuscaMangá Extension - Health Check das Fontes
  * Verifica a conectividade e disponibilidade dos domínios oficiais.
  */
 
 const SOURCES = [
+  { id: "AcervoHentai", name: "Acervo Hentai", url: "https://acervohentai.com" },
   { id: "ArthurScan", name: "Arthur Scan", url: "https://arthurscan.xyz" },
   { id: "BorutoExplorer", name: "Boruto Explorer", url: "https://leitor.borutoexplorer.com.br" },
   { id: "Fliptru", name: "Fliptru", url: "https://fliptru.com.br" },
