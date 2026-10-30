@@ -1,8 +1,17 @@
-.DS_Store
+# Dependências e Builds
 /node_modules
 /bundles
-/.agents
-/.vscode
+
+# Arquivos temporários e rascunhos de depuração
 scratch_*
 test_*
-cb_page.html
+*.log
+*.tmp
+
+# Ambientes e Editores
+.vscode/
+.idea/
+
+# Sistema Operacional
+.DS_Store
+Thumbs.db
