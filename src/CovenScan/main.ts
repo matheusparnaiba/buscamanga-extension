@@ -294,15 +294,7 @@ export class CovenScanExtension implements ExtensionImpl<typeof ContentTemplateC
       method: "GET",
     };
 
-    let buffer: ArrayBuffer | undefined;
-    try {
-      const [_, resBuffer] = await Application.scheduleRequest(request);
-      buffer = resBuffer;
-    } catch (e) {
-      console.error("Erro ao carregar discover section:", e);
-      return { items: [], metadata: undefined };
-    }
-
+    const [_, buffer] = await Application.scheduleRequest(request);
     const $ = parseHTML(buffer);
     const items: DiscoverSectionItem[] = [];
     const seenIds = new Set<string>();
@@ -435,15 +427,7 @@ export class CovenScanExtension implements ExtensionImpl<typeof ContentTemplateC
       method: "GET",
     };
 
-    let buffer: ArrayBuffer | undefined;
-    try {
-      const [_, resBuffer] = await Application.scheduleRequest(request);
-      buffer = resBuffer;
-    } catch (e) {
-      console.error("Erro ao buscar resultados:", e);
-      return { items: [], metadata: undefined };
-    }
-
+    const [_, buffer] = await Application.scheduleRequest(request);
     const $ = parseHTML(buffer);
     const items: SearchResultItem[] = [];
     const seenIds = new Set<string>();
@@ -489,14 +473,7 @@ export class CovenScanExtension implements ExtensionImpl<typeof ContentTemplateC
     const url = `${BASE_URL}/manga/${mangaId}/`;
     const request = { url, method: "GET" };
 
-    let buffer: ArrayBuffer | undefined;
-    try {
-      const [_, resBuffer] = await Application.scheduleRequest(request);
-      buffer = resBuffer;
-    } catch (e) {
-      console.error("Erro ao carregar detalhes do manga:", e);
-    }
-
+    const [_, buffer] = await Application.scheduleRequest(request);
     const $ = parseHTML(buffer);
 
     const title =
