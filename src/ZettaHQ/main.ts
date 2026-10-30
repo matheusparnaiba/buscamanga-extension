@@ -27,6 +27,17 @@ declare const App: any;
 
 const BASE_URL = "https://zettahq.com";
 
+function parseHTML(buffer?: ArrayBuffer | null | string): cheerio.CheerioAPI {
+  if (!buffer) return cheerio.load("");
+  if (typeof buffer === "string") return cheerio.load(buffer || "");
+  try {
+    const str = Application.arrayBufferToUTF8String(buffer);
+    return cheerio.load(str || "");
+  } catch {
+    return cheerio.load("");
+  }
+}
+
 function getImageSrc($img: cheerio.Cheerio<any>): string {
   let src =
     $img.attr("data-lzl-src") ||
@@ -131,42 +142,55 @@ export class ZettaHQExtension implements ExtensionImpl<typeof ZettaHQConfig> {
     let url: string;
     if (section.id === "hq-hentai") {
       url =
-        page === 1
-          ? `${BASE_URL}/category/hq-hentai/`
-          : `${BASE_URL}/category/hq-hentai/page/${page}/`;
+        page === 1 ? `${BASE_URL}/category/hetero/` : `${BASE_URL}/category/hetero/page/${page}/`;
     } else if (section.id === "3d") {
-      url =
-        page === 1
-          ? `${BASE_URL}/category/3d-hentai/`
-          : `${BASE_URL}/category/3d-hentai/page/${page}/`;
+      url = page === 1 ? `${BASE_URL}/tag/3d/` : `${BASE_URL}/tag/3d/page/${page}/`;
     } else if (section.id === "colorido") {
-      url =
-        page === 1
-          ? `${BASE_URL}/category/colorido/`
-          : `${BASE_URL}/category/colorido/page/${page}/`;
+      url = page === 1 ? `${BASE_URL}/tag/colorido/` : `${BASE_URL}/tag/colorido/page/${page}/`;
     } else {
       url = page === 1 ? `${BASE_URL}/` : `${BASE_URL}/page/${page}/`;
     }
 
     const request = { url, method: "GET" };
-    const [_, buffer] = await Application.scheduleRequest(request);
-    const data = Application.arrayBufferToUTF8String(buffer);
-    const $ = cheerio.load(data);
+    let buffer: ArrayBuffer | undefined;
+    try {
+      const [_, resBuffer] = await Application.scheduleRequest(request);
+      buffer = resBuffer;
+    } catch (e) {
+      console.error("Erro ao carregar discover section do ZettaHQ:", e);
+      return { items: [], metadata: undefined };
+    }
+
+    const $ = parseHTML(buffer);
     const items: DiscoverSectionItem[] = [];
     const seenIds = new Set<string>();
 
     $("div.post-item article, article.post, article").each((_, el) => {
       const art = $(el);
-      const a = art.find("h3 a, h2 a, a").first();
-      const href = a.attr("href");
+      const linkEl = art
+        .find("h3 a, h2 a, .title a, a.item-link, a")
+        .filter((_, a) => {
+          const h = $(a).attr("href") || "";
+          return (
+            h.includes("zettahq.com") &&
+            !h.includes("/category/") &&
+            !h.includes("/tag/") &&
+            !h.includes("/delivery/") &&
+            !h.includes("random")
+          );
+        })
+        .first();
+
+      const href = linkEl.attr("href") || art.find("a.item-link").attr("href");
       if (!href) return;
 
-      if (href.startsWith("http") && !href.includes("zettahq.com")) return;
-      if (href.includes("/delivery/") || href.includes("random")) return;
-
       const title =
-        a.text().replace(/\s+/g, " ").trim() ||
-        art.find("h3, h2").text().replace(/\s+/g, " ").trim();
+        art.find("h3 a, h2 a, .title a").first().text().replace(/\s+/g, " ").trim() ||
+        art.find("h3, h2, .title").first().text().replace(/\s+/g, " ").trim() ||
+        linkEl.attr("title") ||
+        art.find("img").attr("title") ||
+        "";
+
       const img = getImageSrc(art.find("img").first());
 
       if (title) {
@@ -244,33 +268,68 @@ export class ZettaHQExtension implements ExtensionImpl<typeof ZettaHQConfig> {
     if (title) {
       url = `${BASE_URL}/page/${page}/?s=${encodeURIComponent(title)}`;
     } else if (category) {
-      url =
-        page === 1
-          ? `${BASE_URL}/category/${encodeURIComponent(category)}/`
-          : `${BASE_URL}/category/${encodeURIComponent(category)}/page/${page}/`;
+      let catPath = `category/${encodeURIComponent(category)}`;
+      if (category === "hq-hentai" || category === "hetero") {
+        catPath = "category/hetero";
+      } else if (category === "3d-hentai" || category === "3d") {
+        catPath = "tag/3d";
+      } else if (category === "colorido") {
+        catPath = "tag/colorido";
+      } else if (category === "milf") {
+        catPath = "tag/milf";
+      } else if (category === "incesto") {
+        catPath = "tag/incesto";
+      } else if (category === "futanari") {
+        catPath = "category/futanari";
+      } else if (category === "traducoes-exclusivas") {
+        catPath = "category/traducoes-exclusivas";
+      }
+
+      url = page === 1 ? `${BASE_URL}/${catPath}/` : `${BASE_URL}/${catPath}/page/${page}/`;
     } else {
       url = page === 1 ? `${BASE_URL}/` : `${BASE_URL}/page/${page}/`;
     }
 
     const request = { url, method: "GET" };
-    const [_, buffer] = await Application.scheduleRequest(request);
-    const data = Application.arrayBufferToUTF8String(buffer);
-    const $ = cheerio.load(data);
+    let buffer: ArrayBuffer | undefined;
+    try {
+      const [_, resBuffer] = await Application.scheduleRequest(request);
+      buffer = resBuffer;
+    } catch (e) {
+      console.error("Erro ao buscar resultados no ZettaHQ:", e);
+      return { items: [], metadata: undefined };
+    }
+
+    const $ = parseHTML(buffer);
     const items: SearchResultItem[] = [];
     const seenIds = new Set<string>();
 
     $("div.post-item article, article.post, article").each((_, el) => {
       const art = $(el);
-      const a = art.find("h3 a, h2 a, a").first();
-      const href = a.attr("href");
+      const linkEl = art
+        .find("h3 a, h2 a, .title a, a.item-link, a")
+        .filter((_, a) => {
+          const h = $(a).attr("href") || "";
+          return (
+            h.includes("zettahq.com") &&
+            !h.includes("/category/") &&
+            !h.includes("/tag/") &&
+            !h.includes("/delivery/") &&
+            !h.includes("random")
+          );
+        })
+        .first();
+
+      const href = linkEl.attr("href") || art.find("a.item-link").attr("href");
       if (!href) return;
 
-      if (href.startsWith("http") && !href.includes("zettahq.com")) return;
-      if (href.includes("/delivery/") || href.includes("random")) return;
-
       const mangaTitle =
-        a.text().replace(/\s+/g, " ").trim() ||
-        art.find("h3, h2").text().replace(/\s+/g, " ").trim();
+        art.find("h3 a, h2 a, .title a").first().text().replace(/\s+/g, " ").trim() ||
+        art.find("h3, h2, .title").first().text().replace(/\s+/g, " ").trim() ||
+        linkEl.attr("title") ||
+        art.find("img").attr("title") ||
+        "";
+
       const img = getImageSrc(art.find("img").first());
 
       if (mangaTitle) {
@@ -300,9 +359,15 @@ export class ZettaHQExtension implements ExtensionImpl<typeof ZettaHQConfig> {
   async getMangaDetails(mangaId: string): Promise<SourceManga> {
     const url = `${BASE_URL}/${mangaId}/`;
     const request = { url, method: "GET" };
-    const [_, buffer] = await Application.scheduleRequest(request);
-    const data = Application.arrayBufferToUTF8String(buffer);
-    const $ = cheerio.load(data);
+    let buffer: ArrayBuffer | undefined;
+    try {
+      const [_, resBuffer] = await Application.scheduleRequest(request);
+      buffer = resBuffer;
+    } catch (e) {
+      console.error("Erro ao carregar detalhes do manga no ZettaHQ:", e);
+    }
+
+    const $ = parseHTML(buffer);
 
     const title = $("h1").first().text().replace(/\s+/g, " ").trim() || mangaId.replace(/-/g, " ");
 
@@ -377,9 +442,20 @@ export class ZettaHQExtension implements ExtensionImpl<typeof ZettaHQConfig> {
   async getChapterDetails(chapter: Chapter): Promise<ChapterDetails> {
     const url = `${BASE_URL}/${chapter.chapterId}/`;
     const request = { url, method: "GET" };
-    const [_, buffer] = await Application.scheduleRequest(request);
-    const data = Application.arrayBufferToUTF8String(buffer);
-    const $ = cheerio.load(data);
+    let buffer: ArrayBuffer | undefined;
+    try {
+      const [_, resBuffer] = await Application.scheduleRequest(request);
+      buffer = resBuffer;
+    } catch (e) {
+      console.error("Erro ao carregar páginas do capítulo no ZettaHQ:", e);
+      return {
+        id: chapter.chapterId,
+        mangaId: chapter.sourceManga.mangaId,
+        pages: [],
+      };
+    }
+
+    const $ = parseHTML(buffer);
 
     const pages: string[] = [];
     const seenPages = new Set<string>();

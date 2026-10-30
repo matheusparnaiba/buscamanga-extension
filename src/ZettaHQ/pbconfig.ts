@@ -4,7 +4,7 @@ export default {
   name: "ZettaHQ",
   description:
     "Extensão oficial do ZettaHQ com foco em Hentai PT-BR, Comic Hentai, Hentai 3D e quadrinhos adultos (+18).",
-  version: "1.0.0",
+  version: "1.0.1",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

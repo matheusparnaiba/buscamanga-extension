@@ -97,7 +97,7 @@ Todas as 62 extensões estão catalogadas e sincronizadas no GitHub Pages:
 |         <img src="src/Vegitoons/icon.png" width="28" height="28" alt="Vegitoons" />         | **Vegitoons**          | `1.0.0`  | [vegitoons.black](https://vegitoons.black)                           | Manhwas & Webtoons                      |  🟢 Ativo   |
 |       <img src="src/YomuComics/icon.png" width="28" height="28" alt="Yomu Comics" />        | **Yomu Comics**        | `1.0.0`  | [yomu.com.br](https://yomu.com.br)                                   | Mangás, Manhwas & Novels                |  🟢 Ativo   |
 |        <img src="src/YuriOnAir/icon.png" width="28" height="28" alt="Yuri on Air" />        | **Yuri on Air**        | `1.0.4`  | [yurionair.top](https://yurionair.top)                               | Yuri & Shoujo Ai                        |  🟢 Ativo   |
-|           <img src="src/ZettaHQ/icon.png" width="28" height="28" alt="ZettaHQ" />           | **ZettaHQ**            | `1.0.0`  | [zettahq.com](https://zettahq.com)                                   | Hentai 3D & Comics • +18                |  🟢 Ativo   |
+|           <img src="src/ZettaHQ/icon.png" width="28" height="28" alt="ZettaHQ" />           | **ZettaHQ**            | `1.0.1`  | [zettahq.com](https://zettahq.com)                                   | Hentai 3D & Comics • +18                |  🟢 Ativo   |
 
 > ℹ️ _Sites protegidos por Cloudflare utilizam rotinas de bypass compatíveis com o ambiente de execução do Paperback._
 >
