@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-10-30T03:53:48.628Z",
+  "buildTime": "2026-10-30T04:04:27.954Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -340,7 +340,7 @@
     {
       "name": "Coven Scan",
       "description": "Extensão da Coven Scan focada em webtoons, manhwas e conteúdo adulto (+18).",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
