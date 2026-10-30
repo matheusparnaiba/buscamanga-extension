@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 import {
   BasicRateLimiter,
+  CloudflareError,
   ContentRating,
   DiscoverSectionType,
   type AdvancedSearchForm,
@@ -52,10 +53,21 @@ function sanitizeTagId(raw: string): string {
   );
 }
 
-function cleanCoverUrl(cover?: string | null): string {
-  if (!cover) return "";
-  if (cover.startsWith("http")) return cover;
-  return `${BASE_URL}${cover.startsWith("/") ? "" : "/"}${cover}`;
+function cleanCoverUrl(cover?: string | null, title?: string): string {
+  if (!cover || !cover.trim()) {
+    return (
+      "https://ui-avatars.com/api/?name=" +
+      encodeURIComponent(title || "Roxinha") +
+      "&background=random"
+    );
+  }
+  let src = cover.trim();
+  if (src.startsWith("//")) src = "https:" + src;
+  else if (!src.startsWith("http")) src = `${BASE_URL}${src.startsWith("/") ? "" : "/"}${src}`;
+  try {
+    src = decodeURI(src);
+  } catch {}
+  return encodeURI(src).replace(/%2520/g, "%20").replace(/ /g, "%20");
 }
 
 function mapStatus(status?: string | null): string {
@@ -180,6 +192,7 @@ export class RoxinhaExtension
         metadata: hasNextPage ? page + 1 : undefined,
       };
     } catch (e) {
+      if (e instanceof CloudflareError) throw e;
       console.error(`Erro ao carregar seção ${section.id} na Roxinha:`, e);
       return { items: [], metadata: undefined };
     }
@@ -245,6 +258,7 @@ export class RoxinhaExtension
         metadata: hasNextPage ? page + 1 : undefined,
       };
     } catch (e) {
+      if (e instanceof CloudflareError) throw e;
       console.error("Erro na busca da Roxinha:", e);
       return { items: [], metadata: undefined };
     }
@@ -366,8 +380,22 @@ export class RoxinhaExtension
       },
     });
 
-    void accessRes;
     const accessText = Application.arrayBufferToUTF8String(accessBuf);
+
+    if (accessRes.status === 401) {
+      try {
+        const errJson = JSON.parse(accessText);
+        if (errJson.requiresLogin) {
+          throw new CloudflareError(
+            { url: `${BASE_URL}/login`, method: "GET" },
+            "Login necessário na Roxinha para ler este capítulo!",
+          );
+        }
+      } catch (err) {
+        if (err instanceof CloudflareError) throw err;
+      }
+    }
+
     let ticket: string | undefined;
 
     try {
@@ -399,7 +427,8 @@ export class RoxinhaExtension
     const pages: string[] = [];
     for (const p of rawPages) {
       if (typeof p === "string" && p.trim()) {
-        pages.push(p.startsWith("http") ? p : `${BASE_URL}${p.startsWith("/") ? "" : "/"}${p}`);
+        const fullUrl = p.startsWith("http") ? p : `${BASE_URL}${p.startsWith("/") ? "" : "/"}${p}`;
+        pages.push(cleanCoverUrl(fullUrl));
       }
     }
 

@@ -4,7 +4,7 @@ export default {
   name: "Roxinha",
   description:
     'Extensão oficial da Roxinha ("https://roxinha.online") com catálogo diversificado de obras traduzidas.',
-  version: "1.0.1",
+  version: "1.0.2",
   icon: "icon.png",
   language: "pt-BR",
   contentRating: ContentRating.EVERYONE,
@@ -13,8 +13,9 @@ export default {
     SourceIntents.DISCOVER_SECTION_PROVIDING,
     SourceIntents.SEARCH_RESULT_PROVIDING,
     SourceIntents.CHAPTER_PROVIDING,
+    SourceIntents.CLOUDFLARE_BYPASS_PROVIDING,
   ],
-  badges: [],
+  badges: [{ label: "Cloudflare", textColor: "#FFFFFF", backgroundColor: "#F38020" }],
   developers: [
     {
       name: "matheusparnaiba",
