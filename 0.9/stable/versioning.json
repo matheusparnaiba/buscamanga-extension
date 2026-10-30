@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-10-30T06:48:52.777Z",
+  "buildTime": "2026-10-30T06:55:45.527Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -737,7 +737,7 @@
     {
       "name": "Hentai Tokyo",
       "description": "Extensão oficial do Hentai Tokyo com acervo completo de mangás, doujinshis e quadrinhos adultos (+18).",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
