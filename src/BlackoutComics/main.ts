@@ -1,15 +1,19 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
 import {
   BasicRateLimiter,
+  CloudflareError,
   ContentRating,
   DiscoverSectionType,
   type AdvancedSearchForm,
   type Chapter,
   type ChapterDetails,
+  type Cookie,
   type DiscoverSection,
   type DiscoverSectionItem,
   type ExtensionImpl,
   type Form,
   type PagedResults,
+  type Request,
   type SearchQuery,
   type SearchResultItem,
   type SortingOption,
@@ -49,9 +53,18 @@ function getImageSrc($img: cheerio.Cheerio<any>): string {
     }
   }
 
+  if (!src || src.startsWith("data:")) {
+    const noscript = $img.parent().find("noscript").text();
+    const match = noscript.match(/src=["']([^"']+)["']/i);
+    if (match?.[1]) src = match[1];
+  }
+
   src = src.trim().replace(/-\d+x\d+(\.[a-zA-Z0-9]+)$/, "$1");
-  if (src.startsWith("//")) src = "https:" + src;
-  else if (src.startsWith("/")) src = BASE_URL + src;
+  if (src.startsWith("//")) {
+    src = "https:" + src;
+  } else if (!src.startsWith("http://") && !src.startsWith("https://")) {
+    src = `${BASE_URL}/${src.replace(/^\/+/, "")}`;
+  }
   return src;
 }
 
@@ -70,7 +83,10 @@ function sanitizeTagId(raw: string): string {
 }
 
 function extractMangaId(url: string): string {
-  const clean = url.replace(/^https?:\/\/[^/]+/, "").replace(/^\/+|\/+$/g, "");
+  const clean = url
+    .replace(/[?#].*$/, "")
+    .replace(/^https?:\/\/[^/]+/, "")
+    .replace(/^\/+|\/+$/g, "");
   return clean || url;
 }
 
@@ -91,6 +107,45 @@ export class BlackoutComicsExtension implements ExtensionImpl<typeof BlackoutCom
   async initialise(): Promise<void> {
     this.mainRateLimiter.registerInterceptor();
     this.mainInterceptor.registerInterceptor();
+  }
+
+  async saveCloudflareBypassCookies(cookies: Cookie[]): Promise<void> {
+    await this.handleCloudflareBypass(cookies);
+  }
+
+  async cloudflareBypassCompleted(
+    request?: Request,
+    cookies?: Cookie[],
+    _localStorage?: Record<string, string>,
+  ): Promise<void> {
+    let ua: string | undefined = undefined;
+    if (request?.headers) {
+      for (const key of Object.keys(request.headers)) {
+        if (key.toLowerCase() === "user-agent") {
+          ua = request.headers[key];
+          break;
+        }
+      }
+    }
+    if (ua && typeof ua === "string") {
+      Application.setState(ua, "cf_user_agent");
+    }
+    if (cookies) {
+      await this.handleCloudflareBypass(cookies);
+    }
+  }
+
+  private async handleCloudflareBypass(cookies: Cookie[]): Promise<void> {
+    if (!cookies || !Array.isArray(cookies)) return;
+
+    const cleanCookies = cookies.map((c) => ({
+      name: c.name,
+      value: c.value,
+      domain: c.domain,
+      path: c.path,
+    }));
+
+    Application.setState(cleanCookies, "blackout_saved_cookies");
   }
 
   async getSettingsForm(): Promise<Form> {
@@ -243,7 +298,6 @@ export class BlackoutComicsExtension implements ExtensionImpl<typeof BlackoutCom
     const items: SearchResultItem[] = [];
     const seenIds = new Set<string>();
 
-    // If query has text, try preview search first
     if (title) {
       try {
         const previewUrl = `${BASE_URL}/comics/search-preview`;
@@ -271,10 +325,16 @@ export class BlackoutComicsExtension implements ExtensionImpl<typeof BlackoutCom
             for (const item of parsed.items) {
               const mangaId = `comics/${item.PJT_ID}`;
               const mangaTitle = item.PJT_NAME;
-              const imageUrl =
-                item.PJT_IMG_PR_URL ||
-                (item.PJT_IMG_PR ? `${BASE_URL}/${item.PJT_IMG_PR}` : "") ||
-                `https://ui-avatars.com/api/?name=${encodeURIComponent(mangaTitle)}&background=random`;
+
+              let imageUrl = item.PJT_IMG_PR_URL || item.PJT_IMG_PR || "";
+              if (imageUrl) {
+                if (imageUrl.startsWith("//")) imageUrl = "https:" + imageUrl;
+                else if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
+                  imageUrl = `${BASE_URL}/${imageUrl.replace(/^\/+/, "")}`;
+                }
+              } else {
+                imageUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(mangaTitle)}&background=random`;
+              }
 
               if (!seenIds.has(mangaId)) {
                 seenIds.add(mangaId);
@@ -294,7 +354,6 @@ export class BlackoutComicsExtension implements ExtensionImpl<typeof BlackoutCom
       }
     }
 
-    // Standard HTML search
     const url = new URL(`${BASE_URL}/comics`);
     if (page > 1) url.searchParams.set("page", String(page));
     if (title) url.searchParams.set("s", title);
@@ -354,7 +413,8 @@ export class BlackoutComicsExtension implements ExtensionImpl<typeof BlackoutCom
     const $ = cheerio.load(data);
 
     const title =
-      $(".project-title, h1").first().text().replace(/\s+/g, " ").trim() ||
+      $(".project-title").first().text().replace(/\s+/g, " ").trim() ||
+      $("h1:not(#ageGateTitle)").first().text().replace(/\s+/g, " ").trim() ||
       cleanId.replace(/-/g, " ");
 
     const image = getImageSrc($(".project-cover, .project-thumb img, img").first());
@@ -433,10 +493,21 @@ export class BlackoutComicsExtension implements ExtensionImpl<typeof BlackoutCom
         if (!seenChapterIds.has(chapterId)) {
           seenChapterIds.add(chapterId);
 
-          let chapterName = `Capítulo ${num}`;
+          let chapterName = numText ? `Capítulo ${numText}` : `Capítulo ${num}`;
           const subTitle = item.find(".cell-title strong.line-3, .cell-title").text().trim();
           if (subTitle) {
             chapterName += ` - ${subTitle}`;
+          }
+
+          const timeVal =
+            item.find("time[datetime]").first().attr("datetime") ||
+            item.find("time").first().text().trim();
+          let publishDate = new Date();
+          if (timeVal) {
+            const parsedDate = new Date(timeVal);
+            if (!isNaN(parsedDate.getTime())) {
+              publishDate = parsedDate;
+            }
           }
 
           chapters.push({
@@ -446,7 +517,7 @@ export class BlackoutComicsExtension implements ExtensionImpl<typeof BlackoutCom
             chapNum: num,
             title: chapterName,
             volume: 0,
-            publishDate: new Date(),
+            publishDate,
           });
         }
       },
@@ -471,56 +542,79 @@ export class BlackoutComicsExtension implements ExtensionImpl<typeof BlackoutCom
     const cleanChapterId = extractMangaId(chapter.chapterId);
     const url = `${BASE_URL}/${cleanChapterId}`;
     const request = { url, method: "GET" };
-    const [_, buffer] = await Application.scheduleRequest(request);
+    const [response, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
 
     const pages: string[] = [];
     const seenPages = new Set<string>();
 
-    // 1. Try script tag parsing for var S = [...]
-    $("script:not([src])").each((_, el) => {
-      const scriptHtml = $(el).html() || "";
-      const match = scriptHtml.match(/S\s*=\s*(\[[^\]]*\])/);
-      if (match && match[1]) {
-        try {
-          const list = JSON.parse(match[1]) as string[];
-          if (Array.isArray(list)) {
-            for (let pageUrl of list) {
-              if (pageUrl && typeof pageUrl === "string") {
-                if (!pageUrl.startsWith("http")) {
-                  pageUrl = BASE_URL + (pageUrl.startsWith("/") ? "" : "/") + pageUrl;
-                }
-                if (!seenPages.has(pageUrl)) {
-                  seenPages.add(pageUrl);
-                  pages.push(pageUrl);
-                }
-              }
-            }
-          }
-        } catch {
-          // ignore json parse error
-        }
+    $(
+      "#pages img, .viewer-body img, img.slice, #pages .slice, .chapter-images img, .reading-content img, .reader-area img, div.read-content img, .reading-content-wrap img",
+    ).each((_, el) => {
+      const src = getImageSrc($(el));
+      if (
+        src &&
+        src.startsWith("http") &&
+        !src.includes("logo") &&
+        !src.includes("banner") &&
+        !src.includes("ico/") &&
+        !seenPages.has(src)
+      ) {
+        seenPages.add(src);
+        pages.push(src);
       }
     });
 
-    // 2. Fallback to image elements
     if (pages.length === 0) {
-      $(
-        ".chapter-images img, .reading-content img, .reader-area img, div.read-content img, .reading-content-wrap img",
-      ).each((_, el) => {
-        const src = getImageSrc($(el));
-        if (
-          src &&
-          src.startsWith("http") &&
-          !src.includes("logo") &&
-          !src.includes("banner") &&
-          !seenPages.has(src)
-        ) {
-          seenPages.add(src);
-          pages.push(src);
+      $("script:not([src])").each((_, el) => {
+        const scriptHtml = $(el).html() || "";
+        const match =
+          scriptHtml.match(/S\s*=\s*(\[[^\]]*\])/) ||
+          scriptHtml.match(/pages\s*=\s*(\[[^\]]*\])/) ||
+          scriptHtml.match(/images\s*=\s*(\[[^\]]*\])/);
+        if (match && match[1]) {
+          try {
+            const list = JSON.parse(match[1]) as string[];
+            if (Array.isArray(list)) {
+              for (let pageUrl of list) {
+                if (pageUrl && typeof pageUrl === "string") {
+                  if (!pageUrl.startsWith("http")) {
+                    pageUrl = `${BASE_URL}/${pageUrl.replace(/^\/+/, "")}`;
+                  }
+                  if (!seenPages.has(pageUrl)) {
+                    seenPages.add(pageUrl);
+                    pages.push(pageUrl);
+                  }
+                }
+              }
+            }
+          } catch {
+            // ignore json parse error
+          }
         }
       });
+    }
+
+    if (pages.length === 0) {
+      const locationHeader = response?.headers?.["location"] || response?.headers?.["Location"];
+      const isLoginOrAuth =
+        Boolean(locationHeader && locationHeader.includes("login")) ||
+        data.includes("modal-login") ||
+        data.includes("showLoginModal") ||
+        data.includes("Unauthenticated") ||
+        data.includes("Login Necessário") ||
+        data.includes("content-lock-alert");
+
+      if (isLoginOrAuth) {
+        throw new CloudflareError(
+          {
+            url: `${BASE_URL}/comics`,
+            method: "GET",
+          },
+          "O Blackout Comics exige login para ler capítulos! Toque para entrar na sua conta no navegador integrado.",
+        );
+      }
     }
 
     return {
