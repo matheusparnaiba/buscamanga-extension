@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 import {
   BasicRateLimiter,
+  CloudflareError,
   ContentRating,
   DiscoverSectionType,
   type AdvancedSearchForm,
@@ -129,6 +130,23 @@ async function postAction(url: string, actionName: string, bodyData: any[]): Pro
   }
 }
 
+function findObjectWithKey(data: any, key: string): any {
+  if (!data || typeof data !== "object") return null;
+  if (key in data && data[key] !== undefined) return data;
+  if (Array.isArray(data)) {
+    for (const item of data) {
+      const found = findObjectWithKey(item, key);
+      if (found) return found;
+    }
+    return null;
+  }
+  for (const k of Object.keys(data)) {
+    const found = findObjectWithKey(data[k], key);
+    if (found) return found;
+  }
+  return null;
+}
+
 function parseRscJson<T>(text: string, indicator: string): T | null {
   const lines = text.split("\n");
   for (const line of lines) {
@@ -137,8 +155,9 @@ function parseRscJson<T>(text: string, indicator: string): T | null {
       const jsonPart = colonIdx !== -1 ? line.substring(colonIdx + 1) : line;
       try {
         const obj = JSON.parse(jsonPart);
-        if (obj && typeof obj === "object") {
-          return obj as T;
+        const target = findObjectWithKey(obj, indicator);
+        if (target) {
+          return target as T;
         }
       } catch {
         // Continue
@@ -152,7 +171,11 @@ function parseRscJson<T>(text: string, indicator: string): T | null {
     const endObj = text.indexOf("}\n", idx);
     if (startObj !== -1 && endObj !== -1) {
       try {
-        return JSON.parse(text.substring(startObj, endObj + 1)) as T;
+        const obj = JSON.parse(text.substring(startObj, endObj + 1));
+        const target = findObjectWithKey(obj, indicator);
+        if (target) {
+          return target as T;
+        }
       } catch {
         // Continue
       }
@@ -288,6 +311,7 @@ export class RFDragonScanExtension implements ExtensionImpl<typeof RFDragonScanC
         metadata: hasNextPage ? page + 1 : undefined,
       };
     } catch (e) {
+      if (e instanceof CloudflareError) throw e;
       console.error(`Erro ao carregar seção RF Dragon ${section.id}:`, e);
       return { items: [], metadata: undefined };
     }
@@ -340,6 +364,7 @@ export class RFDragonScanExtension implements ExtensionImpl<typeof RFDragonScanC
         metadata: hasNextPage ? page + 1 : undefined,
       };
     } catch (e) {
+      if (e instanceof CloudflareError) throw e;
       console.error("Erro na busca RF Dragon Scan:", e);
       return { items: [], metadata: undefined };
     }
@@ -467,21 +492,75 @@ export class RFDragonScanExtension implements ExtensionImpl<typeof RFDragonScanC
 
     const pages: string[] = [];
 
+    // 1. Tenta via Server Action getPages se disponível
     try {
       const rscResponse = await postAction(chapterUrl, "getPages", [id, chapterTitle]);
       const pagesDto = parseRscJson<RFPagesDto>(rscResponse, "pages");
       if (pagesDto?.pages && Array.isArray(pagesDto.pages)) {
         for (const p of pagesDto.pages) {
           if (p.photo) {
-            pages.push(p.photo);
+            pages.push(sanitizeImageUrl(p.photo));
           }
         }
       }
     } catch {
-      // Fallback: check chapter HTML
+      // Ignore
+    }
+
+    // 2. Tenta via requisição RSC da própria página do capítulo
+    if (pages.length === 0) {
+      try {
+        const [_, buffer] = await Application.scheduleRequest({
+          url: chapterUrl,
+          method: "GET",
+          headers: { RSC: "1" },
+        });
+        const rscText = Application.arrayBufferToUTF8String(buffer);
+
+        if (rscText.includes('"login"') && rscText.includes("redirect")) {
+          throw new CloudflareError(
+            { url: `${BASE_URL}/login`, method: "GET" },
+            "Login necessário no RF Dragon Scan para ler este capítulo!",
+          );
+        }
+
+        const pagesDto = parseRscJson<RFPagesDto>(rscText, "pages");
+        if (pagesDto?.pages && Array.isArray(pagesDto.pages)) {
+          for (const p of pagesDto.pages) {
+            if (p.photo) {
+              pages.push(sanitizeImageUrl(p.photo));
+            }
+          }
+        }
+
+        if (pages.length === 0) {
+          const imgMatches = rscText.match(
+            /https:\/\/[^"'\\]+\/storage\/[^"'\\]+\.(webp|jpg|jpeg|png)/g,
+          );
+          if (imgMatches) {
+            for (const img of imgMatches) {
+              if (!img.includes("logo") && !img.includes("avatar")) {
+                pages.push(sanitizeImageUrl(img));
+              }
+            }
+          }
+        }
+      } catch (err) {
+        if (err instanceof CloudflareError) throw err;
+      }
+    }
+
+    // 3. Fallback: requisição HTML regular
+    if (pages.length === 0) {
       try {
         const [_, buffer] = await Application.scheduleRequest({ url: chapterUrl, method: "GET" });
         const html = Application.arrayBufferToUTF8String(buffer);
+        if (html.includes("Entrar | RF DragoN") || html.includes('action="/login"')) {
+          throw new CloudflareError(
+            { url: `${BASE_URL}/login`, method: "GET" },
+            "Login necessário no RF Dragon Scan para ler este capítulo!",
+          );
+        }
         const $ = cheerio.load(html);
         $("img[src]").each((_, el) => {
           const src = $(el).attr("src");
@@ -493,12 +572,12 @@ export class RFDragonScanExtension implements ExtensionImpl<typeof RFDragonScanC
               src.includes(".png"))
           ) {
             if (!src.includes("avatar") && !src.includes("logo")) {
-              pages.push(src);
+              pages.push(sanitizeImageUrl(src));
             }
           }
         });
-      } catch {
-        // Ignore
+      } catch (err) {
+        if (err instanceof CloudflareError) throw err;
       }
     }
 

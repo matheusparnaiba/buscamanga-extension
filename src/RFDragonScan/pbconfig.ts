@@ -4,7 +4,7 @@ import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/typ
 export default {
   name: "RF Dragon Scan",
   description: "Extensão oficial da RF Dragon Scan especializada em manhwas, manhuas e webtoons.",
-  version: "1.0.1",
+  version: "1.0.2",
   icon: "icon.png",
   language: "pt-BR",
   contentRating: ContentRating.EVERYONE,
@@ -13,8 +13,9 @@ export default {
     SourceIntents.DISCOVER_SECTION_PROVIDING,
     SourceIntents.SEARCH_RESULT_PROVIDING,
     SourceIntents.CHAPTER_PROVIDING,
+    SourceIntents.CLOUDFLARE_BYPASS_PROVIDING,
   ],
-  badges: [],
+  badges: [{ label: "Cloudflare", textColor: "#FFFFFF", backgroundColor: "#F38020" }],
   developers: [
     {
       name: "matheusparnaiba",
