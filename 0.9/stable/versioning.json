@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-10-30T15:09:09.712Z",
+  "buildTime": "2026-10-30T15:23:50.372Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -1626,8 +1626,8 @@
     },
     {
       "name": "Pluma Comics",
-      "description": "Extensão oficial da Pluma Comics com manhwas, manhuas e webtoons traduzidos em português.",
-      "version": "1.0.1",
+      "description": "Extensão oficial da Pluma Comics especializada em manhuas, cultivação e artes marciais.",
+      "version": "1.0.2",
       "icon": "icon.png",
       "language": "pt-BR",
       "contentRating": "SAFE",
@@ -1635,7 +1635,8 @@
         32,
         4,
         64,
-        1
+        1,
+        16
       ],
       "badges": [
         {
@@ -1652,13 +1653,13 @@
       ],
       "id": "PlumaComics",
       "author": "matheusparnaiba",
-      "desc": "Extensão oficial da Pluma Comics com manhwas, manhuas e webtoons traduzidos em português.",
+      "desc": "Extensão oficial da Pluma Comics especializada em manhuas, cultivação e artes marciais.",
       "website": "https://github.com/matheusparnaiba"
     },
     {
       "name": "RF Dragon Scan",
       "description": "Extensão oficial da RF Dragon Scan especializada em manhwas, manhuas e webtoons.",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "icon": "icon.png",
       "language": "pt-BR",
       "contentRating": "SAFE",
@@ -1666,7 +1667,8 @@
         32,
         4,
         64,
-        1
+        1,
+        16
       ],
       "badges": [
         {
