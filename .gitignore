@@ -12,6 +12,9 @@ test_*
 .vscode/
 .idea/
 
+# Scripts
+/scripts/
+
 # Sistema Operacional
 .DS_Store
 Thumbs.db
