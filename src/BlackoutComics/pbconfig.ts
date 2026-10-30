@@ -4,7 +4,7 @@ export default {
   name: "Blackout Comics",
   description:
     "Extensão oficial do Blackout Comics com acervo de pornhwas, webtoons e quadrinhos adultos (+18).",
-  version: "1.0.1",
+  version: "1.0.2",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

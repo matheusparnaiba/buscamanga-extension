@@ -31,6 +31,21 @@ declare const App: any;
 
 const BASE_URL = "https://blackoutcomics.com";
 
+function sanitizeImageUrl(raw: string): string {
+  if (!raw) return "";
+  let src = raw.trim().replace(/-\d+x\d+(\.[a-zA-Z0-9]+)$/, "$1");
+  if (src.startsWith("//")) {
+    src = "https:" + src;
+  } else if (!src.startsWith("http://") && !src.startsWith("https://")) {
+    src = `${BASE_URL}/${src.replace(/^\/+/, "")}`;
+  }
+  try {
+    return encodeURI(decodeURI(src));
+  } catch {
+    return src.replace(/\s+/g, "%20");
+  }
+}
+
 function getImageSrc($img: cheerio.Cheerio<any>): string {
   let src =
     $img.attr("data-lzl-src") ||
@@ -59,13 +74,7 @@ function getImageSrc($img: cheerio.Cheerio<any>): string {
     if (match?.[1]) src = match[1];
   }
 
-  src = src.trim().replace(/-\d+x\d+(\.[a-zA-Z0-9]+)$/, "$1");
-  if (src.startsWith("//")) {
-    src = "https:" + src;
-  } else if (!src.startsWith("http://") && !src.startsWith("https://")) {
-    src = `${BASE_URL}/${src.replace(/^\/+/, "")}`;
-  }
-  return src;
+  return sanitizeImageUrl(src);
 }
 
 function sanitizeTagId(raw: string): string {
@@ -328,10 +337,7 @@ export class BlackoutComicsExtension implements ExtensionImpl<typeof BlackoutCom
 
               let imageUrl = item.PJT_IMG_PR_URL || item.PJT_IMG_PR || "";
               if (imageUrl) {
-                if (imageUrl.startsWith("//")) imageUrl = "https:" + imageUrl;
-                else if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
-                  imageUrl = `${BASE_URL}/${imageUrl.replace(/^\/+/, "")}`;
-                }
+                imageUrl = sanitizeImageUrl(imageUrl);
               } else {
                 imageUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(mangaTitle)}&background=random`;
               }
@@ -579,10 +585,8 @@ export class BlackoutComicsExtension implements ExtensionImpl<typeof BlackoutCom
             if (Array.isArray(list)) {
               for (let pageUrl of list) {
                 if (pageUrl && typeof pageUrl === "string") {
-                  if (!pageUrl.startsWith("http")) {
-                    pageUrl = `${BASE_URL}/${pageUrl.replace(/^\/+/, "")}`;
-                  }
-                  if (!seenPages.has(pageUrl)) {
+                  pageUrl = sanitizeImageUrl(pageUrl);
+                  if (pageUrl && !seenPages.has(pageUrl)) {
                     seenPages.add(pageUrl);
                     pages.push(pageUrl);
                   }
@@ -604,15 +608,18 @@ export class BlackoutComicsExtension implements ExtensionImpl<typeof BlackoutCom
         data.includes("showLoginModal") ||
         data.includes("Unauthenticated") ||
         data.includes("Login Necessário") ||
-        data.includes("content-lock-alert");
+        data.includes("content-lock-alert") ||
+        data.includes("/entrar") ||
+        data.includes("form-login") ||
+        data.includes("Redirecting to https://blackoutcomics.com/login");
 
       if (isLoginOrAuth) {
         throw new CloudflareError(
           {
-            url: `${BASE_URL}/comics`,
+            url: `${BASE_URL}/login`,
             method: "GET",
           },
-          "O Blackout Comics exige login para ler capítulos! Toque para entrar na sua conta no navegador integrado.",
+          "Login Necessário no Blackout Comics! O site exige estar conectado em uma conta para ler os capítulos. Toque para entrar ou criar sua conta no navegador integrado.",
         );
       }
     }

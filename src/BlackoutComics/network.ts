@@ -40,7 +40,11 @@ export class MainInterceptor extends PaperbackInterceptor {
 
     const customCookie = Application.getState("blackout_cookie_header") as string | undefined;
     if (customCookie) {
-      headers["cookie"] = customCookie;
+      if (!customCookie.includes("age_gate_consent")) {
+        headers["cookie"] = `${defaultCookie}; ${customCookie}`;
+      } else {
+        headers["cookie"] = customCookie;
+      }
     } else {
       const savedCookies = Application.getState("blackout_saved_cookies") as
         | Array<{ name: string; value: string }>

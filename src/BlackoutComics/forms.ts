@@ -29,9 +29,9 @@ export class SettingsForm extends Form {
     return [
       Section("auth", [
         WebViewRow("login_webview", {
-          title: "Entrar na sua Conta (Webview)",
+          title: "Entrar / Criar Conta (Webview)",
           request: {
-            url: "https://blackoutcomics.com/comics",
+            url: "https://blackoutcomics.com/login",
             method: "GET",
           },
           onComplete: Application.Selector(this as SettingsForm, "handleLoginComplete"),
