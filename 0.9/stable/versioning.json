@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-10-30T06:55:45.527Z",
+  "buildTime": "2026-10-30T07:12:13.765Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -773,7 +773,7 @@
     {
       "name": "Hipercool",
       "description": "Extensão adulta oficial da LerHentais / Hipercool (\"https://lerhentais.com\") com acervo de mangás e quadrinhos adultos.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-BR",
       "contentRating": "ADULT",
@@ -1006,7 +1006,7 @@
     {
       "name": "MangaDash",
       "description": "Extensão oficial do MangaDash (\"https://mangadash.net\") com acervo completo de mangás, manhwas e quadrinhos.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-BR",
       "contentRating": "SAFE",
@@ -1563,7 +1563,7 @@
     {
       "name": "OneReader",
       "description": "Extensão oficial do OneReader (\"https://onereader.net\") com acervo de mangás, manhwas e manhuas.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-BR",
       "contentRating": "SAFE",
@@ -1687,7 +1687,7 @@
     {
       "name": "Roxinha",
       "description": "Extensão oficial da Roxinha (\"https://roxinha.online\") com catálogo diversificado de obras traduzidas.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-BR",
       "contentRating": "SAFE",
@@ -1909,7 +1909,7 @@
     {
       "name": "Vegitoons",
       "description": "Extensão oficial da Vegitoons com acervo de mangás, manhwas e manhuas em português.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-BR",
       "contentRating": "SAFE",
