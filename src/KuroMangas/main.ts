@@ -1,5 +1,6 @@
 import {
   BasicRateLimiter,
+  CloudflareError,
   ContentRating,
   DiscoverSectionType,
   type AdvancedSearchForm,
@@ -42,11 +43,22 @@ function sanitizeTagId(raw: string): string {
 const API_URL = "https://kuromangas.com/api";
 const CDN_URL = "https://cdn.kuromangas.com";
 
+function sanitizeImageUrl(raw: string): string {
+  if (!raw) return "";
+  let src = raw.trim();
+  if (src.startsWith("//")) src = "https:" + src;
+  else if (src.startsWith("/")) src = BASE_URL + src;
+  try {
+    src = decodeURI(src);
+  } catch {}
+  return encodeURI(src).replace(/%2520/g, "%20").replace(/ /g, "%20");
+}
+
 function buildImageUrl(path: string | null | undefined): string {
   if (!path) return "";
   const cleanPath = path.replace(/^\/?uploads\//, "").replace(/^\//, "");
-  if (cleanPath.startsWith("http")) return cleanPath;
-  return `${CDN_URL}/${cleanPath}`;
+  if (cleanPath.startsWith("http")) return sanitizeImageUrl(cleanPath);
+  return sanitizeImageUrl(`${CDN_URL}/${cleanPath}`);
 }
 
 export class KuroMangasExtension implements ExtensionImpl<typeof KuroMangasConfig> {
@@ -177,6 +189,12 @@ export class KuroMangasExtension implements ExtensionImpl<typeof KuroMangasConfi
         };
       }
     } catch (e) {
+      if (
+        e instanceof CloudflareError ||
+        (e && typeof e === "object" && (e as any).name === "CloudflareError")
+      ) {
+        throw e;
+      }
       console.error(`Erro ao carregar seção ${section.title}:`, e);
       return { items: [], metadata: undefined };
     }
@@ -263,6 +281,12 @@ export class KuroMangasExtension implements ExtensionImpl<typeof KuroMangasConfi
         metadata: hasNext ? page + 1 : undefined,
       };
     } catch (e) {
+      if (
+        e instanceof CloudflareError ||
+        (e && typeof e === "object" && (e as any).name === "CloudflareError")
+      ) {
+        throw e;
+      }
       console.error("Erro ao buscar no KuroMangas:", e);
       return { items: [], metadata: undefined };
     }

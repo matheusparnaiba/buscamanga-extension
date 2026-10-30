@@ -4,7 +4,7 @@ export default {
   name: "Kuro Mangás",
   description:
     "Extensão oficial do Kuro Mangás com catálogo diversificado de mangás, manhwas e novels.",
-  version: "1.0.1",
+  version: "1.0.2",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,
@@ -13,8 +13,9 @@ export default {
     SourceIntents.DISCOVER_SECTION_PROVIDING,
     SourceIntents.SEARCH_RESULT_PROVIDING,
     SourceIntents.CHAPTER_PROVIDING,
+    SourceIntents.CLOUDFLARE_BYPASS_PROVIDING,
   ],
-  badges: [],
+  badges: [{ label: "Cloudflare", textColor: "#000000", backgroundColor: "#ffc107" }],
   developers: [
     {
       name: "matheusparnaiba",
