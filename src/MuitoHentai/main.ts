@@ -48,7 +48,7 @@ const SECTIONS: { id: string; title: string; path: string; type: DiscoverSection
   {
     id: "popular",
     title: "Mais Lidos",
-    path: "/mais-vistos",
+    path: "/mangas/mais-vistos",
     type: DiscoverSectionType.prominentCarousel,
   },
 ];
@@ -148,6 +148,10 @@ export class MuitoHentaiExtension implements ExtensionImpl<typeof MuitoHentaiCon
     const def = SECTIONS.find((s) => s.id === section.id);
     if (!def) return { items: [] };
 
+    if (section.id === "popular" && page > 1) {
+      return { items: [], metadata: undefined };
+    }
+
     const $ = await fetchHtml(pageUrl(def.path, page));
     const cards = parseCards($);
     const items: DiscoverSectionItem[] = cards.map((item) => {
@@ -171,7 +175,10 @@ export class MuitoHentaiExtension implements ExtensionImpl<typeof MuitoHentaiCon
       };
     });
 
-    return { items, metadata: items.length > 0 ? page + 1 : undefined };
+    return {
+      items,
+      metadata: section.id === "popular" ? undefined : items.length > 0 ? page + 1 : undefined,
+    };
   }
 
   /**
