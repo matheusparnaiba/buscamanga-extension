@@ -27,6 +27,17 @@ declare const App: any;
 
 const BASE_URL = "https://covendasbruxonas.com";
 
+function parseHTML(buffer?: ArrayBuffer | null | string): cheerio.CheerioAPI {
+  if (!buffer) return cheerio.load("");
+  if (typeof buffer === "string") return cheerio.load(buffer || "");
+  try {
+    const str = Application.arrayBufferToUTF8String(buffer);
+    return cheerio.load(str || "");
+  } catch {
+    return cheerio.load("");
+  }
+}
+
 function getImageSrc($img: cheerio.Cheerio<any>): string {
   let src =
     $img.attr("data-lzl-src") ||
@@ -156,6 +167,7 @@ function parsePortugueseDate(dateStr: string | null | undefined): Date | undefin
     agosto: 7,
     ago: 7,
     august: 7,
+    aug: 7,
     setembro: 8,
     set: 8,
     september: 8,
@@ -173,19 +185,14 @@ function parsePortugueseDate(dateStr: string | null | undefined): Date | undefin
     dec: 11,
   };
 
-  const mdyMatch = str.match(/([a-z]+)\s+(\d{1,2}),?\s+(\d{4})/);
-  if (mdyMatch?.[1] && mdyMatch[2] && mdyMatch[3]) {
-    const mIdx = MONTHS_PT[mdyMatch[1]];
-    if (mIdx !== undefined) {
-      return new Date(parseInt(mdyMatch[3], 10), mIdx, parseInt(mdyMatch[2], 10));
-    }
-  }
-
-  const dmyMatch = str.match(/(\d{1,2})\s*(?:de)?\s*([a-z]+)\s*(?:de)?,?\s*(\d{4})/);
-  if (dmyMatch?.[1] && dmyMatch[2] && dmyMatch[3]) {
-    const mIdx = MONTHS_PT[dmyMatch[2]];
-    if (mIdx !== undefined) {
-      return new Date(parseInt(dmyMatch[3], 10), mIdx, parseInt(dmyMatch[1], 10));
+  const textMatch = str.match(/(\d{1,2})\s+(?:de\s+)?([a-z]+)\s+(?:de\s+)?(\d{4})/);
+  if (textMatch?.[1] && textMatch[2] && textMatch[3]) {
+    const day = parseInt(textMatch[1], 10);
+    const mStr = textMatch[2];
+    const year = parseInt(textMatch[3], 10);
+    const month = MONTHS_PT[mStr];
+    if (month !== undefined) {
+      return new Date(year, month, day);
     }
   }
 
@@ -279,9 +286,16 @@ export class CovenScanExtension implements ExtensionImpl<typeof ContentTemplateC
       method: "GET",
     };
 
-    const [_, buffer] = await Application.scheduleRequest(request);
-    const data = Application.arrayBufferToUTF8String(buffer);
-    const $ = cheerio.load(data);
+    let buffer: ArrayBuffer | undefined;
+    try {
+      const [_, resBuffer] = await Application.scheduleRequest(request);
+      buffer = resBuffer;
+    } catch (e) {
+      console.error("Erro ao carregar discover section:", e);
+      return { items: [], metadata: undefined };
+    }
+
+    const $ = parseHTML(buffer);
     const items: DiscoverSectionItem[] = [];
     const seenIds = new Set<string>();
 
@@ -334,10 +348,10 @@ export class CovenScanExtension implements ExtensionImpl<typeof ContentTemplateC
 
         const chapEl = $(el)
           .find(
-            ".list-chapter .chapter-item .chapter, .chapter-item a, .list-chapter a, .chapter a",
+            ".list-chapter .chapter-item .chapter a, .chapter-item a, .list-chapter a, .chapter a",
           )
           .first();
-        const chapHref = chapEl.closest("a").attr("href") || chapEl.attr("href");
+        const chapHref = chapEl.attr("href")?.trim() || "";
         const chapName = chapEl.text().replace(/\s+/g, " ").trim();
 
         if (href && title) {
@@ -347,8 +361,11 @@ export class CovenScanExtension implements ExtensionImpl<typeof ContentTemplateC
           let chapterId = mangaId;
           if (chapHref) {
             const chapMatch = chapHref.match(/\/manga\/[^/]+\/([^/]+)/);
-            if (chapMatch) chapterId = chapMatch[1] as string;
-            else chapterId = chapHref;
+            if (chapMatch?.[1]) {
+              chapterId = chapMatch[1];
+            } else {
+              chapterId = chapHref;
+            }
           }
 
           if (!seenIds.has(mangaId)) {
@@ -410,9 +427,16 @@ export class CovenScanExtension implements ExtensionImpl<typeof ContentTemplateC
       method: "GET",
     };
 
-    const [_, buffer] = await Application.scheduleRequest(request);
-    const data = Application.arrayBufferToUTF8String(buffer);
-    const $ = cheerio.load(data);
+    let buffer: ArrayBuffer | undefined;
+    try {
+      const [_, resBuffer] = await Application.scheduleRequest(request);
+      buffer = resBuffer;
+    } catch (e) {
+      console.error("Erro ao buscar resultados:", e);
+      return { items: [], metadata: undefined };
+    }
+
+    const $ = parseHTML(buffer);
     const items: SearchResultItem[] = [];
     const seenIds = new Set<string>();
 
@@ -456,9 +480,16 @@ export class CovenScanExtension implements ExtensionImpl<typeof ContentTemplateC
   async getMangaDetails(mangaId: string): Promise<SourceManga> {
     const url = `${BASE_URL}/manga/${mangaId}/`;
     const request = { url, method: "GET" };
-    const [_, buffer] = await Application.scheduleRequest(request);
-    const data = Application.arrayBufferToUTF8String(buffer);
-    const $ = cheerio.load(data);
+
+    let buffer: ArrayBuffer | undefined;
+    try {
+      const [_, resBuffer] = await Application.scheduleRequest(request);
+      buffer = resBuffer;
+    } catch (e) {
+      console.error("Erro ao carregar detalhes do manga:", e);
+    }
+
+    const $ = parseHTML(buffer);
 
     const title =
       $(".post-title h1, .post-title h3, h1").first().text().trim() || mangaId.replace(/-/g, " ");
@@ -533,41 +564,44 @@ export class CovenScanExtension implements ExtensionImpl<typeof ContentTemplateC
         method: "POST",
       };
       const [_, ajaxBuffer] = await Application.scheduleRequest(ajaxReq);
-      chaptersData = Application.arrayBufferToUTF8String(ajaxBuffer);
+      chaptersData = (ajaxBuffer ? Application.arrayBufferToUTF8String(ajaxBuffer) : "") || "";
     } catch (e) {
       console.error("Erro ao buscar capítulos via ajax/chapters:", e);
     }
 
-    let $ = cheerio.load(chaptersData);
+    let $ = parseHTML(chaptersData);
 
-    if ($("li.wp-manga-chapter").length === 0) {
-      const pageReq = {
-        url: `${BASE_URL}/manga/${slug}/`,
-        method: "GET",
-      };
-      const [_, pageBuf] = await Application.scheduleRequest(pageReq);
-      const pageData = Application.arrayBufferToUTF8String(pageBuf);
-      const $page = cheerio.load(pageData);
+    if ($("li.wp-manga-chapter, li.chapter-item").length === 0) {
+      try {
+        const pageReq = {
+          url: `${BASE_URL}/manga/${slug}/`,
+          method: "GET",
+        };
+        const [_, pageBuf] = await Application.scheduleRequest(pageReq);
+        const $page = parseHTML(pageBuf);
 
-      const mangaIdAttr =
-        $page("#manga-chapters-holder").attr("data-id") ||
-        $page(".wp-manga-action-button[data-post]").attr("data-post");
-      if (mangaIdAttr) {
-        try {
-          const adminReq = {
-            url: `${BASE_URL}/wp-admin/admin-ajax.php`,
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `action=manga_get_chapters&manga=${mangaIdAttr}`,
-          };
-          const [_, adminBuf] = await Application.scheduleRequest(adminReq);
-          chaptersData = Application.arrayBufferToUTF8String(adminBuf);
-          $ = cheerio.load(chaptersData);
-        } catch (err) {
-          console.error("Erro ao buscar capítulos via admin-ajax:", err);
+        const mangaIdAttr =
+          $page("#manga-chapters-holder").attr("data-id") ||
+          $page(".wp-manga-action-button[data-post]").attr("data-post");
+        if (mangaIdAttr) {
+          try {
+            const adminReq = {
+              url: `${BASE_URL}/wp-admin/admin-ajax.php`,
+              method: "POST",
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+              body: `action=manga_get_chapters&manga=${mangaIdAttr}`,
+            };
+            const [_, adminBuf] = await Application.scheduleRequest(adminReq);
+            $ = parseHTML(adminBuf);
+          } catch (err) {
+            console.error("Erro ao buscar capítulos via admin-ajax:", err);
+            $ = $page;
+          }
+        } else {
+          $ = $page;
         }
-      } else {
-        $ = $page;
+      } catch (err) {
+        console.error("Erro ao carregar página de capítulos do manga:", err);
       }
     }
 
@@ -606,13 +640,31 @@ export class CovenScanExtension implements ExtensionImpl<typeof ContentTemplateC
   }
 
   async getChapterDetails(chapter: Chapter): Promise<ChapterDetails> {
-    const url = chapter.chapterId.startsWith("http")
-      ? chapter.chapterId
-      : `${BASE_URL}${chapter.chapterId.startsWith("/") ? "" : "/"}${chapter.chapterId}`;
+    let url = chapter.chapterId;
+    if (!url.startsWith("http")) {
+      if (url.includes("/manga/")) {
+        url = `${BASE_URL}${url.startsWith("/") ? "" : "/"}${url}`;
+      } else {
+        const mangaSlug = chapter.sourceManga?.mangaId || "";
+        url = `${BASE_URL}/manga/${mangaSlug}/${url.replace(/^\/+|\/+$/g, "")}/`;
+      }
+    }
+
     const request = { url, method: "GET" };
-    const [_, buffer] = await Application.scheduleRequest(request);
-    const data = Application.arrayBufferToUTF8String(buffer);
-    const $ = cheerio.load(data);
+    let buffer: ArrayBuffer | undefined;
+    try {
+      const [_, resBuffer] = await Application.scheduleRequest(request);
+      buffer = resBuffer;
+    } catch (e) {
+      console.error("Erro ao carregar páginas do capítulo:", e);
+      return {
+        id: chapter.chapterId,
+        mangaId: chapter.sourceManga.mangaId,
+        pages: [],
+      };
+    }
+
+    const $ = parseHTML(buffer);
 
     const pages: string[] = [];
     const seenPages = new Set<string>();
