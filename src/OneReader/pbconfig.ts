@@ -4,7 +4,7 @@ export default {
   name: "OneReader",
   description:
     'Extensão oficial do OneReader ("https://onereader.net") com acervo de mangás, manhwas e manhuas.',
-  version: "1.0.1",
+  version: "1.0.2",
   icon: "icon.png",
   language: "pt-BR",
   contentRating: ContentRating.EVERYONE,

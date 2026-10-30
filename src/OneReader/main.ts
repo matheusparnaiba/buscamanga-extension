@@ -23,12 +23,12 @@ import {
 
 import { ContentTemplateAdvancedSearchForm, SettingsForm } from "./forms";
 import type {
-  ChapterDto,
-  HomeMangaDto,
-  OneReaderMangaDto,
+  OneReaderCatalogResponse,
+  OneReaderChapterDetailResponse,
   OneReaderSearchMetadata,
-  PagesDto,
-  SearchDto,
+  OneReaderSearchResponse,
+  OneReaderUpdatesResponse,
+  OneReaderWorkDetailResponse,
 } from "./models";
 import { MainInterceptor } from "./network";
 import type OneReaderConfig from "./pbconfig";
@@ -36,8 +36,18 @@ import type OneReaderConfig from "./pbconfig";
 declare const App: any;
 
 const BASE_URL = "https://onereader.net";
-const API_URL = "https://api.onereader.net";
 const PAGE_SIZE = 24;
+
+function sanitizeImageUrl(raw: string | null | undefined): string {
+  if (!raw) return "";
+  let src = raw.trim();
+  if (src.startsWith("//")) src = "https:" + src;
+  else if (src.startsWith("/")) src = BASE_URL + src;
+  try {
+    src = decodeURI(src);
+  } catch {}
+  return encodeURI(src).replace(/%2520/g, "%20").replace(/ /g, "%20");
+}
 
 function sanitizeTagId(raw: string): string {
   return (
@@ -84,7 +94,7 @@ export class OneReaderExtension
   }
 
   mainRateLimiter = new BasicRateLimiter("main", {
-    numberOfRequests: 6,
+    numberOfRequests: 8,
     bufferInterval: 2,
     ignoreImages: true,
   });
@@ -130,7 +140,7 @@ export class OneReaderExtension
 
     try {
       if (section.id === "updates") {
-        const url = `${API_URL}/api/mangas/home?limit=60`;
+        const url = `${BASE_URL}/api/reader/home/updates?page=${page}`;
         const [_, buffer] = await Application.scheduleRequest({
           url,
           method: "GET",
@@ -138,49 +148,61 @@ export class OneReaderExtension
         });
 
         const jsonText = Application.arrayBufferToUTF8String(buffer);
-        const homeList: HomeMangaDto[] = JSON.parse(jsonText);
+        const data: OneReaderUpdatesResponse = JSON.parse(jsonText);
         const items: DiscoverSectionItem[] = [];
 
-        if (Array.isArray(homeList)) {
-          for (const m of homeList) {
+        if (Array.isArray(data.items)) {
+          for (const m of data.items) {
+            const mangaId = m.slug || m.id;
+            const subtitle =
+              m.latestChapterNumber != null
+                ? `Capítulo ${m.latestChapterNumber}`
+                : m.status || "Atualizado";
+
             items.push({
-              mangaId: m.manga_key,
-              chapterId: m.manga_key,
-              title: m.display_name,
-              subtitle: m.status || "Atualizado",
-              imageUrl: m.cover_image,
+              mangaId,
+              chapterId: mangaId,
+              title: m.title,
+              subtitle,
+              imageUrl: sanitizeImageUrl(m.coverUrl),
               type: "chapterUpdatesCarouselItem",
               contentRating: ContentRating.EVERYONE,
             });
           }
         }
 
-        return { items, metadata: undefined };
+        const hasNextPage = data.pagination ? data.pagination.page < data.pagination.pages : false;
+
+        return { items, metadata: hasNextPage ? page + 1 : undefined };
       }
 
-      const url = `${API_URL}/api/mangas/search?page=${page}&limit=${PAGE_SIZE}&order=az&role=standard&search=&genre=&type=&status=`;
+      // Catálogo (A-Z)
+      const url = `${BASE_URL}/api/reader/catalog`;
       const [_, buffer] = await Application.scheduleRequest({
         url,
         method: "GET",
-        headers: { referer: `${BASE_URL}/` },
+        headers: { referer: `${BASE_URL}/acervo` },
       });
 
       const jsonText = Application.arrayBufferToUTF8String(buffer);
-      const data: SearchDto = JSON.parse(jsonText);
-      const mangas = data.data ?? [];
+      const data: OneReaderCatalogResponse = JSON.parse(jsonText);
+      const allWorks = data.works ?? [];
+
+      const start = (page - 1) * PAGE_SIZE;
+      const pageWorks = allWorks.slice(start, start + PAGE_SIZE);
 
       const items: DiscoverSectionItem[] = [];
-      for (const m of mangas) {
+      for (const m of pageWorks) {
         items.push({
-          mangaId: m.manga_key,
-          title: m.display_name,
-          imageUrl: m.cover_image,
+          mangaId: m.slug || m.id,
+          title: m.title,
+          imageUrl: sanitizeImageUrl(m.coverUrl),
           type: "prominentCarouselItem",
           contentRating: ContentRating.EVERYONE,
         });
       }
 
-      const hasNextPage = data.page < data.totalPages;
+      const hasNextPage = start + PAGE_SIZE < allWorks.length;
       return {
         items,
         metadata: hasNextPage ? page + 1 : undefined,
@@ -198,43 +220,86 @@ export class OneReaderExtension
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata ?? 1;
     const searchTitle = query.title?.trim() ?? "";
-    const order = query.metadata?.order ?? "az";
     const status = query.metadata?.status ?? "";
     const type = query.metadata?.type ?? "";
     const genre = query.metadata?.genre ?? "";
 
-    const urlBuilder = new URL(`${API_URL}/api/mangas/search`);
-    urlBuilder.searchParams.set("page", String(page));
-    urlBuilder.searchParams.set("limit", String(PAGE_SIZE));
-    urlBuilder.searchParams.set("order", order);
-    urlBuilder.searchParams.set("role", "standard");
-    urlBuilder.searchParams.set("search", searchTitle);
-    urlBuilder.searchParams.set("genre", genre);
-    urlBuilder.searchParams.set("type", type);
-    urlBuilder.searchParams.set("status", status);
-
     try {
+      if (searchTitle) {
+        const url = `${BASE_URL}/api/reader/search?q=${encodeURIComponent(searchTitle)}`;
+        const [_, buffer] = await Application.scheduleRequest({
+          url,
+          method: "GET",
+          headers: { referer: `${BASE_URL}/` },
+        });
+
+        const jsonText = Application.arrayBufferToUTF8String(buffer);
+        const data: OneReaderSearchResponse = JSON.parse(jsonText);
+        let works = data.works ?? [];
+
+        if (status) {
+          works = works.filter((w) => w.status?.toLowerCase().includes(status.toLowerCase()));
+        }
+        if (type) {
+          works = works.filter((w) => w.type?.toLowerCase().includes(type.toLowerCase()));
+        }
+        if (genre) {
+          works = works.filter((w) =>
+            w.genres?.some((g) => g.toLowerCase().includes(genre.toLowerCase())),
+          );
+        }
+
+        const items: SearchResultItem[] = [];
+        for (const m of works) {
+          items.push({
+            mangaId: m.slug || m.id,
+            title: m.title,
+            imageUrl: sanitizeImageUrl(m.coverUrl),
+            subtitle: m.status ?? undefined,
+          });
+        }
+
+        return { items, metadata: undefined };
+      }
+
+      // Se não digitou termo, busca no catálogo completo
+      const url = `${BASE_URL}/api/reader/catalog`;
       const [_, buffer] = await Application.scheduleRequest({
-        url: urlBuilder.toString(),
+        url,
         method: "GET",
-        headers: { referer: `${BASE_URL}/` },
+        headers: { referer: `${BASE_URL}/acervo` },
       });
 
       const jsonText = Application.arrayBufferToUTF8String(buffer);
-      const data: SearchDto = JSON.parse(jsonText);
-      const mangas = data.data ?? [];
+      const data: OneReaderCatalogResponse = JSON.parse(jsonText);
+      let works = data.works ?? [];
+
+      if (status) {
+        works = works.filter((w) => w.status?.toLowerCase().includes(status.toLowerCase()));
+      }
+      if (type) {
+        works = works.filter((w) => w.type?.toLowerCase().includes(type.toLowerCase()));
+      }
+      if (genre) {
+        works = works.filter((w) =>
+          w.genres?.some((g) => g.toLowerCase().includes(genre.toLowerCase())),
+        );
+      }
+
+      const start = (page - 1) * PAGE_SIZE;
+      const pageWorks = works.slice(start, start + PAGE_SIZE);
 
       const items: SearchResultItem[] = [];
-      for (const m of mangas) {
+      for (const m of pageWorks) {
         items.push({
-          mangaId: m.manga_key,
-          title: m.display_name,
-          imageUrl: m.cover_image,
+          mangaId: m.slug || m.id,
+          title: m.title,
+          imageUrl: sanitizeImageUrl(m.coverUrl),
           subtitle: m.status ?? undefined,
         });
       }
 
-      const hasNextPage = data.page < data.totalPages;
+      const hasNextPage = start + PAGE_SIZE < works.length;
       return {
         items,
         metadata: hasNextPage ? page + 1 : undefined,
@@ -247,26 +312,27 @@ export class OneReaderExtension
 
   async getMangaDetails(mangaId: string): Promise<SourceManga> {
     const mangaKey = mangaId.replace(/^[/#]+/, "");
-    const url = `${API_URL}/api/mangas/${mangaKey}`;
+    const url = `${BASE_URL}/api/reader/works/${encodeURIComponent(mangaKey)}`;
 
     const [_, buffer] = await Application.scheduleRequest({
       url,
       method: "GET",
-      headers: { referer: `${BASE_URL}/` },
+      headers: { referer: `${BASE_URL}/obra?id=${encodeURIComponent(mangaKey)}` },
     });
 
     const jsonText = Application.arrayBufferToUTF8String(buffer);
-    const dto: OneReaderMangaDto = JSON.parse(jsonText);
+    const dto: OneReaderWorkDetailResponse = JSON.parse(jsonText);
+    const work = dto.work || (dto as any);
 
-    const title = dto.display_name || dto.name || mangaKey;
-    const author = dto.author || "Desconhecido";
-    const artist = dto.artist || author;
-    const thumbnailUrl = dto.cover_image || "";
+    const title = work.title || mangaKey;
+    const author = work.author || "Desconhecido";
+    const artist = work.artist || author;
+    const thumbnailUrl = sanitizeImageUrl(work.coverUrl);
 
     const tags: Tag[] = [];
     const seenTagIds = new Set<string>();
-    if (dto.tags && Array.isArray(dto.tags)) {
-      for (const t of dto.tags) {
+    if (work.genres && Array.isArray(work.genres)) {
+      for (const t of work.genres) {
         if (t && typeof t === "string" && t.trim()) {
           const id = sanitizeTagId(t);
           if (!seenTagIds.has(id)) {
@@ -278,69 +344,79 @@ export class OneReaderExtension
     }
 
     const metadataLines: string[] = [];
-    if (dto.name && dto.name.toLowerCase() !== title.toLowerCase()) {
-      metadataLines.push(`Título original: ${dto.name}`);
+    if (work.originalName && work.originalName.toLowerCase() !== title.toLowerCase()) {
+      metadataLines.push(`Título original: ${work.originalName}`);
     }
-    if (dto.japanese_name) {
-      metadataLines.push(`Título nativo: ${dto.japanese_name}`);
+    if (work.nativeTitle) {
+      metadataLines.push(`Título nativo: ${work.nativeTitle}`);
     }
-    if (dto.type) metadataLines.push(`Tipo: ${dto.type}`);
-    if (dto.origin_country) metadataLines.push(`País: ${dto.origin_country}`);
-    if (dto.year) metadataLines.push(`Ano: ${dto.year}`);
-    if (dto.publisher_name) metadataLines.push(`Editora: ${dto.publisher_name}`);
+    if (work.englishTitle) {
+      metadataLines.push(`Título inglês: ${work.englishTitle}`);
+    }
+    if (work.portugueseTitle) {
+      metadataLines.push(`Título em português: ${work.portugueseTitle}`);
+    }
+    if (work.type) metadataLines.push(`Tipo: ${work.type}`);
+    if (work.releaseYear) metadataLines.push(`Ano: ${work.releaseYear}`);
+    if (work.publisher) metadataLines.push(`Editora: ${work.publisher}`);
 
-    let synopsis = dto.synopsis || "Sem sinopse disponível.";
+    let synopsis = work.synopsis || "Sem sinopse disponível.";
     if (metadataLines.length > 0) {
       synopsis = `${synopsis}\n\n${metadataLines.join("\n")}`;
     }
 
+    const secondaryTitles = [
+      work.originalName,
+      work.nativeTitle,
+      work.englishTitle,
+      work.portugueseTitle,
+    ].filter(Boolean) as string[];
+
     return {
-      mangaId: dto.manga_key || mangaKey,
+      mangaId: work.slug || work.id || mangaKey,
       mangaInfo: {
         primaryTitle: title,
-        secondaryTitles: dto.japanese_name ? [dto.japanese_name] : [],
+        secondaryTitles,
         thumbnailUrl,
         synopsis,
         contentRating: ContentRating.EVERYONE,
-        status: mapStatus(dto.status),
+        status: mapStatus(work.status),
         author,
         artist,
         tagGroups: tags.length > 0 ? [{ id: "genres", title: "Gêneros", tags }] : [],
         artworkUrls: thumbnailUrl ? [thumbnailUrl] : [],
-        shareUrl: `${BASE_URL}/manga-details?id=${mangaKey}`,
+        shareUrl: `${BASE_URL}/obra?id=${encodeURIComponent(work.slug || work.id || mangaKey)}`,
       },
     };
   }
 
   async getChapters(sourceManga: SourceManga, _sinceDate?: Date): Promise<Chapter[]> {
     const mangaKey = sourceManga.mangaId.replace(/^[/#]+/, "");
-    const url = `${API_URL}/api/chapters/${mangaKey}`;
+    const url = `${BASE_URL}/api/reader/works/${encodeURIComponent(mangaKey)}`;
 
     const [_, buffer] = await Application.scheduleRequest({
       url,
       method: "GET",
-      headers: { referer: `${BASE_URL}/` },
+      headers: { referer: `${BASE_URL}/obra?id=${encodeURIComponent(mangaKey)}` },
     });
 
     const jsonText = Application.arrayBufferToUTF8String(buffer);
-    const chapterMap: Record<string, ChapterDto> = JSON.parse(jsonText);
+    const dto: OneReaderWorkDetailResponse = JSON.parse(jsonText);
+    const chapterList = dto.chapters || [];
 
     const chapters: Chapter[] = [];
-    const keys = Object.keys(chapterMap);
-
-    for (const key of keys) {
-      const chDto = chapterMap[key];
-      const chapNum = parseFloat(key);
-      const title = `Capítulo ${key}`;
+    for (const ch of chapterList) {
+      const chapNum = typeof ch.number === "number" ? ch.number : parseFloat(String(ch.number));
+      const title = ch.title ? `Capítulo ${ch.number} - ${ch.title}` : `Capítulo ${ch.number}`;
 
       let publishDate: Date | undefined;
-      if (chDto?.posted_date) {
-        const parsed = new Date(chDto.posted_date);
+      if (ch.postedAt) {
+        const parsed = new Date(ch.postedAt);
         if (!isNaN(parsed.getTime())) publishDate = parsed;
       }
 
       chapters.push({
-        chapterId: `${mangaKey}#${key}`,
+        chapterId: `${mangaKey}#${ch.number}`,
         sourceManga,
         langCode: "PT-BR",
         chapNum: isNaN(chapNum) ? 0 : chapNum,
@@ -357,28 +433,27 @@ export class OneReaderExtension
   async getChapterDetails(chapter: Chapter): Promise<ChapterDetails> {
     const parts = chapter.chapterId.split("#");
     const mangaKey = parts[0] ?? chapter.sourceManga.mangaId;
-    const number = (parts[1] ?? String(chapter.chapNum)).replace(/\./g, "_");
+    const number = parts[1] ?? String(chapter.chapNum);
 
-    const url = `${API_URL}/api/chapters/${mangaKey}/${number}`;
+    const url = `${BASE_URL}/api/reader/works/${encodeURIComponent(mangaKey)}/chapters/${encodeURIComponent(number)}`;
 
     const [_, buffer] = await Application.scheduleRequest({
       url,
       method: "GET",
-      headers: { referer: `${BASE_URL}/` },
+      headers: {
+        referer: `${BASE_URL}/leitor?id=${encodeURIComponent(mangaKey)}&cap=${encodeURIComponent(number)}`,
+      },
     });
 
     const jsonText = Application.arrayBufferToUTF8String(buffer);
-    const data: PagesDto = JSON.parse(jsonText);
-    const rawPages = data.pages ?? [];
+    const data: OneReaderChapterDetailResponse = JSON.parse(jsonText);
+    const rawPages = data.chapter?.pages ?? [];
 
     const pages: string[] = [];
     for (const p of rawPages) {
       if (typeof p === "string" && p.trim()) {
-        if (p.startsWith("http")) {
-          pages.push(p);
-        } else {
-          pages.push(`${API_URL}/${p.replace(/^\/+/, "")}`);
-        }
+        const fullUrl = p.startsWith("http") ? p : `${BASE_URL}${p.startsWith("/") ? "" : "/"}${p}`;
+        pages.push(sanitizeImageUrl(fullUrl));
       }
     }
 

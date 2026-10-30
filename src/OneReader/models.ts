@@ -30,41 +30,83 @@ export type OneReaderSearchMetadata = {
   genre?: string;
 };
 
-export interface HomeMangaDto {
-  manga_key: string;
-  display_name: string;
-  status: string;
-  cover_image: string;
+export interface OneReaderHomeUpdateItem {
+  id: string;
+  slug: string;
+  title: string;
+  synopsis?: string | null;
+  status?: string;
+  contentType?: string;
+  coverUrl: string;
+  totalChapters?: number;
+  latestChapterNumber?: number;
+  latestChapterAt?: string;
+  chapters?: Array<{
+    number: number;
+    postedAt?: string;
+  }>;
 }
 
-export interface OneReaderMangaDto {
-  manga_key: string;
-  display_name: string;
-  name?: string;
-  japanese_name?: string | null;
+export interface OneReaderUpdatesResponse {
+  items: OneReaderHomeUpdateItem[];
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+}
+
+export interface OneReaderCatalogWork {
+  id: string;
+  slug: string;
+  title: string;
+  originalName?: string | null;
+  nativeTitle?: string | null;
+  englishTitle?: string | null;
+  portugueseTitle?: string | null;
   author?: string | null;
   artist?: string | null;
   synopsis?: string | null;
-  status: string;
-  type: string;
-  origin_country?: string;
-  year?: number;
-  tags?: string[] | null;
-  cover_image: string;
-  publisher_name?: string | null;
+  status?: string;
+  type?: string;
+  genres?: string[];
+  coverUrl: string;
+  totalChapters?: number;
+  latestChapterNumber?: number;
+  latestChapterAt?: string;
+  publisher?: string | null;
+  releaseYear?: number;
 }
 
-export interface SearchDto {
-  data: OneReaderMangaDto[];
-  page: number;
-  totalPages: number;
+export interface OneReaderCatalogResponse {
+  works: OneReaderCatalogWork[];
 }
 
-export interface ChapterDto {
-  manga_key?: string;
-  posted_date?: string;
+export interface OneReaderSearchResponse {
+  works: OneReaderCatalogWork[];
 }
 
-export interface PagesDto {
-  pages: string[];
+export interface OneReaderChapterDto {
+  id: string;
+  number: number;
+  title?: string | null;
+  pageCount?: number;
+  isPremium?: boolean;
+  postedAt?: string;
+}
+
+export interface OneReaderWorkDetailResponse {
+  work: OneReaderCatalogWork;
+  chapters: OneReaderChapterDto[];
+}
+
+export interface OneReaderChapterDetailResponse {
+  chapter: {
+    id: string;
+    number: number;
+    title?: string | null;
+    pageCount?: number;
+    pages: string[];
+  };
 }
