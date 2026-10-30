@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 import {
   BasicRateLimiter,
+  CloudflareError,
   ContentRating,
   DiscoverSectionType,
   type AdvancedSearchForm,
@@ -168,6 +169,7 @@ export class PlumaComicsExtension implements ExtensionImpl<typeof PlumaComicsCon
         metadata: hasNextPage ? page + 1 : undefined,
       };
     } catch (e) {
+      if (e instanceof CloudflareError) throw e;
       console.error(`Erro ao carregar seção Pluma Comics ${section.id}:`, e);
       return { items: [], metadata: undefined };
     }
@@ -223,6 +225,7 @@ export class PlumaComicsExtension implements ExtensionImpl<typeof PlumaComicsCon
         metadata: hasNextPage ? page + 1 : undefined,
       };
     } catch (e) {
+      if (e instanceof CloudflareError) throw e;
       console.error("Erro na busca Pluma Comics:", e);
       return { items: [], metadata: undefined };
     }

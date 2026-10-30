@@ -4,8 +4,8 @@ import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/typ
 export default {
   name: "Pluma Comics",
   description:
-    "Extensão oficial da Pluma Comics com manhwas, manhuas e webtoons traduzidos em português.",
-  version: "1.0.1",
+    "Extensão oficial da Pluma Comics especializada em manhuas, cultivação e artes marciais.",
+  version: "1.0.2",
   icon: "icon.png",
   language: "pt-BR",
   contentRating: ContentRating.EVERYONE,
@@ -14,8 +14,9 @@ export default {
     SourceIntents.DISCOVER_SECTION_PROVIDING,
     SourceIntents.SEARCH_RESULT_PROVIDING,
     SourceIntents.CHAPTER_PROVIDING,
+    SourceIntents.CLOUDFLARE_BYPASS_PROVIDING,
   ],
-  badges: [],
+  badges: [{ label: "Manutenção", textColor: "#000000", backgroundColor: "#FACC15" }],
   developers: [
     {
       name: "matheusparnaiba",
