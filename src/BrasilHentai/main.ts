@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
 import {
   BasicRateLimiter,
   ContentRating,
@@ -49,10 +50,36 @@ function getImageSrc($img: cheerio.Cheerio<any>): string {
     }
   }
 
+  if (!src || src.startsWith("data:")) {
+    const noscript = $img.parent().find("noscript").text();
+    const match = noscript.match(/src=["']([^"']+)["']/i);
+    if (match?.[1]) src = match[1];
+  }
+
   src = src.trim().replace(/-\d+x\d+(\.[a-zA-Z0-9]+)$/, "$1");
   if (src.startsWith("//")) src = "https:" + src;
   else if (src.startsWith("/")) src = BASE_URL + src;
   return src;
+}
+
+function getItemImage($: cheerio.CheerioAPI, $el: cheerio.Cheerio<any>): string {
+  let found = "";
+  $el.find(".entry-content img, .post-thumbnail img, img").each((_, imgEl) => {
+    const src = getImageSrc($(imgEl));
+    if (
+      src &&
+      src.startsWith("http") &&
+      !src.includes("logotipo") &&
+      !src.includes("banner") &&
+      !src.includes("gif-icon") &&
+      !src.includes("new-gif") &&
+      !src.endsWith(".gif")
+    ) {
+      found = src;
+      return false;
+    }
+  });
+  return found;
 }
 
 function sanitizeTagId(raw: string): string {
@@ -70,7 +97,10 @@ function sanitizeTagId(raw: string): string {
 }
 
 function extractMangaId(url: string): string {
-  const clean = url.replace(/^https?:\/\/[^/]+/, "").replace(/^\/+|\/+$/g, "");
+  const clean = url
+    .replace(/[?#].*$/, "")
+    .replace(/^https?:\/\/[^/]+/, "")
+    .replace(/^\/+|\/+$/g, "");
   return clean || url;
 }
 
@@ -146,26 +176,40 @@ export class BrasilHentaiExtension implements ExtensionImpl<typeof BrasilHentaiC
     const seenIds = new Set<string>();
 
     $("article, .type-post, .post").each((_, el) => {
-      const a = $(el).find(".entry-title a, h2 a, h1 a, h3 a, a").first();
-      const title = a.text().replace(/\s+/g, " ").trim();
-      const href = a.attr("href");
-      const img = getImageSrc($(el).find("img").first());
+      const titleEl = $(el).find(".entry-title a, .entry-title, h2 a, h1 a, h3 a").first();
+      let title = titleEl.text().replace(/\s+/g, " ").trim();
+      if (!title) {
+        title =
+          $(el).find("a[title]").attr("title")?.trim() ||
+          $(el).find(".entry-content img[alt]").first().attr("alt")?.trim() ||
+          "";
+      }
+
+      const href =
+        titleEl.attr("href") ||
+        $(el).find(".entry-title a, h2 a, a[rel='bookmark']").first().attr("href") ||
+        $(el).find(".blog-item-wrap > a").first().attr("href") ||
+        $(el).find("a[href]").first().attr("href");
 
       if (href && title) {
         const mangaId = extractMangaId(href);
 
+        if (mangaId.includes("category/") || mangaId.includes("page/")) {
+          return;
+        }
+
         if (!seenIds.has(mangaId)) {
           seenIds.add(mangaId);
+          const img = getItemImage($, $(el));
+          const imageUrl =
+            img ||
+            "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
 
           if (section.id === "colorido") {
             items.push({
               mangaId,
               title,
-              imageUrl:
-                img ||
-                "https://ui-avatars.com/api/?name=" +
-                  encodeURIComponent(title) +
-                  "&background=random",
+              imageUrl,
               type: "prominentCarouselItem",
               contentRating: ContentRating.EVERYONE,
             });
@@ -173,11 +217,7 @@ export class BrasilHentaiExtension implements ExtensionImpl<typeof BrasilHentaiC
             items.push({
               mangaId,
               title,
-              imageUrl:
-                img ||
-                "https://ui-avatars.com/api/?name=" +
-                  encodeURIComponent(title) +
-                  "&background=random",
+              imageUrl,
               type: "simpleCarouselItem",
               contentRating: ContentRating.EVERYONE,
             });
@@ -187,11 +227,7 @@ export class BrasilHentaiExtension implements ExtensionImpl<typeof BrasilHentaiC
               title,
               subtitle: "Completo",
               chapterId: mangaId,
-              imageUrl:
-                img ||
-                "https://ui-avatars.com/api/?name=" +
-                  encodeURIComponent(title) +
-                  "&background=random",
+              imageUrl,
               type: "chapterUpdatesCarouselItem",
               contentRating: ContentRating.EVERYONE,
             });
@@ -225,7 +261,10 @@ export class BrasilHentaiExtension implements ExtensionImpl<typeof BrasilHentaiC
 
     let url: string;
     if (title) {
-      url = `${BASE_URL}/page/${page}/?s=${encodeURIComponent(title)}`;
+      url =
+        page === 1
+          ? `${BASE_URL}/?s=${encodeURIComponent(title)}`
+          : `${BASE_URL}/page/${page}/?s=${encodeURIComponent(title)}`;
     } else if (category) {
       url =
         page === 1
@@ -243,16 +282,31 @@ export class BrasilHentaiExtension implements ExtensionImpl<typeof BrasilHentaiC
     const seenIds = new Set<string>();
 
     $("article, .type-post, .post").each((_, el) => {
-      const a = $(el).find(".entry-title a, h2 a, h1 a, h3 a, a").first();
-      const mangaTitle = a.text().replace(/\s+/g, " ").trim();
-      const href = a.attr("href");
-      const img = getImageSrc($(el).find("img").first());
+      const titleEl = $(el).find(".entry-title a, .entry-title, h2 a, h1 a, h3 a").first();
+      let mangaTitle = titleEl.text().replace(/\s+/g, " ").trim();
+      if (!mangaTitle) {
+        mangaTitle =
+          $(el).find("a[title]").attr("title")?.trim() ||
+          $(el).find(".entry-content img[alt]").first().attr("alt")?.trim() ||
+          "";
+      }
+
+      const href =
+        titleEl.attr("href") ||
+        $(el).find(".entry-title a, h2 a, a[rel='bookmark']").first().attr("href") ||
+        $(el).find(".blog-item-wrap > a").first().attr("href") ||
+        $(el).find("a[href]").first().attr("href");
 
       if (href && mangaTitle) {
         const mangaId = extractMangaId(href);
 
+        if (mangaId.includes("category/") || mangaId.includes("page/")) {
+          return;
+        }
+
         if (!seenIds.has(mangaId)) {
           seenIds.add(mangaId);
+          const img = getItemImage($, $(el));
           items.push({
             mangaId,
             title: mangaTitle,
@@ -284,14 +338,24 @@ export class BrasilHentaiExtension implements ExtensionImpl<typeof BrasilHentaiC
       $(".entry-title, h1").first().text().replace(/\s+/g, " ").trim() ||
       mangaId.replace(/-/g, " ");
 
-    const image = getImageSrc(
-      $(".entry-content img, article img, .post-thumbnail img, img").first(),
-    );
+    const image = getItemImage($, $("article, .entry-content, body"));
     const thumbnailUrl =
       image ||
       "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
 
-    const synopsis = $(".entry-content p").first().text().trim() || "Quadrinho adulto completo.";
+    const synopsis =
+      $(".entry-content p")
+        .map((_, p) => $(p).text().trim())
+        .get()
+        .filter(
+          (t) =>
+            t &&
+            !t.includes("Use VPN") &&
+            !t.includes("Leia Mais") &&
+            !t.includes("New ENGLISH") &&
+            !t.includes("Novos PT"),
+        )
+        .join("\n\n") || "Quadrinho adulto completo.";
 
     const genres: Tag[] = [];
     const seenGenres = new Set<string>();
@@ -355,6 +419,9 @@ export class BrasilHentaiExtension implements ExtensionImpl<typeof BrasilHentaiC
         src.startsWith("http") &&
         !src.includes("logotipo") &&
         !src.includes("banner") &&
+        !src.includes("gif-icon") &&
+        !src.includes("new-gif") &&
+        !src.endsWith(".gif") &&
         !seenPages.has(src)
       ) {
         seenPages.add(src);
