@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-10-30T04:04:27.954Z",
+  "buildTime": "2026-10-30T04:13:18.685Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -2002,7 +2002,7 @@
     {
       "name": "ZettaHQ",
       "description": "Extensão oficial do ZettaHQ com foco em Hentai PT-BR, Comic Hentai, Hentai 3D e quadrinhos adultos (+18).",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
