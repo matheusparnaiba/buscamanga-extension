@@ -1,0 +1,3027 @@
+[
+  {
+    "id": "AcervoHentai",
+    "name": "Acervo Hentai",
+    "version": "1.0.0",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 3,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 24,
+          "hasCover": true,
+          "sampleTitle": "Mensagens Sexuais da minha Noona",
+          "sampleCover": "https://acervohentai.com/wp-content/uploads/2026/09/capa-15.webp",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Populares",
+          "itemCount": 24,
+          "hasCover": true,
+          "sampleTitle": "Minha Nova Família Me Trata Muito Bem",
+          "sampleCover": "https://acervohentai.com/wp-content/uploads/2025/02/My-New-Family-Treats-me-Well-1.webp",
+          "error": null
+        },
+        {
+          "id": "rating",
+          "title": "Melhor Avaliados",
+          "itemCount": 24,
+          "hasCover": true,
+          "sampleTitle": "Meu Vizinho Barulhento",
+          "sampleCover": "https://acervohentai.com/wp-content/uploads/2026/07/capa-20.webp",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "mensagens-sexuais-da-minha-noona",
+      "title": "Mensagens Sexuais da minha Noona",
+      "thumbnailUrl": "https://acervohentai.com/wp-content/uploads/2026/09/capa-15.webp"
+    },
+    "chapters": {
+      "count": 6,
+      "sampleTitle": "Capítulo 1"
+    },
+    "reader": {
+      "pagesCount": 39,
+      "samplePage": "https://acervohentai.com/wp-content/uploads/WP-manga/data/manga_6aa787d236b7b/ec67fb84a930519f78c2994ef2e882f3/0001.webp"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 1309
+  },
+  {
+    "id": "ApenasUmaFa",
+    "name": "Apenas Uma Fã",
+    "version": "1.0.0",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 3,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 11,
+          "hasCover": true,
+          "sampleTitle": "Paradoxo do Fanservice",
+          "sampleCover": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjfLWehyphenhyphenOeUoxVaCjdwBKa6bEavrzp589-N0fzOoNXbjzpMMWfOVG5GnNyp0ZhzcvORbPXgLL0mqv0bZFVdeDVwFSAf5m8nq3eA_fGxne78o-2xh_b5XCAPIuIuTRo1D13PTQ1BSuSFV7c9DHBgr1UxI4B9J8PRiKpMPXAUuvIJT6k84cm6AqcogMxtj8k/w600/fanservice%20paradoxo.png",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Obras em Destaque",
+          "itemCount": 11,
+          "hasCover": true,
+          "sampleTitle": "Nós, Introvertidos",
+          "sampleCover": "https://files.catbox.moe/ch8agm.png",
+          "error": null
+        },
+        {
+          "id": "all",
+          "title": "Todas as Obras",
+          "itemCount": 11,
+          "hasCover": true,
+          "sampleTitle": "Nós, Introvertidos",
+          "sampleCover": "https://files.catbox.moe/ch8agm.png",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "https://apenasuma-fa.blogspot.com/2024/10/paradoxo-do-fanservice.html",
+      "title": "Paradoxo do Fanservice",
+      "thumbnailUrl": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjfLWehyphenhyphenOeUoxVaCjdwBKa6bEavrzp589-N0fzOoNXbjzpMMWfOVG5GnNyp0ZhzcvORbPXgLL0mqv0bZFVdeDVwFSAf5m8nq3eA_fGxne78o-2xh_b5XCAPIuIuTRo1D13PTQ1BSuSFV7c9DHBgr1UxI4B9J8PRiKpMPXAUuvIJT6k84cm6AqcogMxtj8k/w600/fanservice%20paradoxo.png"
+    },
+    "chapters": {
+      "count": 14,
+      "sampleTitle": "Chapter 14"
+    },
+    "reader": {
+      "pagesCount": 10,
+      "samplePage": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi5R65R0hLtG1KyPjkrLw1Q-Mp_lJdFWba1UXmIHRswMlTmDNk9EMjwXAh_Sm_lm_azjmBs59izqcUWIiCXEJj1DwyC6_o4B3BF5TYZmG9FR-f4sW9Z3FxieqlFle5TBBxgMxVPIEXya0Qxk-y_5AEccUmUkel0SREb0UMBCZ4pLBU11C2fUibdOPIY2p4/w600/00%20-%20Paradox.png"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 4246
+  },
+  {
+    "id": "ArthurScan",
+    "name": "Arthur Scan",
+    "version": "1.0.5",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 12,
+          "hasCover": true,
+          "sampleTitle": "I Randomly Have a New Career Every Week",
+          "sampleCover": "https://arthurscan.xyz/wp-content/uploads/2021/12/I-randomly-have-a-new-career-every-week-capa-2.webp",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Lidos",
+          "itemCount": 12,
+          "hasCover": true,
+          "sampleTitle": "I Randomly Have a New Career Every Week",
+          "sampleCover": "https://arthurscan.xyz/wp-content/uploads/2021/12/I-randomly-have-a-new-career-every-week-capa-2.webp",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "i-randomly-have-a-new-career-every-week-1",
+      "title": "I Randomly Have a New Career Every Week",
+      "thumbnailUrl": "https://arthurscan.xyz/wp-content/uploads/2021/12/I-randomly-have-a-new-career-every-week-capa-2.webp"
+    },
+    "chapters": {
+      "count": 296,
+      "sampleTitle": "Capítulo 296"
+    },
+    "reader": {
+      "pagesCount": 15,
+      "samplePage": "https://arthurscan.xyz/wp-content/uploads/WP-manga/data/manga_61be914e034c2/ee0f7d3c597244d3497c50af4bbaf30d/00.webp"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 4600
+  },
+  {
+    "id": "Astratoons",
+    "name": "Astratoons",
+    "version": "1.0.0",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 3,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "O Melhor Engenheiro Do Mundo",
+          "sampleCover": "https://new.astratoons.com/storage/covers/01KKQ833TNPT3P165EAJ108BRV.webp",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Populares",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "Aparências",
+          "sampleCover": "https://new.astratoons.com/storage/covers/01KKCCGSSQ5RBR28TSF7HK0V9H.webp",
+          "error": null
+        },
+        {
+          "id": "all",
+          "title": "Todas as Obras",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "O Melhor Engenheiro Do Mundo",
+          "sampleCover": "https://new.astratoons.com/storage/covers/01KKQ833TNPT3P165EAJ108BRV.webp",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "o-melhor-engenheiro-do-mundo:140",
+      "title": "O Melhor Engenheiro Do Mundo",
+      "thumbnailUrl": "https://new.astratoons.com/storage/covers/01KKQ833TNPT3P165EAJ108BRV.webp"
+    },
+    "chapters": {
+      "count": 222,
+      "sampleTitle": "Capítulo 222"
+    },
+    "reader": {
+      "pagesCount": 29,
+      "samplePage": "https://new.astratoons.com/storage/chapters/o-melhor-engenheiro-do-mundo/222/001.webp"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 8141
+  },
+  {
+    "id": "Azuretoons",
+    "name": "Azuretoons",
+    "version": "1.0.0",
+    "status": "BROKEN",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        },
+        {
+          "id": "popular",
+          "title": "Mais Lidos",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        }
+      ]
+    },
+    "manga": null,
+    "chapters": {
+      "count": 0,
+      "sampleTitle": null
+    },
+    "reader": {
+      "pagesCount": 0,
+      "samplePage": null
+    },
+    "issues": ["Nenhuma obra encontrada para testar capítulos e leitor"],
+    "cloudflare": false,
+    "durationMs": 3226
+  },
+  {
+    "id": "BRScans",
+    "name": "BR Scans",
+    "version": "1.0.0",
+    "status": "BROKEN",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        },
+        {
+          "id": "popular",
+          "title": "Mais Populares",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        }
+      ]
+    },
+    "manga": null,
+    "chapters": {
+      "count": 0,
+      "sampleTitle": null
+    },
+    "reader": {
+      "pagesCount": 0,
+      "samplePage": null
+    },
+    "issues": ["Nenhuma obra encontrada para testar capítulos e leitor"],
+    "cloudflare": false,
+    "durationMs": 1612
+  },
+  {
+    "id": "BlackoutComics",
+    "name": "Blackout Comics",
+    "version": "1.0.1",
+    "status": "CLOUDFLARE",
+    "discover": {
+      "totalSections": 4,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimos Lançamentos",
+          "itemCount": 20,
+          "hasCover": true,
+          "sampleTitle": "Secret Class",
+          "sampleCover": "https://blackoutcomics.com/projects/68f504229849b/info/68f50422986d4.webp",
+          "error": null
+        },
+        {
+          "id": "ranking",
+          "title": "Ranking / Populares",
+          "itemCount": 7,
+          "hasCover": true,
+          "sampleTitle": "O Único Homem no Batalhão",
+          "sampleCover": "https://blackoutcomics.com/projects/68f525c3cca94/info/11790_1d53LT672028tvKp1sD41x099443Okbu08l473B0j6360736rid64liI3dg09m7z_847.webp",
+          "error": null
+        },
+        {
+          "id": "adulto",
+          "title": "Pornhwas Adultos",
+          "itemCount": 213,
+          "hasCover": true,
+          "sampleTitle": "15 Minutos",
+          "sampleCover": "https://blackoutcomics.com/projects/69194c10c24de/info/2019_02_18_15504619923329_321.jpg",
+          "error": null
+        },
+        {
+          "id": "completos",
+          "title": "Comics Completos",
+          "itemCount": 168,
+          "hasCover": true,
+          "sampleTitle": "15 Minutos",
+          "sampleCover": "https://blackoutcomics.com/projects/69194c10c24de/info/2019_02_18_15504619923329_321.jpg",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "comics/121",
+      "title": "Secret Class",
+      "thumbnailUrl": "https://blackoutcomics.com/media/logo-blackout.png"
+    },
+    "chapters": {
+      "count": 322,
+      "sampleTitle": "Capítulo 322 - Avaliações\n                                \n                                    \n                                \n                                5.0\n                                (6)\n                                                                                            \n                                    \n                                    \n                                        29 Oct, 2026"
+    },
+    "reader": {
+      "pagesCount": 0,
+      "samplePage": null
+    },
+    "issues": [
+      "Erro em getChapterDetails: O Blackout Comics exige login para ler capítulos! Toque para entrar na sua conta no navegador integrado."
+    ],
+    "cloudflare": true,
+    "durationMs": 6420
+  },
+  {
+    "id": "BorutoExplorer",
+    "name": "Boruto Explorer",
+    "version": "1.0.3",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "NOVO\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tNaruto: Versão Colorida Oficial",
+          "sampleCover": "https://leitor.borutoexplorer.com.br/wp-content/uploads/2024/10/naruto-volume-1-vizmedia.jpg",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Lidos",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "+ LIDO\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tBoruto: Naruto Next Generations",
+          "sampleCover": "https://leitor.borutoexplorer.com.br/wp-content/uploads/2021/02/boruto-20-panini-brasil.webp",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "naruto-versao-colorida-oficial",
+      "title": "Naruto: Versão Colorida Oficial",
+      "thumbnailUrl": "https://leitor.borutoexplorer.com.br/wp-content/uploads/2024/10/naruto-volume-1-vizmedia.jpg"
+    },
+    "chapters": {
+      "count": 191,
+      "sampleTitle": "Capítulo 191 - Camaradas…!!"
+    },
+    "reader": {
+      "pagesCount": 19,
+      "samplePage": "https://leitor.borutoexplorer.com.br/wp-content/uploads/WP-manga/data/manga_671563161221b/0f9e0eccaade2be696abde0770fd5cd1/0.png"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 1906
+  },
+  {
+    "id": "BrasilHentai",
+    "name": "Brasil Hentai",
+    "version": "1.0.1",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 3,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimos Lançamentos",
+          "itemCount": 8,
+          "hasCover": true,
+          "sampleTitle": "O Que Estou Falando É, Pode Fazer Isso! 2",
+          "sampleCover": "https://brasilhentai.com/BH/wp-content/uploads/2026/10/EstouFalando-2-CAPA.jpg",
+          "error": null
+        },
+        {
+          "id": "colorido",
+          "title": "Mangás Coloridos",
+          "itemCount": 8,
+          "hasCover": true,
+          "sampleTitle": "Cloudflare WARP",
+          "sampleCover": "https://brasilhentai.com/BH/wp-content/uploads/2026/05/warp.jpg",
+          "error": null
+        },
+        {
+          "id": "3d",
+          "title": "Hentai 3D",
+          "itemCount": 7,
+          "hasCover": true,
+          "sampleTitle": "Dando uma Ajudinha para o Sogro",
+          "sampleCover": "https://brasilhentai.com/BH/wp-content/uploads/2023/11/Dando-uma-Ajudinha-para-o-Sogro-CAPA.jpg",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "o-que-estou-falando-e-pode-fazer-isso-2",
+      "title": "O Que Estou Falando É, Pode Fazer Isso! 2",
+      "thumbnailUrl": "https://brasilhentai.com/BH/wp-content/uploads/2026/10/EstouFalando-2-CAPA.jpg"
+    },
+    "chapters": {
+      "count": 1,
+      "sampleTitle": "Capítulo Completo"
+    },
+    "reader": {
+      "pagesCount": 77,
+      "samplePage": "https://brasilhentai.com/BH/wp-content/uploads/2026/10/EstouFalando-2-CAPA.jpg"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 2075
+  },
+  {
+    "id": "Capitoons",
+    "name": "Capitoons",
+    "version": "1.0.0",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "popular",
+          "title": "Destaques & Populares",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "Despertando o Trovão Roxo no Início",
+          "sampleCover": "https://capitoons.com/wp-content/uploads/2025/12/capa.jpg",
+          "error": null
+        },
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "Evolução Infinita: Começando do Zero",
+          "sampleCover": "https://capitoons.com/wp-content/uploads/2026/01/capa.webp",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "despertando-o-trovao-roxo-no-inicio",
+      "title": "Login",
+      "thumbnailUrl": "https://capitoons.com/wp-content/uploads/2025/12/capa.jpg"
+    },
+    "chapters": {
+      "count": 50,
+      "sampleTitle": "Capítulo 98"
+    },
+    "reader": {
+      "pagesCount": 7,
+      "samplePage": "https://capitoons.com/wp-content/uploads/manga_auto_capitulos/cddb1da5-b726-45b4-846f-5476fb2f5486/98/01.webp"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 12262
+  },
+  {
+    "id": "CovenScan",
+    "name": "Coven Scan",
+    "version": "1.0.1",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 14,
+          "hasCover": true,
+          "sampleTitle": "Bad Beat",
+          "sampleCover": "https://covendasbruxonas.com/wp-content/uploads/2026/06/tall-1.jpg",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Lidos",
+          "itemCount": 14,
+          "hasCover": true,
+          "sampleTitle": "Rebirth as the Villainous Duke",
+          "sampleCover": "https://covendasbruxonas.com/wp-content/uploads/2025/07/ENG-COVER-1.png",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "bad-beat",
+      "title": "Bad Beat",
+      "thumbnailUrl": "https://covendasbruxonas.com/wp-content/uploads/2026/06/tall-1.jpg"
+    },
+    "chapters": {
+      "count": 13,
+      "sampleTitle": "Capítulo 13"
+    },
+    "reader": {
+      "pagesCount": 3,
+      "samplePage": "https://covendasbruxonas.com/wp-content/uploads/WP-manga/data/manga_6a2a090a2a07a/dc2da02fce03fd675f3a86574db07192/01.jpg"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 3360
+  },
+  {
+    "id": "EgoToons",
+    "name": "EgoToons",
+    "version": "1.0.0",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 3,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Capítulos Recentes",
+          "itemCount": 24,
+          "hasCover": true,
+          "sampleTitle": "O mundo arruinado foi confundido com um jogo",
+          "sampleCover": "https://egotoons.com/api/obras/647/capa?v=573bf713224ceccd2d92",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Populares",
+          "itemCount": 24,
+          "hasCover": true,
+          "sampleTitle": "O Gênio Supremo da Academia",
+          "sampleCover": "https://egotoons.com/api/obras/12598/capa?v=91c2cd4a94d5d3095fdb",
+          "error": null
+        },
+        {
+          "id": "all",
+          "title": "Todas as Obras",
+          "itemCount": 24,
+          "hasCover": true,
+          "sampleTitle": "O mundo arruinado foi confundido com um jogo",
+          "sampleCover": "https://egotoons.com/api/obras/647/capa?v=573bf713224ceccd2d92",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "647",
+      "title": "O mundo arruinado foi confundido com um jogo",
+      "thumbnailUrl": "https://egotoons.com/api/obras/647/capa?v=573bf713224ceccd2d92"
+    },
+    "chapters": {
+      "count": 31,
+      "sampleTitle": "Capítulo 30"
+    },
+    "reader": {
+      "pagesCount": 12,
+      "samplePage": "https://api.egotoons.com/cdn/capitulos/1246840657/p/0?tst=6cda90f48727a628cafd46d70695968b"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 3153
+  },
+  {
+    "id": "Fliptru",
+    "name": "Fliptru",
+    "version": "1.0.3",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "popular",
+          "title": "Mais Populares",
+          "itemCount": 13,
+          "hasCover": true,
+          "sampleTitle": "DARK ASHES",
+          "sampleCover": "https://media.fliptru.com.br/media/comic/dark-ashes/Design_sem_nome_37.png",
+          "error": null
+        },
+        {
+          "id": "updates",
+          "title": "Todas as Obras / Lançamentos",
+          "itemCount": 13,
+          "hasCover": true,
+          "sampleTitle": "ESQUADRÃO JUVENTUDE",
+          "sampleCover": "https://media.fliptru.com.br/media/comic/esquadrao-juventude/106289.png",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "dark-ashes",
+      "title": "DARK ASHES",
+      "thumbnailUrl": "https://media.fliptru.com.br/media/comic/dark-ashes/Design_sem_nome_37.png"
+    },
+    "chapters": {
+      "count": 2,
+      "sampleTitle": "001 - Que tipo de Monstro?"
+    },
+    "reader": {
+      "pagesCount": 51,
+      "samplePage": "https://media.fliptru.com.br/media/comic/dark-ashes/que-tipo-de-monstro/0_1790849921.png"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 9930
+  },
+  {
+    "id": "FlowerManga",
+    "name": "Flower Mangas",
+    "version": "1.0.0",
+    "status": "BROKEN",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        },
+        {
+          "id": "popular",
+          "title": "Mais Lidos",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        }
+      ]
+    },
+    "manga": null,
+    "chapters": {
+      "count": 0,
+      "sampleTitle": null
+    },
+    "reader": {
+      "pagesCount": 0,
+      "samplePage": null
+    },
+    "issues": ["Nenhuma obra encontrada para testar capítulos e leitor"],
+    "cloudflare": false,
+    "durationMs": 84
+  },
+  {
+    "id": "GalaxScans",
+    "name": "GALAX Scans",
+    "version": "1.0.0",
+    "status": "PARTIAL",
+    "discover": {
+      "totalSections": 3,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 20,
+          "hasCover": true,
+          "sampleTitle": "Soren: O Cavaleiro Arcano",
+          "sampleCover": "https://ui-avatars.com/api/?name=Soren%3A%20O%20Cavaleiro%20Arcano&background=random",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Obras em Destaque",
+          "itemCount": 15,
+          "hasCover": true,
+          "sampleTitle": "Soren: O Cavaleiro Arcano",
+          "sampleCover": "https://ui-avatars.com/api/?name=Soren%3A%20O%20Cavaleiro%20Arcano&background=random",
+          "error": null
+        },
+        {
+          "id": "all",
+          "title": "Todas as Obras",
+          "itemCount": 20,
+          "hasCover": true,
+          "sampleTitle": "Soren: O Cavaleiro Arcano",
+          "sampleCover": "https://ui-avatars.com/api/?name=Soren%3A%20O%20Cavaleiro%20Arcano&background=random",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "https://galaxscanlator.blogspot.com/2026/10/soren-o-cavaleiro-arcano.html",
+      "title": "GalaxSCANS",
+      "thumbnailUrl": "https://ui-avatars.com/api/?name=GalaxSCANS&background=random"
+    },
+    "chapters": {
+      "count": 23,
+      "sampleTitle": "O Fantasma Lamentoso Quer se Aposentar Chapter 23 Volume 1"
+    },
+    "reader": {
+      "pagesCount": 0,
+      "samplePage": null
+    },
+    "issues": ["Capítulo retornou 0 páginas no leitor"],
+    "cloudflare": false,
+    "durationMs": 4259
+  },
+  {
+    "id": "GeassComics",
+    "name": "Geass Comics",
+    "version": "1.0.0",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 3,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Lançamentos Recentes",
+          "itemCount": 24,
+          "hasCover": true,
+          "sampleTitle": "Único Fazendeiro da Torre",
+          "sampleCover": "https://cdn.geasscomics.xyz/covers/ee53eb4a-3575-49a9-bedd-c480e771bfce/1768789244971-unico-fazendeiro-da-torre-w1800.webp",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Melhor Avaliados",
+          "itemCount": 24,
+          "hasCover": true,
+          "sampleTitle": "Nanotecnologia Marcial",
+          "sampleCover": "https://cdn.geasscomics.xyz/covers/36933695-7b52-4785-a433-a983e17d7a80/1767911874955-nanotecnologia-marcial-w1800.webp",
+          "error": null
+        },
+        {
+          "id": "all",
+          "title": "Todas as Obras",
+          "itemCount": 24,
+          "hasCover": true,
+          "sampleTitle": "Único Fazendeiro da Torre",
+          "sampleCover": "https://cdn.geasscomics.xyz/covers/ee53eb4a-3575-49a9-bedd-c480e771bfce/1768789244971-unico-fazendeiro-da-torre-w1800.webp",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "unico-fazendeiro-da-torre",
+      "title": "Único Fazendeiro da Torre",
+      "thumbnailUrl": "https://cdn.geasscomics.xyz/covers/ee53eb4a-3575-49a9-bedd-c480e771bfce/1768789244971-unico-fazendeiro-da-torre-w1800.webp"
+    },
+    "chapters": {
+      "count": 67,
+      "sampleTitle": "Capítulo 144"
+    },
+    "reader": {
+      "pagesCount": 36,
+      "samplePage": "https://cdn.geasscomics.xyz/pages/aa5ee4d5-ee2f-4362-9123-6ccf563ca485/1790460257020-0001-001.webp"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 1366
+  },
+  {
+    "id": "HQHentai",
+    "name": "HQ Hentai",
+    "version": "1.0.6",
+    "status": "PARTIAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 13,
+          "hasCover": true,
+          "sampleTitle": "As Babás Safadas 3",
+          "sampleCover": "https://hqhentai.online/wp-content/uploads/2022/06/As-Babas-Safadas-3-01-248x320.jpg",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Lidos",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "O Orgulho de um Leão 8",
+          "sampleCover": "https://hqhentai.online/wp-content/uploads/2026/10/O-Orgulho-de-um-Leao-8-01-248x320.webp",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "as-babas-safadas-3",
+      "title": "as-babas-safadas-3",
+      "thumbnailUrl": "https://hqhentai.online/wp-content/uploads/2022/06/As-Babas-Safadas-3-01.jpg"
+    },
+    "chapters": {
+      "count": 1,
+      "sampleTitle": "Capítulo Único"
+    },
+    "reader": {
+      "pagesCount": 0,
+      "samplePage": null
+    },
+    "issues": ["Erro em getChapterDetails: Nenhuma página encontrada para este conteúdo."],
+    "cloudflare": false,
+    "durationMs": 1027
+  },
+  {
+    "id": "HQNow",
+    "name": "HQ Now",
+    "version": "1.0.3",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "popular",
+          "title": "Mais Lidos (Popular)",
+          "itemCount": 100,
+          "hasCover": true,
+          "sampleTitle": "Invencível (2003)",
+          "sampleCover": "https://static.hq-now.com/hqs/hqs/uploads/picture/image/736164/Invincible-144-000.jpg",
+          "error": null
+        },
+        {
+          "id": "updates",
+          "title": "Atualizações Recentes",
+          "itemCount": 45,
+          "hasCover": true,
+          "sampleTitle": "Doutor Estranho (2023)",
+          "sampleCover": "https://static.hq-now.com/hqs/hqs/uploads/picture/image/954516/Doctor_Strange_001-000.jpg",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "2219",
+      "title": "Invencível (2003)",
+      "thumbnailUrl": "https://static.hq-now.com/hqs/hqs/uploads/picture/image/736164/Invincible-144-000.jpg"
+    },
+    "chapters": {
+      "count": 147,
+      "sampleTitle": "Edição #0"
+    },
+    "reader": {
+      "pagesCount": 12,
+      "samplePage": "https://static.hq-now.com/hqs/hqs/uploads/picture/image/635874/0001_0000.jpg"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 1935
+  },
+  {
+    "id": "HQPorno",
+    "name": "HQ Porno",
+    "version": "1.0.4",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 30,
+          "hasCover": true,
+          "sampleTitle": "Crazy Dad – Madison 23",
+          "sampleCover": "https://www.hqporno.net/wp-content/uploads/2026/10/Madison-23-00-CAPA.webp",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Lidos",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "Au Naturel, Nudist Resort 12",
+          "sampleCover": "https://www.hqporno.net/wp-content/uploads/2023/04/Au-Naturel-Nudist-Resort-12-364x156.webp",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "crazy-dad-madison-23",
+      "title": "Crazy Dad – Madison 23",
+      "thumbnailUrl": "https://www.hqporno.net/wp-content/uploads/2026/10/Madison-23-00-CAPA.webp"
+    },
+    "chapters": {
+      "count": 1,
+      "sampleTitle": "Capítulo Único"
+    },
+    "reader": {
+      "pagesCount": 20,
+      "samplePage": "https://static.superhq.net/galerias/hqporno/2026/Madison_23/Madison-23-01.webp"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 828
+  },
+  {
+    "id": "HanmokkuScan",
+    "name": "Hanmokku Scan",
+    "version": "1.0.0",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 3,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 15,
+          "hasCover": true,
+          "sampleTitle": "I Reincarnated as a Minor Villain in My Favorite Game World – Using My Game Knowledge to Live Freely, I Somehow Ended Up Famous Everywhere",
+          "sampleCover": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhoOQ8adFsGw5YfltkHX50Ke6r7Xdp5yQaKP67xE5ULX_8fRxQ0AP-f8M_VXG-TTLyjHJxiU_1oTw6CiSqeS8jFv20dpM1fzz0WGT5H6lsOKY9yuXG-18j0mb_er1OYKRsMHHyb9dYX5wxwbNaDqn4sCQeyP7gtoBhyGARZtJEXRs6qFonEzYgeqknlHycY/w600/30a7d738-bf71-4a99-8d03-a94b0996e748.jpg",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Obras em Destaque",
+          "itemCount": 15,
+          "hasCover": true,
+          "sampleTitle": "I Reincarnated as a Minor Villain in My Favorite Game World – Using My Game Knowledge to Live Freely, I Somehow Ended Up Famous Everywhere",
+          "sampleCover": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhoOQ8adFsGw5YfltkHX50Ke6r7Xdp5yQaKP67xE5ULX_8fRxQ0AP-f8M_VXG-TTLyjHJxiU_1oTw6CiSqeS8jFv20dpM1fzz0WGT5H6lsOKY9yuXG-18j0mb_er1OYKRsMHHyb9dYX5wxwbNaDqn4sCQeyP7gtoBhyGARZtJEXRs6qFonEzYgeqknlHycY/w600/30a7d738-bf71-4a99-8d03-a94b0996e748.jpg",
+          "error": null
+        },
+        {
+          "id": "all",
+          "title": "Todas as Obras",
+          "itemCount": 15,
+          "hasCover": true,
+          "sampleTitle": "I Reincarnated as a Minor Villain in My Favorite Game World – Using My Game Knowledge to Live Freely, I Somehow Ended Up Famous Everywhere",
+          "sampleCover": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhoOQ8adFsGw5YfltkHX50Ke6r7Xdp5yQaKP67xE5ULX_8fRxQ0AP-f8M_VXG-TTLyjHJxiU_1oTw6CiSqeS8jFv20dpM1fzz0WGT5H6lsOKY9yuXG-18j0mb_er1OYKRsMHHyb9dYX5wxwbNaDqn4sCQeyP7gtoBhyGARZtJEXRs6qFonEzYgeqknlHycY/w600/30a7d738-bf71-4a99-8d03-a94b0996e748.jpg",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "https://hanmokkuscan.blogspot.com/2026/05/i-reincarnated-as-minor-villain-in-my.html",
+      "title": "I Reincarnated as a Minor Villain in My Favorite Game World – Using My Game Knowledge to Live Freely, I Somehow Ended Up Famous Everywhere",
+      "thumbnailUrl": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhoOQ8adFsGw5YfltkHX50Ke6r7Xdp5yQaKP67xE5ULX_8fRxQ0AP-f8M_VXG-TTLyjHJxiU_1oTw6CiSqeS8jFv20dpM1fzz0WGT5H6lsOKY9yuXG-18j0mb_er1OYKRsMHHyb9dYX5wxwbNaDqn4sCQeyP7gtoBhyGARZtJEXRs6qFonEzYgeqknlHycY/w1200-h1200-p-k-no-nu/30a7d738-bf71-4a99-8d03-a94b0996e748.jpg"
+    },
+    "chapters": {
+      "count": 3,
+      "sampleTitle": "Capítulo 03"
+    },
+    "reader": {
+      "pagesCount": 30,
+      "samplePage": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgnNr_6a_mhuAWAsVhyPoFX8VU5egX0f-vWYbX2jx4BO9GXg6rKb8_mQA7_ni9hXVeBdQifmtfcG47NUqlU5eiz8fsOHUb_yWfrRb0fE8gT9xiC7QkXTIB237uH_GBq79pc8UhuWEemVBSPJQ8-af55H7I7E89cRG4Wxg5QzFf64xNZTVYByrYeVQ8_GdrF/w600/00.jpg"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 3418
+  },
+  {
+    "id": "HentaiHQ",
+    "name": "Hentai HQ",
+    "version": "1.0.5",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 29,
+          "hasCover": true,
+          "sampleTitle": "Chemistry Class – Hq de Sexo – Hentais",
+          "sampleCover": "https://hentaihq.net/wp-content/uploads/destacadas/48055-248x320.webp",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Lidos",
+          "itemCount": 29,
+          "hasCover": true,
+          "sampleTitle": "Chemistry Class – Hq de Sexo – Hentais",
+          "sampleCover": "https://hentaihq.net/wp-content/uploads/destacadas/48055-248x320.webp",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "chemistry-class-hq-de-sexo-hentais",
+      "title": "Chemistry Class – Hq de Sexo – Hentais",
+      "thumbnailUrl": "https://hentaihq.net/wp-content/uploads/destacadas/48055.webp"
+    },
+    "chapters": {
+      "count": 1,
+      "sampleTitle": "Capítulo Único"
+    },
+    "reader": {
+      "pagesCount": 3,
+      "samplePage": "https://static.hentaihq.net/uploads/1-1-17.webp"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 2670
+  },
+  {
+    "id": "HentaiSeason",
+    "name": "Hentai Season",
+    "version": "1.0.0",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 4,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimos Lançamentos",
+          "itemCount": 20,
+          "hasCover": true,
+          "sampleTitle": "Pack de Imagens (Halloween 2k26)",
+          "sampleCover": "https://hentaiseason.com/wp-content/uploads/2026/10/pack_imagens_halloween_2k26_09.webp",
+          "error": null
+        },
+        {
+          "id": "doujinshi",
+          "title": "Doujinshis",
+          "itemCount": 20,
+          "hasCover": true,
+          "sampleTitle": "A Rotina da Irmã Alicia",
+          "sampleCover": "https://hentaiseason.com/wp-content/uploads/2026/10/rotina_irma_alicia_01.webp",
+          "error": null
+        },
+        {
+          "id": "oneshot",
+          "title": "One-Shots",
+          "itemCount": 20,
+          "hasCover": true,
+          "sampleTitle": "Quer fazer isso com a Onee-san? Você pode fazer o que quiser com o cartão de pau 11",
+          "sampleCover": "https://hentaiseason.com/wp-content/uploads/2026/10/quer_fazer_isso_onee_san_11_01.webp",
+          "error": null
+        },
+        {
+          "id": "pack-imagens",
+          "title": "Packs de Imagens",
+          "itemCount": 20,
+          "hasCover": true,
+          "sampleTitle": "Pack de Imagens (Halloween 2k26)",
+          "sampleCover": "https://hentaiseason.com/wp-content/uploads/2026/10/pack_imagens_halloween_2k26_09.webp",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "pack-de-imagens-halloween-2k26",
+      "title": "Pack de Imagens (Halloween 2k26)",
+      "thumbnailUrl": "https://hentaiseason.com/wp-content/uploads/2026/10/pack_imagens_halloween_2k26_09.webp"
+    },
+    "chapters": {
+      "count": 1,
+      "sampleTitle": "Capítulo Único"
+    },
+    "reader": {
+      "pagesCount": 25,
+      "samplePage": "https://hentaiseason.com/wp-content/uploads/2026/10/pack_imagens_halloween_2k26_01.webp"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 2244
+  },
+  {
+    "id": "HentaiTokyo",
+    "name": "Hentai Tokyo",
+    "version": "1.0.0",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 4,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimos Lançamentos",
+          "itemCount": 22,
+          "hasCover": true,
+          "sampleTitle": "Serviço Secreto no Campus",
+          "sampleCover": "https://hentaitokyo.net/wp-content/uploads/2026/10/001-13.jpg",
+          "error": null
+        },
+        {
+          "id": "mangas",
+          "title": "Mangás Hentai",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "Depois de Obter o Poder de Parar o Tempo, Me Vinguei de Todas Elas",
+          "sampleCover": "https://hentaitokyo.net/wp-content/uploads/2025/07/1-10.webp",
+          "error": null
+        },
+        {
+          "id": "hqs",
+          "title": "HQ Hentai",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "A Irmã Onahole de Olhos Puxados e Bunda Grande Que Absolutamente Não Consegue Engravidar",
+          "sampleCover": "https://hentaitokyo.net/wp-content/uploads/2024/08/01-4.jpg",
+          "error": null
+        },
+        {
+          "id": "3d",
+          "title": "Hentai 3D",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "Toile no Jimiko to Omukae no Gokusotsu",
+          "sampleCover": "https://hentaitokyo.net/wp-content/uploads/2023/02/Toile-no-Jimiko-to-Omukae-no-Gokusotsu-Pag_01.jpg",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "servico-secreto-no-campus",
+      "title": "Serviço Secreto no Campus",
+      "thumbnailUrl": "https://hentaitokyo.net/wp-content/uploads/2026/10/001-13.jpg"
+    },
+    "chapters": {
+      "count": 1,
+      "sampleTitle": "Capítulo Único"
+    },
+    "reader": {
+      "pagesCount": 153,
+      "samplePage": "https://hentaitokyo.net/wp-content/uploads/2026/10/001-13.jpg"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 2605
+  },
+  {
+    "id": "Hipercool",
+    "name": "Hipercool",
+    "version": "1.0.0",
+    "status": "BROKEN",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "popular",
+          "title": "Mais Populares",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        },
+        {
+          "id": "updates",
+          "title": "Lançamentos Recentes",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        }
+      ]
+    },
+    "manga": null,
+    "chapters": {
+      "count": 0,
+      "sampleTitle": null
+    },
+    "reader": {
+      "pagesCount": 0,
+      "samplePage": null
+    },
+    "issues": ["Nenhuma obra encontrada para testar capítulos e leitor"],
+    "cloudflare": false,
+    "durationMs": 1659
+  },
+  {
+    "id": "Hipertoon",
+    "name": "Hipertoon",
+    "version": "1.0.18",
+    "status": "BROKEN",
+    "discover": {
+      "totalSections": 3,
+      "sections": [
+        {
+          "id": "popular",
+          "title": "Populares",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "t.cookies is not iterable"
+        },
+        {
+          "id": "updates",
+          "title": "Atualizações",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "t.cookies is not iterable"
+        },
+        {
+          "id": "new",
+          "title": "Recém Adicionados",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "t.cookies is not iterable"
+        }
+      ]
+    },
+    "manga": null,
+    "chapters": {
+      "count": 0,
+      "sampleTitle": null
+    },
+    "reader": {
+      "pagesCount": 0,
+      "samplePage": null
+    },
+    "issues": ["Nenhuma obra encontrada para testar capítulos e leitor"],
+    "cloudflare": false,
+    "durationMs": 234
+  },
+  {
+    "id": "HoraHentai",
+    "name": "Hora Hentai",
+    "version": "1.0.0",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 4,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimos Lançamentos",
+          "itemCount": 33,
+          "hasCover": true,
+          "sampleTitle": "Tendo Meu Apartamento Usado Como Motel pelas Donas de Casa",
+          "sampleCover": "https://horahentai.com/wp-content/uploads/2026/10/1-2.webp",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Populares",
+          "itemCount": 26,
+          "hasCover": true,
+          "sampleTitle": "A Aprovação da Vovó",
+          "sampleCover": "https://horahentai.com/wp-content/uploads/2026/09/001-53.jpg",
+          "error": null
+        },
+        {
+          "id": "doujinshi",
+          "title": "Doujinshis",
+          "itemCount": 21,
+          "hasCover": true,
+          "sampleTitle": "Tendo Meu Apartamento Usado Como Motel pelas Donas de Casa",
+          "sampleCover": "https://horahentai.com/wp-content/uploads/2026/10/1-2.webp",
+          "error": null
+        },
+        {
+          "id": "mangas",
+          "title": "Mangás Hentai",
+          "itemCount": 21,
+          "hasCover": true,
+          "sampleTitle": "Não Consigo Resistir Ao Instinto Feminino",
+          "sampleCover": "https://horahentai.com/wp-content/uploads/2026/10/1-23.jpg",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "tendo-meu-apartamento-usado-como-motel-pelas-donas-de-casa",
+      "title": "Tendo Meu Apartamento Usado Como Motel pelas Donas de Casa",
+      "thumbnailUrl": "https://horahentai.com/wp-content/uploads/2025/12/logohh.png"
+    },
+    "chapters": {
+      "count": 1,
+      "sampleTitle": "Capítulo Único"
+    },
+    "reader": {
+      "pagesCount": 75,
+      "samplePage": "https://horahentai.com/wp-content/uploads/2026/10/1-2.webp"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 3176
+  },
+  {
+    "id": "KamiSamaExplorer",
+    "name": "Kami Sama Explorer",
+    "version": "1.0.3",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "Dragon Ball GT –  DBGalaxyTouring",
+          "sampleCover": "https://leitor.kamisama.com.br/wp-content/uploads/2025/04/42949435.jpg",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Lidos",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "Dragon Ball Super",
+          "sampleCover": "https://leitor.kamisama.com.br/wp-content/uploads/2021/10/dragon-ball-super-capa-volume-12.jpg",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "dragon-ball-gt-dbgalaxytouring",
+      "title": "Dragon Ball GT –  DBGalaxyTouring",
+      "thumbnailUrl": "https://leitor.kamisama.com.br/wp-content/uploads/2025/04/42949435.jpg"
+    },
+    "chapters": {
+      "count": 30,
+      "sampleTitle": "Capítulo 30"
+    },
+    "reader": {
+      "pagesCount": 1,
+      "samplePage": "https://leitor.kamisama.com.br/wp-content/uploads/WP-manga/data/manga_67fad0bec7113/cfbd08ecee371b1c28e773a5f011e59e/00.jpg"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 1292
+  },
+  {
+    "id": "KuroMangas",
+    "name": "Kuro Mangás",
+    "version": "1.0.0",
+    "status": "BROKEN",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "popular",
+          "title": "Mais Populares",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        },
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        }
+      ]
+    },
+    "manga": null,
+    "chapters": {
+      "count": 0,
+      "sampleTitle": null
+    },
+    "reader": {
+      "pagesCount": 0,
+      "samplePage": null
+    },
+    "issues": ["Nenhuma obra encontrada para testar capítulos e leitor"],
+    "cloudflare": false,
+    "durationMs": 477
+  },
+  {
+    "id": "LeituraManga",
+    "name": "Leitura Manga",
+    "version": "1.0.3",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "popular",
+          "title": "Mais Lidos (Populares)",
+          "itemCount": 24,
+          "hasCover": true,
+          "sampleTitle": "Lágrimas Sobre Flores Murchas",
+          "sampleCover": "https://cdn.leituramanga.net/lagrimas-sobre-flores-murchas/cover-md.webp",
+          "error": null
+        },
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 24,
+          "hasCover": true,
+          "sampleTitle": "A Transmissão do Reino Demoníaco do Demônio Celestial Rejuvenescido",
+          "sampleCover": "https://cdn.leituramanga.net/a-transmissao-do-reino-demoniaco-do-demonio-celestial-rejuvenescido/cover-md.webp",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "lagrimas-sobre-flores-murchas",
+      "title": "Lágrimas Sobre Flores Murchas",
+      "thumbnailUrl": "https://cdn.leituramanga.net/lagrimas-sobre-flores-murchas/cover-og.jpg"
+    },
+    "chapters": {
+      "count": 124,
+      "sampleTitle": "Capítulo 124"
+    },
+    "reader": {
+      "pagesCount": 34,
+      "samplePage": "https://cdn.leituramanga.net/lagrimas-sobre-flores-murchas/capitulo-124/page-1-1.webp"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 944
+  },
+  {
+    "id": "Ler999",
+    "name": "Ler 999",
+    "version": "1.0.0",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 3,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 7,
+          "hasCover": true,
+          "sampleTitle": "Cretaceous Period",
+          "sampleCover": "https://i.ibb.co/BtW4k9X/Cretaceous-Period-capa.jpg",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Obras em Destaque",
+          "itemCount": 7,
+          "hasCover": true,
+          "sampleTitle": "What Level Are You, How Dare You Pretend in Front of My Seven Senior Sisters",
+          "sampleCover": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgNd_Z-9mEB9c13i2QyZpx6PhhUKIHvIrenec3WtJ9mAxVLbpNwhifIA5PYVbbQIOfbAnLKM03PB44CNNTSh5QcOCkgMOR6BS2zWUopmnaqIJcjPYNc45PnnQaS8Ob8Qh5v9eFcxJqEENijHi1HGDT5vxs3kEkc_EPtYDE1mz9qj2qXSYncU-9v99yQX_Y/w600/What%20Level%20Are%20You,%20How%20Dare%20You%20Pretend%20in%20Front%20of%20My%20Seven%20Senior%20Sisters.jpg",
+          "error": null
+        },
+        {
+          "id": "all",
+          "title": "Todas as Obras",
+          "itemCount": 7,
+          "hasCover": true,
+          "sampleTitle": "What Level Are You, How Dare You Pretend in Front of My Seven Senior Sisters",
+          "sampleCover": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgNd_Z-9mEB9c13i2QyZpx6PhhUKIHvIrenec3WtJ9mAxVLbpNwhifIA5PYVbbQIOfbAnLKM03PB44CNNTSh5QcOCkgMOR6BS2zWUopmnaqIJcjPYNc45PnnQaS8Ob8Qh5v9eFcxJqEENijHi1HGDT5vxs3kEkc_EPtYDE1mz9qj2qXSYncU-9v99yQX_Y/w600/What%20Level%20Are%20You,%20How%20Dare%20You%20Pretend%20in%20Front%20of%20My%20Seven%20Senior%20Sisters.jpg",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "https://ler999.blogspot.com/2023/03/cretaceous-period.html",
+      "title": "Cretaceous Period",
+      "thumbnailUrl": "https://lh3.googleusercontent.com/blogger_img_proxy/AEn0k_tbrgPEuxxGTCsf9STkwmnNNGT_LKXliwRH1HdlnBkPkNAf6KbT5JI9Lv2LcbZ-C80okLrEo_qGhKGGjQeUuEzLD29wUvq23M85QkZYLXgIHWCgFBbP=w1200-h1200-p-k-no-nu"
+    },
+    "chapters": {
+      "count": 1,
+      "sampleTitle": "Chapter 00"
+    },
+    "reader": {
+      "pagesCount": 23,
+      "samplePage": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEimlNlfyHHTN_pVeYoybQerEPQ5sD5q8DcxPCFoWA1LwyCekhcBDLrm7AsO3d_SCsvdimdNFzhMh7oa5He7I1njjFKCYJsLHrsdzvmq-shb9kpbpleBiDt_JT0cF0ibnD38G0L2X5i3RDoj8LIeAubsnb62TA4YEwcctSmPFR-TDLIdIU0YsPCLvle9/w600/00.jpg"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 3824
+  },
+  {
+    "id": "MangaDash",
+    "name": "MangaDash",
+    "version": "1.0.0",
+    "status": "PARTIAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "popular",
+          "title": "Mais Vistos",
+          "itemCount": 24,
+          "hasCover": true,
+          "sampleTitle": "Stop Smoking",
+          "sampleCover": "https://mangadash.net/static/images/covers/stop_smoking_capa.webp",
+          "error": null
+        },
+        {
+          "id": "updates",
+          "title": "Mais Recentes",
+          "itemCount": 24,
+          "hasCover": true,
+          "sampleTitle": "Beware the Villainess!",
+          "sampleCover": "https://mangadash.net/static/images/covers/beware_the_villainess_capa.webp",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "41-stop-smoking",
+      "title": "41-stop-smoking",
+      "thumbnailUrl": null
+    },
+    "chapters": {
+      "count": 0,
+      "sampleTitle": null
+    },
+    "reader": {
+      "pagesCount": 0,
+      "samplePage": null
+    },
+    "issues": ["Nenhum capítulo retornado"],
+    "cloudflare": false,
+    "durationMs": 1081
+  },
+  {
+    "id": "MangaDex",
+    "name": "MangaDex",
+    "version": "1.0.0",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 3,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimos Lançamentos em PT-BR",
+          "itemCount": 20,
+          "hasCover": true,
+          "sampleTitle": "The Ghostly Doctor",
+          "sampleCover": "https://uploads.mangadex.org/covers/e900135b-8eba-4d29-85c9-db3d5ae885c7/9a9fa7b3-df9a-4b74-970e-9853a40e2977.jpg.256.jpg",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Populares no Brasil",
+          "itemCount": 20,
+          "hasCover": true,
+          "sampleTitle": "Na Honjaman Level-Up",
+          "sampleCover": "https://uploads.mangadex.org/covers/32d76d19-8a05-4db0-9fc2-e0b0648fe9d0/e90bdc47-c8b9-4df7-b2c0-17641b645ee1.jpg.256.jpg",
+          "error": null
+        },
+        {
+          "id": "rating",
+          "title": "Melhor Avaliados",
+          "itemCount": 20,
+          "hasCover": true,
+          "sampleTitle": "JoJo no Kimyou na Bouken: Part 7 - Steel Ball Run Color-ban",
+          "sampleCover": "https://uploads.mangadex.org/covers/1044287a-73df-48d0-b0b2-5327f32dd651/92e82cbb-de1e-47f0-a3ae-22f480a59994.jpg.256.jpg",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "e900135b-8eba-4d29-85c9-db3d5ae885c7",
+      "title": "The Ghostly Doctor",
+      "thumbnailUrl": "https://uploads.mangadex.org/covers/e900135b-8eba-4d29-85c9-db3d5ae885c7/9a9fa7b3-df9a-4b74-970e-9853a40e2977.jpg.256.jpg"
+    },
+    "chapters": {
+      "count": 28,
+      "sampleTitle": "Capítulo 27 [Usagi Scan]"
+    },
+    "reader": {
+      "pagesCount": 60,
+      "samplePage": "https://cmdxd98sb0x3yprd.mangadex.network/data/926ff2478bfd1cee8e8fd6407274217e/f1-96d166b45bd62a6ce9fd0585d61d15f2200a9dbd218f9e850fd45b30d4c0ccb0.png"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 3705
+  },
+  {
+    "id": "MangaFlix",
+    "name": "Manga Flix",
+    "version": "1.0.2",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 3,
+      "sections": [
+        {
+          "id": "most-read",
+          "title": "Mais Lidos",
+          "itemCount": 30,
+          "hasCover": true,
+          "sampleTitle": "Martial Peak",
+          "sampleCover": "https://static.mangaflix.net/data/mangas/6513a5c4d0e2acdd1e1ab741/posters/30c946e2-ab3e-4ca7-84b8-968c834311c4.jpg",
+          "error": null
+        },
+        {
+          "id": "trending",
+          "title": "Em Alta",
+          "itemCount": 30,
+          "hasCover": true,
+          "sampleTitle": "Leveling Up by Killing Gods",
+          "sampleCover": "https://static.mangaflix.net/data/mangas/6515f76b29c6a805b1796256/posters/c4cdba27-9451-4560-ab3d-c25bec6ed130.jpg",
+          "error": null
+        },
+        {
+          "id": "latest",
+          "title": "Últimos Lançamentos",
+          "itemCount": 100,
+          "hasCover": true,
+          "sampleTitle": "O General – Lenda Lutadora",
+          "sampleCover": "https://static.mangaflix.net/up/9dbc2653-44a8-457b-b14e-d621cde86176/optimized.jpg",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "6513a5c4d0e2acdd1e1ab741",
+      "title": "Martial Peak",
+      "thumbnailUrl": "https://static.mangaflix.net/data/mangas/6513a5c4d0e2acdd1e1ab741/posters/30c946e2-ab3e-4ca7-84b8-968c834311c4.jpg"
+    },
+    "chapters": {
+      "count": 3863,
+      "sampleTitle": "Capítulo 3862"
+    },
+    "reader": {
+      "pagesCount": 6,
+      "samplePage": "https://static.mangaflix.net/up/chap/0eeb6600-8aec-4bc9-9760-d235105b1612/full.webp"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 5352
+  },
+  {
+    "id": "MangaLivreBlog",
+    "name": "MangaLivre Blog",
+    "version": "1.0.14",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 3,
+      "sections": [
+        {
+          "id": "popular",
+          "title": "Populares",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "Trapped in the Academy’s Eroge",
+          "sampleCover": "https://mangalivre.blog/wp-content/uploads/2026/10/cover-001-b19f0437.webp?v=4",
+          "error": null
+        },
+        {
+          "id": "updates",
+          "title": "Atualizações",
+          "itemCount": 21,
+          "hasCover": true,
+          "sampleTitle": "The Beginning After The End",
+          "sampleCover": "https://livre.xn--c5wx58dnej.online/mui/slimeread/528588/cover-001-5ad34f5e99.jpg?v=4",
+          "error": null
+        },
+        {
+          "id": "recommended",
+          "title": "Recomendados",
+          "itemCount": 6,
+          "hasCover": true,
+          "sampleTitle": "Trapped in the Academy’s Eroge",
+          "sampleCover": "https://mangalivre.blog/wp-content/uploads/2026/10/cover-001-b19f0437.webp",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "trapped-in-the-academys-eroge",
+      "title": "Trapped in the Academy’s Eroge",
+      "thumbnailUrl": "https://mangalivre.blog/wp-content/uploads/2026/10/cover-001-b19f0437.webp"
+    },
+    "chapters": {
+      "count": 120,
+      "sampleTitle": "Capítulo 120"
+    },
+    "reader": {
+      "pagesCount": 28,
+      "samplePage": "https://pub-fd34549394dd487c833b561317c11eed.r2.dev/manga/586959/capitulo-120/page-001-565f1529.webp"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 3538
+  },
+  {
+    "id": "MangaLivreTo",
+    "name": "MangaLivre To",
+    "version": "1.0.5",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "One Piece",
+          "sampleCover": "https://mangalivre.to/wp-content/uploads/2025/07/One-Piece-Manga-Livre.webp",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Populares",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "The Greatest Estate Developer – O Melhor Engenheiro do Mundo",
+          "sampleCover": "https://mangalivre.to/wp-content/uploads/2025/10/The-Greatest-Estate-Developer-o-Melhor-engenheiro-do-mundo.webp",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "one-piece-ptbr",
+      "title": "One Piece",
+      "thumbnailUrl": "https://mangalivre.to/wp-content/uploads/2025/07/One-Piece-Manga-Livre.webp"
+    },
+    "chapters": {
+      "count": 1181,
+      "sampleTitle": "Capitulo 1192"
+    },
+    "reader": {
+      "pagesCount": 14,
+      "samplePage": "https://mangalivre.to/wp-content/uploads/WP-manga/data/manga_6871553888b71/2c07672e60324a0a85d8c9df5d12641d/001.webp"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 3546
+  },
+  {
+    "id": "MangaNYX",
+    "name": "MangaNYX",
+    "version": "1.0.14",
+    "status": "PARTIAL",
+    "discover": {
+      "totalSections": 3,
+      "sections": [
+        {
+          "id": "highlights",
+          "title": "Destaques",
+          "itemCount": 6,
+          "hasCover": true,
+          "sampleTitle": "Blue Lock",
+          "sampleCover": "https://aurora.snipercache.com/manga/blue-lock/cover/1792243886806-blue-lock.webp?sig=9JByDEtmJmdOH2zaWkbo0Q&exp=1793941200",
+          "error": null
+        },
+        {
+          "id": "updates",
+          "title": "Atualizações Recentes",
+          "itemCount": 18,
+          "hasCover": true,
+          "sampleTitle": "One Piece Gakuen!!",
+          "sampleCover": "https://aurora.snipercache.com/manga/one-piece-gakuen/cover/1785813310985-one-piece-gakuen.webp?sig=-fn1FXXxxV74bUwXJgECjg&exp=1793941200",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Populares",
+          "itemCount": 12,
+          "hasCover": true,
+          "sampleTitle": "Blue Lock",
+          "sampleCover": "https://aurora.snipercache.com/manga/blue-lock/cover/1792243886806-blue-lock.webp?sig=9JByDEtmJmdOH2zaWkbo0Q&exp=1793941200",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "blue-lock",
+      "title": "Blue Lock",
+      "thumbnailUrl": "https://aurora.snipercache.com/manga/blue-lock/cover/1792243886806-blue-lock.webp?sig=9JByDEtmJmdOH2zaWkbo0Q&exp=1793941200"
+    },
+    "chapters": {
+      "count": 371,
+      "sampleTitle": "Ainda não existe neste mundo"
+    },
+    "reader": {
+      "pagesCount": 0,
+      "samplePage": null
+    },
+    "issues": [
+      "Erro em getChapterDetails: Resposta inválida ao obter chave de descriptografia (HTTP 403)"
+    ],
+    "cloudflare": false,
+    "durationMs": 9194
+  },
+  {
+    "id": "MangaOnline",
+    "name": "Manga Online",
+    "version": "1.0.20",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 3,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 21,
+          "hasCover": true,
+          "sampleTitle": "The Beginning After The End",
+          "sampleCover": "https://sp-ao.shortpixel.ai/client/to_webp,q_lossless,ret_img,w_333,h_500/https://mangaonline.love/wp-content/uploads/slimeread-turbo/1175/0/1.jpg",
+          "error": null
+        },
+        {
+          "id": "ranking",
+          "title": "Mais Lidos (Populares)",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "Eleceed",
+          "sampleCover": "https://sp-ao.shortpixel.ai/client/to_webp,q_lossless,ret_img,w_350,h_500/https://mangaonline.love/wp-content/uploads/2026/10/cover-001-487c527f.jpg",
+          "error": null
+        },
+        {
+          "id": "latest",
+          "title": "Destaques da Semana",
+          "itemCount": 6,
+          "hasCover": true,
+          "sampleTitle": "Eleceed",
+          "sampleCover": "https://sp-ao.shortpixel.ai/client/to_webp",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "the-beginning-after-the-end",
+      "title": "The Beginning After The End",
+      "thumbnailUrl": "https://sp-ao.shortpixel.ai/client/to_webp,q_lossless,ret_img,w_683,h_1024/https://mangaonline.love/wp-content/uploads/slimeread-turbo/1175/0/1.jpg"
+    },
+    "chapters": {
+      "count": 259,
+      "sampleTitle": "Capítulo 259"
+    },
+    "reader": {
+      "pagesCount": 13,
+      "samplePage": "https://sp-ao.shortpixel.ai/client/to_webp,q_lossless,ret_img/https://mangaonline.love/wp-content/uploads/slimeread-chapters/20953/1.webp"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 2308
+  },
+  {
+    "id": "MangasBrasuka",
+    "name": "Mangás Brasuka",
+    "version": "1.0.18",
+    "status": "BROKEN",
+    "discover": {
+      "totalSections": 4,
+      "sections": [
+        {
+          "id": "highlights",
+          "title": "Destaques",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "t.cookies is not iterable"
+        },
+        {
+          "id": "updates",
+          "title": "Atualizações Recentes",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "t.cookies is not iterable"
+        },
+        {
+          "id": "popular",
+          "title": "Mais Populares",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "t.cookies is not iterable"
+        },
+        {
+          "id": "mostRead",
+          "title": "Mais Lidos",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "t.cookies is not iterable"
+        }
+      ]
+    },
+    "manga": null,
+    "chapters": {
+      "count": 0,
+      "sampleTitle": null
+    },
+    "reader": {
+      "pagesCount": 0,
+      "samplePage": null
+    },
+    "issues": ["Nenhuma obra encontrada para testar capítulos e leitor"],
+    "cloudflare": false,
+    "durationMs": 1273
+  },
+  {
+    "id": "Manhastro",
+    "name": "Manhastro",
+    "version": "1.0.3",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "ranking",
+          "title": "Mais Lidos (Ranking Diário)",
+          "itemCount": 20,
+          "hasCover": true,
+          "sampleTitle": "The Return of the Scorned Genius",
+          "sampleCover": "https://temp3.manhastro.com/manga_6ac68ed8763bf/cover/n21qme7lrd/cover.jpg",
+          "error": null
+        },
+        {
+          "id": "updates",
+          "title": "Últimos Lançamentos",
+          "itemCount": 100,
+          "hasCover": true,
+          "sampleTitle": "O Reincarnante",
+          "sampleCover": "https://capa.manhastro.net/wp-content/uploads/2024/03/05185757/nova-thum-reincarnator-46403.png",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "135088",
+      "title": "The Return of the Scorned Genius",
+      "thumbnailUrl": "https://temp3.manhastro.com/manga_6ac68ed8763bf/cover/n21qme7lrd/cover.jpg"
+    },
+    "chapters": {
+      "count": 28,
+      "sampleTitle": "Capitulo 4"
+    },
+    "reader": {
+      "pagesCount": 31,
+      "samplePage": "https://albums.manhastro.net/t/426bfabc98d1f52c3f373e2417d2d079661d3a0077b2f6f600cddae5245049ab/temp3/manga_6ac68ed8763bf/capitulo-4-msjhnxk4vi/1.webp"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 2146
+  },
+  {
+    "id": "MonteTai",
+    "name": "Monte Tai",
+    "version": "1.0.0",
+    "status": "BROKEN",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        },
+        {
+          "id": "popular",
+          "title": "Mais Lidos",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        }
+      ]
+    },
+    "manga": null,
+    "chapters": {
+      "count": 0,
+      "sampleTitle": null
+    },
+    "reader": {
+      "pagesCount": 0,
+      "samplePage": null
+    },
+    "issues": ["Nenhuma obra encontrada para testar capítulos e leitor"],
+    "cloudflare": false,
+    "durationMs": 4389
+  },
+  {
+    "id": "MugiwarasOficial",
+    "name": "Mugiwaras Oficial",
+    "version": "1.0.0",
+    "status": "PARTIAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "popular",
+          "title": "Mais Lidos & Populares",
+          "itemCount": 19,
+          "hasCover": true,
+          "sampleTitle": "Shounen",
+          "sampleCover": "https://aurora.snipercache.com/manga/one-piece/cover/1785954191353-one-piece.webp?sig=dIWZKHB8i9ouAcStCHKFTQ&exp=1793941200",
+          "error": null
+        },
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 44,
+          "hasCover": true,
+          "sampleTitle": "One Piece Gakuen!!",
+          "sampleCover": "https://aurora.snipercache.com/manga/one-piece-gakuen/cover/1785813310985-one-piece-gakuen.webp?sig=-fn1FXXxxV74bUwXJgECjg&exp=1793941200",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "one-piece",
+      "title": "One Piece",
+      "thumbnailUrl": "https://mugiwarasoficial.org/api/og/cover/one-piece.jpg"
+    },
+    "chapters": {
+      "count": 11,
+      "sampleTitle": "Capítulo 1197 — Amar é proteger29 de out. de 2026"
+    },
+    "reader": {
+      "pagesCount": 0,
+      "samplePage": null
+    },
+    "issues": ["Capítulo retornou 0 páginas no leitor"],
+    "cloudflare": false,
+    "durationMs": 4588
+  },
+  {
+    "id": "MuitoHentai",
+    "name": "Muito Hentai",
+    "version": "1.0.6",
+    "status": "PARTIAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 24,
+          "hasCover": true,
+          "sampleTitle": "Melhor Que Ficção 2",
+          "sampleCover": "https://mangaz.muitohentai.club/posters/better-than-fiction-2.jpg",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Lidos",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        }
+      ]
+    },
+    "manga": {
+      "id": "better-than-fiction-2",
+      "title": "Melhor Que Ficção 2",
+      "thumbnailUrl": "https://mangaz.muitohentai.club/posters/better-than-fiction-2.jpg"
+    },
+    "chapters": {
+      "count": 1,
+      "sampleTitle": "Capitulo 1"
+    },
+    "reader": {
+      "pagesCount": 88,
+      "samplePage": "https://mangaz.muitohentai.club/mangas/better-than-fiction-2/1/1.jpg?nocache42"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 1098
+  },
+  {
+    "id": "MundoHentai",
+    "name": "Mundo Hentai",
+    "version": "1.0.5",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 15,
+          "hasCover": true,
+          "sampleTitle": "No Fim das Contas, as Oneesans Sensuais São Invencíveis, é Isso!?",
+          "sampleCover": "https://mundohentaioficial.com/wp-content/uploads/2026/10/1-15-241x334.jpg",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Lidos",
+          "itemCount": 15,
+          "hasCover": true,
+          "sampleTitle": "No Fim das Contas, as Oneesans Sensuais São Invencíveis, é Isso!?",
+          "sampleCover": "https://mundohentaioficial.com/wp-content/uploads/2026/10/1-15-241x334.jpg",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "no-fim-das-contas-as-oneesans-sensuais-sao-invenciveis-e-isso",
+      "title": "No Fim das Contas, as Oneesans Sensuais São Invencíveis, é Isso!?",
+      "thumbnailUrl": "https://mundohentaioficial.com/wp-content/uploads/2026/10/1-15.jpg"
+    },
+    "chapters": {
+      "count": 1,
+      "sampleTitle": "Capítulo Único"
+    },
+    "reader": {
+      "pagesCount": 62,
+      "samplePage": "https://mundohentaioficial.com/wp-content/uploads/2026/10/1-15.jpg"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 1721
+  },
+  {
+    "id": "NHentaiBR",
+    "name": "NHentai BR",
+    "version": "1.0.5",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 15,
+          "hasCover": true,
+          "sampleTitle": "Tower Residence Setsugu-ka Taiou-chuu 3 [Digital]",
+          "sampleCover": "https://nhentaibr.com/wp-content/uploads/2026/10/001-38-241x334.jpg",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Lidos",
+          "itemCount": 16,
+          "hasCover": true,
+          "sampleTitle": "Tower Residence Setsugu-ka Taiou-chuu 3 [Digital]",
+          "sampleCover": "https://nhentaibr.com/wp-content/uploads/2026/10/001-38-241x334.jpg",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "tower-residence-setsugu-ka-taiou-chuu-3",
+      "title": "Tower Residence Setsugu-ka Taiou-chuu 3 [Digital]",
+      "thumbnailUrl": "https://nhentaibr.com/wp-content/uploads/2026/10/001-38.jpg"
+    },
+    "chapters": {
+      "count": 1,
+      "sampleTitle": "Capítulo Único"
+    },
+    "reader": {
+      "pagesCount": 67,
+      "samplePage": "https://nhentaibr.com/wp-content/uploads/2026/10/001-38.jpg"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 790
+  },
+  {
+    "id": "NebulosaScan",
+    "name": "Nebulosa Scan",
+    "version": "1.0.5",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "18+\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tA reencarnação da gansa dourada do alfa dominante",
+          "sampleCover": "https://nebulosascan.com/wp-content/uploads/2025/10/Design_sem_nome-16.png",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Lidos",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "18+\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tA reencarnação da gansa dourada do alfa dominante",
+          "sampleCover": "https://nebulosascan.com/wp-content/uploads/2025/10/Design_sem_nome-16.png",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "a-reencarnacao-da-gansa-dourada-do-alfa-dominante",
+      "title": "A reencarnação da gansa dourada do alfa dominante",
+      "thumbnailUrl": "https://nebulosascan.com/wp-content/uploads/2025/10/Design_sem_nome-16.png"
+    },
+    "chapters": {
+      "count": 67,
+      "sampleTitle": "Capítulo 65"
+    },
+    "reader": {
+      "pagesCount": 8,
+      "samplePage": "https://nebulosascan.com/wp-content/uploads/WP-manga/data/manga_68a4db56750dd/8ba31f87bbe71644d41d71fb321d66d4/01.webp"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 1929
+  },
+  {
+    "id": "NexusMangas",
+    "name": "Nexus Mangás",
+    "version": "1.0.0",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "popular",
+          "title": "Mais Populares",
+          "itemCount": 30,
+          "hasCover": true,
+          "sampleTitle": "Eu Sou o Boss Final!",
+          "sampleCover": "https://supabase.nexusmangas.com/functions/v1/read-public-media?key=works%2Fffa0f03b-073c-41ce-8c66-76150d7888f0%2Fcover%2Fcover_1792171707333.webp",
+          "error": null
+        },
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 30,
+          "hasCover": true,
+          "sampleTitle": "O Horizonte",
+          "sampleCover": "https://supabase.nexusmangas.com/functions/v1/read-public-media?key=works%2F5de7038f-7506-469b-91f0-7151f016780f%2Fcover_timeline%2Fcover_1792126279924.webp",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "eu-sou-o-boss-final",
+      "title": "Eu Sou o Boss Final!",
+      "thumbnailUrl": "https://supabase.nexusmangas.com/functions/v1/read-public-media?key=works%2Fffa0f03b-073c-41ce-8c66-76150d7888f0%2Fcover%2Fcover_1792171707333.webp"
+    },
+    "chapters": {
+      "count": 26,
+      "sampleTitle": "Capítulo 26"
+    },
+    "reader": {
+      "pagesCount": 4,
+      "samplePage": "https://assets.nexusmangas.com/works/ffa0f03b-073c-41ce-8c66-76150d7888f0/chapters/26/p_0_dfda32b1e72f4a8eb5bff08c0f399aed.webp"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 673
+  },
+  {
+    "id": "NinjaScan",
+    "name": "Ninja Scan",
+    "version": "1.0.4",
+    "status": "BROKEN",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        },
+        {
+          "id": "popular",
+          "title": "Mais Lidos",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        }
+      ]
+    },
+    "manga": null,
+    "chapters": {
+      "count": 0,
+      "sampleTitle": null
+    },
+    "reader": {
+      "pagesCount": 0,
+      "samplePage": null
+    },
+    "issues": ["Nenhuma obra encontrada para testar capítulos e leitor"],
+    "cloudflare": false,
+    "durationMs": 287
+  },
+  {
+    "id": "OneReader",
+    "name": "OneReader",
+    "version": "1.0.0",
+    "status": "BROKEN",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Atualizações Recentes",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        },
+        {
+          "id": "popular",
+          "title": "Catálogo (A-Z)",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        }
+      ]
+    },
+    "manga": null,
+    "chapters": {
+      "count": 0,
+      "sampleTitle": null
+    },
+    "reader": {
+      "pagesCount": 0,
+      "samplePage": null
+    },
+    "issues": ["Nenhuma obra encontrada para testar capítulos e leitor"],
+    "cloudflare": false,
+    "durationMs": 101
+  },
+  {
+    "id": "PizzariaScan",
+    "name": "Pizzaria Scan",
+    "version": "1.0.0",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "popular",
+          "title": "Mais Populares",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "Isekai Meikyuu de Harem o",
+          "sampleCover": "https://images-ext-1.discordapp.net/external/bhvqclt_Ov0FsxDT6vYXZJvcEQCkywHCjCK44x8hncE/https/pizzariacomics.com/wp-content/uploads/2026/03/950599ce-fe8c-4e60-b982-d7d2b864e50d.jpg?format=webp&width=549&height=780",
+          "error": null
+        },
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 10,
+          "hasCover": true,
+          "sampleTitle": "O Investidor que Ve o Futuro",
+          "sampleCover": "https://pizzariacomics.com/wp-content/uploads/2026/10/o-investidor-que-ve-o-futuro-35e8820855da.webp",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "isekai-meikyuu-de-harem-o",
+      "title": "Entrar na Conta",
+      "thumbnailUrl": "https://images-ext-1.discordapp.net/external/bhvqclt_Ov0FsxDT6vYXZJvcEQCkywHCjCK44x8hncE/https/pizzariacomics.com/wp-content/uploads/2026/03/950599ce-fe8c-4e60-b982-d7d2b864e50d.jpg?format=webp&width=549&height=780"
+    },
+    "chapters": {
+      "count": 140,
+      "sampleTitle": "Capítulo 110"
+    },
+    "reader": {
+      "pagesCount": 13,
+      "samplePage": "https://pizzariacomics.com/wp-content/uploads/2026/08/manga/isekai-meikyuu-de-harem-o/ch-110/1-d0bbf9bbe560a5df5826c84780b480d14ec5f3630843efbf7a18ffabf09d3e69.png"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 5428
+  },
+  {
+    "id": "PlumaComics",
+    "name": "Pluma Comics",
+    "version": "1.0.0",
+    "status": "BROKEN",
+    "discover": {
+      "totalSections": 3,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Recém Atualizados",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        },
+        {
+          "id": "popular",
+          "title": "Mais Populares",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        },
+        {
+          "id": "all",
+          "title": "Todas as Obras",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        }
+      ]
+    },
+    "manga": null,
+    "chapters": {
+      "count": 0,
+      "sampleTitle": null
+    },
+    "reader": {
+      "pagesCount": 0,
+      "samplePage": null
+    },
+    "issues": ["Nenhuma obra encontrada para testar capítulos e leitor"],
+    "cloudflare": false,
+    "durationMs": 371
+  },
+  {
+    "id": "RFDragonScan",
+    "name": "RF Dragon Scan",
+    "version": "1.0.0",
+    "status": "BROKEN",
+    "discover": {
+      "totalSections": 3,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        },
+        {
+          "id": "popular",
+          "title": "Projetos em Destaque",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        },
+        {
+          "id": "all",
+          "title": "Todos os Projetos",
+          "itemCount": 0,
+          "hasCover": false,
+          "sampleTitle": null,
+          "sampleCover": null,
+          "error": "Nenhum item retornado (vazio)"
+        }
+      ]
+    },
+    "manga": null,
+    "chapters": {
+      "count": 0,
+      "sampleTitle": null
+    },
+    "reader": {
+      "pagesCount": 0,
+      "samplePage": null
+    },
+    "issues": ["Nenhuma obra encontrada para testar capítulos e leitor"],
+    "cloudflare": false,
+    "durationMs": 1829
+  },
+  {
+    "id": "Roxinha",
+    "name": "Roxinha",
+    "version": "1.0.0",
+    "status": "PARTIAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "popular",
+          "title": "Mais Populares",
+          "itemCount": 24,
+          "hasCover": true,
+          "sampleTitle": "Criando Vilões da Maneira Correta",
+          "sampleCover": "https://roxinha.online/uploads/1770943172404-536749722.png",
+          "error": null
+        },
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 24,
+          "hasCover": true,
+          "sampleTitle": "A Montanha da Ascensão",
+          "sampleCover": "https://roxinha.online/uploads/covers/cover_1793301264853.png",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "65",
+      "title": "Criando Vilões da Maneira Correta",
+      "thumbnailUrl": "https://roxinha.online/uploads/1770943172404-536749722.png"
+    },
+    "chapters": {
+      "count": 64,
+      "sampleTitle": "Capítulo 59"
+    },
+    "reader": {
+      "pagesCount": 0,
+      "samplePage": null
+    },
+    "issues": ["Capítulo retornou 0 páginas no leitor"],
+    "cloudflare": false,
+    "durationMs": 886
+  },
+  {
+    "id": "TaimuMangas",
+    "name": "Taimu Mangás",
+    "version": "1.0.0",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 24,
+          "hasCover": true,
+          "sampleTitle": "Meu Corpo Foi Possuído por Alguém",
+          "sampleCover": "https://cdn.taimumangas.com/covers/9c6c4fda-be61-40e2-b925-de37c4a40179.jpg",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Populares",
+          "itemCount": 24,
+          "hasCover": true,
+          "sampleTitle": "Por Favor me dê Essa Chupeta",
+          "sampleCover": "https://cdn.taimumangas.com/covers/88c03161-f567-4940-8aef-5038a23b3fcd_md.webp",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "026611027115",
+      "title": "Meu Corpo Foi Possuído por Alguém",
+      "thumbnailUrl": "https://cdn.taimumangas.com/covers/9c6c4fda-be61-40e2-b925-de37c4a40179_lg.webp"
+    },
+    "chapters": {
+      "count": 104,
+      "sampleTitle": "Capítulo 104"
+    },
+    "reader": {
+      "pagesCount": 35,
+      "samplePage": "https://cdn.taimumangas.com/chapters/842a11e7-103f-4b29-9c3a-f42aea7fe76a/001.webp"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 3114
+  },
+  {
+    "id": "Taiyo",
+    "name": "Taiyo",
+    "version": "1.0.0",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "popular",
+          "title": "Mais Populares",
+          "itemCount": 21,
+          "hasCover": true,
+          "sampleTitle": "Upando sozinho",
+          "sampleCover": "https://cdn.taiyo.moe/medias/17b03940-450b-4b34-a904-e9b296daee9a/covers/4ce8e97f-a130-4e06-8651-958f9d15d832.jpg",
+          "error": null
+        },
+        {
+          "id": "updates",
+          "title": "Atualizações Recentes",
+          "itemCount": 21,
+          "hasCover": true,
+          "sampleTitle": "The Protagonist's Childhood Friend Is Coming on Strong to Me, a Mob",
+          "sampleCover": "https://cdn.taiyo.moe/medias/15c9510c-fef5-4bbf-b545-465ed1ba626f/covers/ea0bb1fe-e09d-4cc0-bf35-51bca5c5d244.jpg",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "17b03940-450b-4b34-a904-e9b296daee9a",
+      "title": "Solo Leveling",
+      "thumbnailUrl": "https://taiyo.moe/_next/image?url=https%3A%2F%2Fcdn.taiyo.moe%2Fmedias%2F17b03940-450b-4b34-a904-e9b296daee9a%2Fcovers%2F4ce8e97f-a130-4e06-8651-958f9d15d832.jpg&w=384&q=75"
+    },
+    "chapters": {
+      "count": 201,
+      "sampleTitle": "Capítulo 200"
+    },
+    "reader": {
+      "pagesCount": 20,
+      "samplePage": "https://cdn.taiyo.moe/medias/17b03940-450b-4b34-a904-e9b296daee9a/chapters/9d694606-a816-422f-bd57-147cb4965007/d56ce2c7-6245-45d2-8079-059240926134.jpg"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 3414
+  },
+  {
+    "id": "TankouHentai",
+    "name": "Tankou Hentai",
+    "version": "1.0.0",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 12,
+          "hasCover": true,
+          "sampleTitle": "Seitei Gakuen Soccer-bu no Nichijou Zenpen ♡ + Kouhen",
+          "sampleCover": "https://tankouhentai.com/wp-content/uploads/2026/10/Seitei-Gakuen-Soccer-bu-no-Nichijou-Zenpen-hentai.jpg",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Lidos",
+          "itemCount": 12,
+          "hasCover": true,
+          "sampleTitle": "Rankou de Wakarou!",
+          "sampleCover": "https://tankouhentai.com/wp-content/uploads/2023/02/capa-rankou-de-wakarou-hentai-manga-ptbr.jpg",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "seitei-gakuen-soccer-bu-no-nichijou-zenpen-kouhen",
+      "title": "Seitei Gakuen Soccer-bu no Nichijou Zenpen ♡ + Kouhen",
+      "thumbnailUrl": "https://tankouhentai.com/wp-content/uploads/2026/10/Seitei-Gakuen-Soccer-bu-no-Nichijou-Zenpen-hentai.jpg"
+    },
+    "chapters": {
+      "count": 2,
+      "sampleTitle": "Capítulo 02"
+    },
+    "reader": {
+      "pagesCount": 143,
+      "samplePage": "https://tankouhentai.com/wp-content/uploads/WP-manga/data/manga_6abeb8b26b65d/9b6da575996779dea462d88d90199e15/PG_099_99.webp"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 2613
+  },
+  {
+    "id": "TaoSect",
+    "name": "Tao Sect",
+    "version": "1.0.3",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 3,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 20,
+          "hasCover": true,
+          "sampleTitle": "One Punch Man",
+          "sampleCover": "https://taosect.com/wp-content/uploads/2020/05/Volume_23_Cover.png",
+          "error": null
+        },
+        {
+          "id": "projects",
+          "title": "Obras em Destaque",
+          "itemCount": 15,
+          "hasCover": true,
+          "sampleTitle": "Baki vs Kengan",
+          "sampleCover": "https://taosect.com/wp-content/uploads/2021/09/27.jpg",
+          "error": null
+        },
+        {
+          "id": "all",
+          "title": "Todas as Obras",
+          "itemCount": 20,
+          "hasCover": true,
+          "sampleTitle": "Baki vs Kengan",
+          "sampleCover": "https://taosect.com/wp-content/uploads/2021/09/27.jpg",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "1296",
+      "title": "One Punch Man",
+      "thumbnailUrl": "https://taosect.com/wp-content/uploads/2020/05/Volume_23_Cover.png"
+    },
+    "chapters": {
+      "count": 100,
+      "sampleTitle": "Capítulo 238"
+    },
+    "reader": {
+      "pagesCount": 19,
+      "samplePage": "https://drive.google.com/thumbnail?id=1vyd4fdAMQ84JpFWxXu7VWAuJbHzZbcIy&sz=w1000"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 6823
+  },
+  {
+    "id": "ToonBr",
+    "name": "ToonBr",
+    "version": "1.0.0",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimos Lançamentos",
+          "itemCount": 24,
+          "hasCover": true,
+          "sampleTitle": "O Mundo Após a Queda",
+          "sampleCover": "https://cdn2.toonbr.com/manga/covers/df47bfd2-3d9c-49f5-ac6b-638006667c9c.jpeg",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Populares",
+          "itemCount": 24,
+          "hasCover": true,
+          "sampleTitle": "Escola de Guerreiros – Departamento de Ataque às Dungeons",
+          "sampleCover": "https://cdn2.toonbr.com/manga/covers/d5619b92-9756-4952-8955-3440d88fa4f6.webp",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "o-mundo-apos-a-queda",
+      "title": "O Mundo Após a Queda",
+      "thumbnailUrl": "https://cdn2.toonbr.com/manga/covers/df47bfd2-3d9c-49f5-ac6b-638006667c9c.jpeg"
+    },
+    "chapters": {
+      "count": 220,
+      "sampleTitle": "Capítulo 220"
+    },
+    "reader": {
+      "pagesCount": 15,
+      "samplePage": "https://cdn2.toonbr.com/manga/pages/1e6b29e7-7598-4ab8-9bf4-378f1bca2f08.jpeg"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 1331
+  },
+  {
+    "id": "TraducoesDoLipe",
+    "name": "Traduções do Lipe",
+    "version": "1.0.0",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 3,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 20,
+          "hasCover": true,
+          "sampleTitle": "Yamisu",
+          "sampleCover": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjle4z2FqjpZpBZwx8fQm5sefols0nNWqDsBa2aphnbnvxXz4zakV-wU1VZU8G6FIgsuG8cptaYCRCEVM-uLN7tCaXRG7M2prSYcXhxUk-wOzXHcXhmcYM_JR0Zi6kQ0TbFB4aPdtgqN3JATI-B-jdDssrAMQOsCAXP0BOCRzvCODXb3tp8T-nPRbCLcxOi/w600/1.jpg",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Obras em Destaque",
+          "itemCount": 15,
+          "hasCover": true,
+          "sampleTitle": "Yamisu",
+          "sampleCover": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjle4z2FqjpZpBZwx8fQm5sefols0nNWqDsBa2aphnbnvxXz4zakV-wU1VZU8G6FIgsuG8cptaYCRCEVM-uLN7tCaXRG7M2prSYcXhxUk-wOzXHcXhmcYM_JR0Zi6kQ0TbFB4aPdtgqN3JATI-B-jdDssrAMQOsCAXP0BOCRzvCODXb3tp8T-nPRbCLcxOi/w600/1.jpg",
+          "error": null
+        },
+        {
+          "id": "all",
+          "title": "Todas as Obras",
+          "itemCount": 20,
+          "hasCover": true,
+          "sampleTitle": "Yamisu",
+          "sampleCover": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjle4z2FqjpZpBZwx8fQm5sefols0nNWqDsBa2aphnbnvxXz4zakV-wU1VZU8G6FIgsuG8cptaYCRCEVM-uLN7tCaXRG7M2prSYcXhxUk-wOzXHcXhmcYM_JR0Zi6kQ0TbFB4aPdtgqN3JATI-B-jdDssrAMQOsCAXP0BOCRzvCODXb3tp8T-nPRbCLcxOi/w600/1.jpg",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "https://traducoesdolipe.blogspot.com/2026/10/yamisu.html",
+      "title": "Yamisu",
+      "thumbnailUrl": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjle4z2FqjpZpBZwx8fQm5sefols0nNWqDsBa2aphnbnvxXz4zakV-wU1VZU8G6FIgsuG8cptaYCRCEVM-uLN7tCaXRG7M2prSYcXhxUk-wOzXHcXhmcYM_JR0Zi6kQ0TbFB4aPdtgqN3JATI-B-jdDssrAMQOsCAXP0BOCRzvCODXb3tp8T-nPRbCLcxOi/w1200-h1200-p-k-no-nu/1.jpg"
+    },
+    "chapters": {
+      "count": 1,
+      "sampleTitle": "one shot"
+    },
+    "reader": {
+      "pagesCount": 14,
+      "samplePage": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgK7Pydg2qDocq63I_VvNxyguig9dv-0qNZ3gWChAXgQMY0ORd-g1PQZ5rPZgKeGkAcFTBZt3eUz9RsxW_LSdwo6C3JqB0y-OtOF9tkjosN2QrHJzchCrKsEFOfX30rk8mhXWEiEtUnkxOFpo4xIIvbHgiY3I78hIw7YdZAWyARrgKgGjukKjAFKClq9jmt/w600/1.jpg"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 3692
+  },
+  {
+    "id": "Vegitoons",
+    "name": "Vegitoons",
+    "version": "1.0.0",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "popular",
+          "title": "Mais Populares",
+          "itemCount": 26,
+          "hasCover": true,
+          "sampleTitle": "Pico Marcial",
+          "sampleCover": "https://api.vegitoons.black/cdn/obra/15472/capa",
+          "error": null
+        },
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 26,
+          "hasCover": true,
+          "sampleTitle": "Usuário de Gravidade de Classe Oculta",
+          "sampleCover": "https://api.vegitoons.black/cdn/obra/20946/capa",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "15472",
+      "title": "Pico Marcial",
+      "thumbnailUrl": "https://api.vegitoons.black/cdn/obra/15472/capa"
+    },
+    "chapters": {
+      "count": 3862,
+      "sampleTitle": "Capítulo 3862"
+    },
+    "reader": {
+      "pagesCount": 17,
+      "samplePage": "https://api.vegitoons.black/cdn/capitulo/420285/p/0?tst=bb116d45f8e85a1e"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 1781
+  },
+  {
+    "id": "YomuComics",
+    "name": "Yomu Comics",
+    "version": "1.0.0",
+    "status": "PARTIAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 23,
+          "hasCover": true,
+          "sampleTitle": "Inkya no Ore ga Sekigae de S-kyuu Bishoujo ni Kakomaretara Himitsu no Kankei ga Hajimatta.",
+          "sampleCover": "https://b2.yomumangas.com/mangas/1351/cover.avif?v=1793333918431",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Populares",
+          "itemCount": 25,
+          "hasCover": true,
+          "sampleTitle": "Hagane no Renkinjutsushi",
+          "sampleCover": "https://b2.yomumangas.com/mangas/8/cover.avif",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "1351#inkya-no-ore-ga-sekigae-de-s-kyuu-bishoujo-ni-kakomaretara-himitsu-no-kankei-ga-hajimatta",
+      "title": "Inkya no Ore ga Sekigae de S-kyuu Bishoujo ni Kakomaretara Himitsu no Kankei ga Hajimatta.",
+      "thumbnailUrl": "https://b2.yomumangas.com/mangas/1351/cover.avif?v=1793333919032"
+    },
+    "chapters": {
+      "count": 4,
+      "sampleTitle": "Capítulo 1 - Troca de Lugares"
+    },
+    "reader": {
+      "pagesCount": 0,
+      "samplePage": null
+    },
+    "issues": ["Capítulo retornou 0 páginas no leitor"],
+    "cloudflare": false,
+    "durationMs": 1652
+  },
+  {
+    "id": "YuriOnAir",
+    "name": "Yuri on Air",
+    "version": "1.0.4",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 2,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimas Atualizações",
+          "itemCount": 12,
+          "hasCover": true,
+          "sampleTitle": "O cara que estou a fim não é um cara?!",
+          "sampleCover": "https://yurionair.top/wp-content/uploads/2024/04/The-Guy-She-Was-Interested-in-Wasnt-a-Guy-at-All-Manga-GL-1.webp",
+          "error": null
+        },
+        {
+          "id": "popular",
+          "title": "Mais Lidos",
+          "itemCount": 12,
+          "hasCover": true,
+          "sampleTitle": "Tamen de Gushi (Tan Jiu)",
+          "sampleCover": "https://yurionair.top/wp-content/uploads/2018/07/tamen-de-gushi-manhua.jpg",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "the-guy-she-was-interested-in-wasnt-a-guy-at-all",
+      "title": "O cara que estou a fim não é um cara?!",
+      "thumbnailUrl": "https://yurionair.top/wp-content/uploads/2024/04/The-Guy-She-Was-Interested-in-Wasnt-a-Guy-at-All-Manga-GL-1.webp"
+    },
+    "chapters": {
+      "count": 203,
+      "sampleTitle": "Capítulo 182 - Vitórias e Derrotas na Casa"
+    },
+    "reader": {
+      "pagesCount": 5,
+      "samplePage": "https://yurionair.top/wp-content/uploads/2024/04/YuriLive-amazon-logo-sticker-adesivo.webp"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 3400
+  },
+  {
+    "id": "ZettaHQ",
+    "name": "ZettaHQ",
+    "version": "1.0.1",
+    "status": "OPERATIONAL",
+    "discover": {
+      "totalSections": 4,
+      "sections": [
+        {
+          "id": "updates",
+          "title": "Últimos Lançamentos",
+          "itemCount": 20,
+          "hasCover": true,
+          "sampleTitle": "A Day At The Beach",
+          "sampleCover": "https://zettahq.com/wp-content/uploads/2026/09/PG_20.jpg.jpg",
+          "error": null
+        },
+        {
+          "id": "hq-hentai",
+          "title": "HQ Hentai",
+          "itemCount": 20,
+          "hasCover": true,
+          "sampleTitle": "A Day At The Beach",
+          "sampleCover": "https://zettahq.com/wp-content/uploads/2026/09/PG_20.jpg.jpg",
+          "error": null
+        },
+        {
+          "id": "3d",
+          "title": "Hentai 3D",
+          "itemCount": 20,
+          "hasCover": true,
+          "sampleTitle": "A Day At The Beach",
+          "sampleCover": "https://zettahq.com/wp-content/uploads/2026/09/PG_20.jpg.jpg",
+          "error": null
+        },
+        {
+          "id": "colorido",
+          "title": "Coloridos",
+          "itemCount": 20,
+          "hasCover": true,
+          "sampleTitle": "A Night With Flayn",
+          "sampleCover": "https://zettahq.com/wp-content/uploads/2026/09/08.jpg-2.webp",
+          "error": null
+        }
+      ]
+    },
+    "manga": {
+      "id": "a-day-at-the-beach",
+      "title": "A Day At The Beach",
+      "thumbnailUrl": "https://zettahq.com/wp-content/uploads/2023/04/logo-site.png"
+    },
+    "chapters": {
+      "count": 1,
+      "sampleTitle": "Capítulo Único"
+    },
+    "reader": {
+      "pagesCount": 51,
+      "samplePage": "https://zettahq.com/wp-content/uploads/2026/09/01.jpg.webp"
+    },
+    "issues": [],
+    "cloudflare": false,
+    "durationMs": 809
+  }
+]
