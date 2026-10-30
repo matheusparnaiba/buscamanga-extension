@@ -4,7 +4,7 @@ export default {
   name: "Hentai Tokyo",
   description:
     "Extensão oficial do Hentai Tokyo com acervo completo de mangás, doujinshis e quadrinhos adultos (+18).",
-  version: "1.0.1",
+  version: "1.0.2",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,
