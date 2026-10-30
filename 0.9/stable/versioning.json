@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-10-30T14:19:13.059Z",
+  "buildTime": "2026-10-30T14:49:09.620Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -1364,7 +1364,7 @@
     {
       "name": "Muito Hentai",
       "description": "Extensão do \"https://www.muitohentai.com\" (conteúdo adulto +18)",
-      "version": "1.0.7",
+      "version": "1.0.8",
       "icon": "icon.png",
       "language": "pt-br",
       "contentRating": "SAFE",
@@ -1565,7 +1565,7 @@
     {
       "name": "OneReader",
       "description": "Extensão oficial do OneReader (\"https://onereader.net\") com acervo de mangás, manhwas e manhuas.",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "icon": "icon.png",
       "language": "pt-BR",
       "contentRating": "SAFE",
