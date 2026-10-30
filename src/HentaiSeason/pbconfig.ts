@@ -4,7 +4,7 @@ export default {
   name: "Hentai Season",
   description:
     "Extensão oficial da Hentai Season com foco em doujinshis, quadrinhos e hentai em português (+18).",
-  version: "1.0.0",
+  version: "1.0.1",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

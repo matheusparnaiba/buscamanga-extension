@@ -3,7 +3,7 @@ import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/typ
 export default {
   name: "Monte Tai",
   description: "Extensão da Monte Tai Scanlator com foco em manhwas, manhuas e cultivação.",
-  version: "1.0.0",
+  version: "1.0.1",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

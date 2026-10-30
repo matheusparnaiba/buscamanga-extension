@@ -4,7 +4,7 @@ export default {
   name: "HQ Porno",
   description:
     'Extensão do "https://www.hqporno.net" (Quadrinhos eróticos, hentai e HQs em português, conteúdo adulto +18)',
-  version: "1.0.4",
+  version: "1.0.5",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

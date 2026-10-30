@@ -4,7 +4,7 @@ export default {
   name: "MangaDex",
   description:
     "Extensão do MangaDex com catálogo de mangás e capítulos traduzidos em Português (PT-BR).",
-  version: "1.0.0",
+  version: "1.0.1",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

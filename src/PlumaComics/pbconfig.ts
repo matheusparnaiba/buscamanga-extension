@@ -5,7 +5,7 @@ export default {
   name: "Pluma Comics",
   description:
     "Extensão oficial da Pluma Comics com manhwas, manhuas e webtoons traduzidos em português.",
-  version: "1.0.0",
+  version: "1.0.1",
   icon: "icon.png",
   language: "pt-BR",
   contentRating: ContentRating.EVERYONE,

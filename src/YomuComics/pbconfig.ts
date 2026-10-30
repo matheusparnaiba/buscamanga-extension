@@ -4,7 +4,7 @@ export default {
   name: "Yomu Comics",
   description:
     "Extensão oficial do Yomu Comics / Yomu Mangás para leitura de mangás, manhwas e novels em português.",
-  version: "1.0.0",
+  version: "1.0.1",
   icon: "icon.png",
   language: "pt-BR",
   contentRating: ContentRating.EVERYONE,

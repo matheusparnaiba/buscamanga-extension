@@ -4,7 +4,7 @@ export default {
   name: "Hora Hentai",
   description:
     "Extensão oficial do Hora Hentai com acervo de mangás hentai, doujinshis, quadrinhos e traduzidos (+18).",
-  version: "1.0.0",
+  version: "1.0.1",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

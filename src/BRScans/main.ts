@@ -39,12 +39,11 @@ function getImageUrl(
     | undefined,
 ): string {
   if (!images) return "";
-  const src = images.original || images.translated || images.raw || "";
+  let src = images.original || images.translated || images.raw || "";
   try {
-    return encodeURI(decodeURI(src));
-  } catch {
-    return src.replace(/\s+/g, "%20");
-  }
+    src = decodeURI(src);
+  } catch {}
+  return encodeURI(src).replace(/%2520/g, "%20").replace(/ /g, "%20");
 }
 
 export class BRScansExtension implements ExtensionImpl<typeof BRScansConfig> {

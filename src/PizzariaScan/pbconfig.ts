@@ -4,7 +4,7 @@ export default {
   name: "Pizzaria Scan",
   description:
     "Extensão oficial da Pizzaria Scan com foco em comédia, ecchi, manhwas e mangás variados.",
-  version: "1.0.0",
+  version: "1.0.1",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.MATURE,

@@ -4,7 +4,7 @@ import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/typ
 export default {
   name: "Astratoons",
   description: "Extensão oficial do Astratoons com grande catálogo de manhwas, manhuas e webtoons.",
-  version: "1.0.0",
+  version: "1.0.1",
   icon: "icon.png",
   language: "pt-BR",
   contentRating: ContentRating.EVERYONE,

@@ -82,10 +82,9 @@ function sanitizeImageUrl(raw: string): string {
   if (src.startsWith("//")) src = "https:" + src;
   else if (src.startsWith("/")) src = BASE_URL + src;
   try {
-    return encodeURI(decodeURI(src));
-  } catch {
-    return src.replace(/\s+/g, "%20");
-  }
+    src = decodeURI(src);
+  } catch {}
+  return encodeURI(src).replace(/%2520/g, "%20").replace(/ /g, "%20");
 }
 
 function imageFrom($img: cheerio.Cheerio<any>): string {

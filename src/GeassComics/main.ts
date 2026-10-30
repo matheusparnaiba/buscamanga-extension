@@ -36,8 +36,14 @@ const API_URL = "https://api.geasscomics.xyz";
 
 function cleanCoverUrl(url: string | null | undefined): string {
   if (!url) return "";
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  return `${API_URL}/${url.replace(/^\//, "")}`;
+  let full = url;
+  if (!full.startsWith("http://") && !full.startsWith("https://")) {
+    full = `${API_URL}/${full.replace(/^\//, "")}`;
+  }
+  try {
+    full = decodeURI(full);
+  } catch {}
+  return encodeURI(full).replace(/%2520/g, "%20").replace(/ /g, "%20");
 }
 
 function sanitizeTagId(raw: string): string {

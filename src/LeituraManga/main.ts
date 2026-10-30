@@ -29,6 +29,17 @@ const API_BASE = "https://api.leituramanga.net";
 const SITE_BASE = "https://leituramanga.net";
 const CDN_BASE = "https://cdn.leituramanga.net";
 
+function sanitizeImageUrl(raw: string | null | undefined): string {
+  if (!raw) return "";
+  let src = raw.trim();
+  if (src.startsWith("//")) src = "https:" + src;
+  else if (src.startsWith("/")) src = SITE_BASE + src;
+  try {
+    src = decodeURI(src);
+  } catch {}
+  return encodeURI(src).replace(/%2520/g, "%20").replace(/ /g, "%20");
+}
+
 function cleanJson(body: string): any {
   const cleaned = body
     .replace(/^[\uFEFF\s]+/, "")
@@ -121,7 +132,7 @@ export class LeituraMangaExtension implements ExtensionImpl<typeof ContentTempla
       }
 
       const title = item.title || slug;
-      const imageUrl = `${CDN_BASE}/${slug}/cover-md.webp`;
+      const imageUrl = sanitizeImageUrl(`${CDN_BASE}/${slug}/cover-md.webp`);
       const isAdult = item.genres?.some((g: any) => g.isAdult);
 
       if (section.id === "popular") {
@@ -203,7 +214,7 @@ export class LeituraMangaExtension implements ExtensionImpl<typeof ContentTempla
       }
 
       const title = item.title || slug;
-      const imageUrl = `${CDN_BASE}/${slug}/cover-md.webp`;
+      const imageUrl = sanitizeImageUrl(`${CDN_BASE}/${slug}/cover-md.webp`);
       const isAdult = item.genres?.some((g: any) => g.isAdult);
 
       items.push({
@@ -248,7 +259,9 @@ export class LeituraMangaExtension implements ExtensionImpl<typeof ContentTempla
       $('img[src*="cover"]').attr("src") ||
       `${CDN_BASE}/${slug}/cover-md.webp`;
 
-    const thumbnailUrl = rawCover.startsWith("//") ? "https:" + rawCover : rawCover;
+    const thumbnailUrl = sanitizeImageUrl(
+      rawCover.startsWith("//") ? "https:" + rawCover : rawCover,
+    );
 
     // Cache mongo ID if present in page
     const mongoMatch = data.match(/mangaId[\\]*":[\\]*"([a-f0-9]{24})/i);

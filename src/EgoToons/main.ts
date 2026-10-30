@@ -39,8 +39,14 @@ const API_URL = "https://api.egotoons.com";
 
 function cleanCoverUrl(url: string | null | undefined): string {
   if (!url) return "";
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  return `${BASE_URL}${url.startsWith("/") ? "" : "/"}${url}`;
+  let full = url;
+  if (!full.startsWith("http://") && !full.startsWith("https://")) {
+    full = `${BASE_URL}${full.startsWith("/") ? "" : "/"}${full}`;
+  }
+  try {
+    full = decodeURI(full);
+  } catch {}
+  return encodeURI(full).replace(/%2520/g, "%20").replace(/ /g, "%20");
 }
 
 function sanitizeTagId(raw: string): string {

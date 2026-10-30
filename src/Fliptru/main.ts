@@ -27,6 +27,17 @@ declare const App: any;
 
 const BASE_URL = "https://fliptru.com.br";
 
+function sanitizeImageUrl(raw: string | null | undefined): string {
+  if (!raw) return "";
+  let src = raw.trim();
+  if (src.startsWith("//")) src = "https:" + src;
+  else if (src.startsWith("/")) src = BASE_URL + src;
+  try {
+    src = decodeURI(src);
+  } catch {}
+  return encodeURI(src).replace(/%2520/g, "%20").replace(/ /g, "%20");
+}
+
 function sanitizeTagId(raw: string): string {
   return (
     raw
@@ -256,7 +267,7 @@ export class FliptruExtension implements ExtensionImpl<typeof ContentTemplateCon
             mangaId: slug,
             title,
             imageUrl:
-              img ||
+              sanitizeImageUrl(img) ||
               "https://ui-avatars.com/api/?name=" +
                 encodeURIComponent(title) +
                 "&background=random",
@@ -295,7 +306,7 @@ export class FliptruExtension implements ExtensionImpl<typeof ContentTemplateCon
             chapterId: slug,
             title,
             imageUrl:
-              img ||
+              sanitizeImageUrl(img) ||
               "https://ui-avatars.com/api/?name=" +
                 encodeURIComponent(title) +
                 "&background=random",
@@ -406,7 +417,7 @@ export class FliptruExtension implements ExtensionImpl<typeof ContentTemplateCon
           mangaId: slug,
           title,
           imageUrl:
-            img ||
+            sanitizeImageUrl(img) ||
             "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random",
           contentRating: ContentRating.EVERYONE,
         });
@@ -440,10 +451,11 @@ export class FliptruExtension implements ExtensionImpl<typeof ContentTemplateCon
       $('meta[property="og:image"]').attr("content") ||
       $(".comic-cover img, .cover img").attr("src");
 
-    const thumbnailUrl =
+    const thumbnailUrl = sanitizeImageUrl(
       rawImage && rawImage.startsWith("http")
         ? rawImage
-        : "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
+        : "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random",
+    );
 
     let author = "Desconhecido";
     const authorEl = $('a[href*="/user/"], a[href*="/@"], .comic-author, .author-name').first();

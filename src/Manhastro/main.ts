@@ -45,10 +45,9 @@ function getCoverUrl(imagem: string | null | undefined, title: string): string {
     src = "https://" + src.replace(/^\/+/, "");
   }
   try {
-    return encodeURI(decodeURI(src));
-  } catch {
-    return src.replace(/\s+/g, "%20");
-  }
+    src = decodeURI(src);
+  } catch {}
+  return encodeURI(src).replace(/%2520/g, "%20").replace(/ /g, "%20");
 }
 
 function sanitizeTagId(raw: string): string {

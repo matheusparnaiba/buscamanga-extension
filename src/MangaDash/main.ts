@@ -56,10 +56,9 @@ function cleanCoverUrl(capa?: string | null): string {
     src = `${BASE_URL}${src.startsWith("/") ? "" : "/"}${src}`;
   }
   try {
-    return encodeURI(decodeURI(src));
-  } catch {
-    return src.replace(/\s+/g, "%20");
-  }
+    src = decodeURI(src);
+  } catch {}
+  return encodeURI(src).replace(/%2520/g, "%20").replace(/ /g, "%20");
 }
 
 export class MangaDashExtension

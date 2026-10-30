@@ -3,7 +3,7 @@ import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/typ
 export default {
   name: "Manga Flix",
   description: "Extensão oficial do MangaFlix com catálogo abrangente de mangás e manhwas.",
-  version: "1.0.2",
+  version: "1.0.3",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

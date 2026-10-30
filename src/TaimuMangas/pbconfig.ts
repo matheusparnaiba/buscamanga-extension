@@ -4,7 +4,7 @@ export default {
   name: "Taimu Mangás",
   description:
     "Extensão oficial da Taimu Mangás com catálogo completo de mangás, manhwas e manhuas em português.",
-  version: "1.0.0",
+  version: "1.0.1",
   icon: "icon.png",
   language: "pt-BR",
   contentRating: ContentRating.EVERYONE,

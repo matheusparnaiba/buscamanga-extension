@@ -4,7 +4,7 @@ export default {
   name: "BR Scans",
   description:
     "Extensão oficial da BR Scans com foco em manhwas e webtoons com múltiplas variantes de leitura.",
-  version: "1.0.0",
+  version: "1.0.1",
   icon: "icon.png",
   language: "pt-BR",
   contentRating: ContentRating.EVERYONE,

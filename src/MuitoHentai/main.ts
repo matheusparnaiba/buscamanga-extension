@@ -26,6 +26,17 @@ declare const App: any;
 
 const BASE_URL = "https://www.muitohentai.com";
 
+function sanitizeImageUrl(raw: string | null | undefined): string {
+  if (!raw) return "";
+  let src = raw.trim();
+  if (src.startsWith("//")) src = "https:" + src;
+  else if (src.startsWith("/")) src = BASE_URL + src;
+  try {
+    src = decodeURI(src);
+  } catch {}
+  return encodeURI(src).replace(/%2520/g, "%20").replace(/ /g, "%20");
+}
+
 /** `page` é a página atual (1-based); o site pagina com `/<path>/N`. */
 const SECTIONS: { id: string; title: string; path: string; type: DiscoverSectionType }[] = [
   {
@@ -85,7 +96,7 @@ function parseCards($: cheerio.CheerioAPI): SearchResultItem[] {
     items.push({
       mangaId,
       title,
-      imageUrl: img,
+      imageUrl: sanitizeImageUrl(img),
       contentRating: ContentRating.EVERYONE,
       subtitle: "18+",
     });
@@ -217,7 +228,7 @@ export class MuitoHentaiExtension implements ExtensionImpl<typeof MuitoHentaiCon
       mangaInfo: {
         primaryTitle: title || mangaId,
         secondaryTitles: [],
-        thumbnailUrl: cover,
+        thumbnailUrl: sanitizeImageUrl(cover),
         synopsis,
         contentRating: ContentRating.EVERYONE,
         status: "COMPLETED",

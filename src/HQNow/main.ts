@@ -39,13 +39,16 @@ function normalizeImageUrl(url: string | null | undefined, title: string): strin
   if (!url) {
     return "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
   }
-  if (url.startsWith("http://")) {
-    return url.replace("http://", "https://");
+  let src = url;
+  if (src.startsWith("http://")) {
+    src = src.replace("http://", "https://");
+  } else if (src.startsWith("//")) {
+    src = "https:" + src;
   }
-  if (url.startsWith("//")) {
-    return "https:" + url;
-  }
-  return url;
+  try {
+    src = decodeURI(src);
+  } catch {}
+  return encodeURI(src).replace(/%2520/g, "%20").replace(/ /g, "%20");
 }
 
 export class HQNowExtension implements ExtensionImpl<typeof ContentTemplateConfig> {

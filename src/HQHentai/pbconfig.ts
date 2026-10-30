@@ -4,7 +4,7 @@ export default {
   name: "HQ Hentai",
   description:
     'Extensão do "https://hqhentai.net" (HQs e doujinshis hentai em português, conteúdo adulto +18)',
-  version: "1.0.6",
+  version: "1.0.7",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

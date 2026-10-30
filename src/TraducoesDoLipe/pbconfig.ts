@@ -4,7 +4,7 @@ export default {
   name: "Traduções do Lipe",
   description:
     "Extensão oficial da Traduções do Lipe com foco em mangás clássicos, nostálgicos e alternativos.",
-  version: "1.0.0",
+  version: "1.0.1",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

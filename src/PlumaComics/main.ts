@@ -36,9 +36,15 @@ const BASE_URL = "https://plumacomics.cloud";
 
 function cleanCoverUrl(url: string | null | undefined): string {
   if (!url) return "";
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  const path = url.replace(/^\/?(api\/cover\/)?/, "");
-  return `${BASE_URL}/api/cover/${path}`;
+  let full = url;
+  if (!full.startsWith("http://") && !full.startsWith("https://")) {
+    const path = full.replace(/^\/?(api\/cover\/)?/, "");
+    full = `${BASE_URL}/api/cover/${path}`;
+  }
+  try {
+    full = decodeURI(full);
+  } catch {}
+  return encodeURI(full).replace(/%2520/g, "%20").replace(/ /g, "%20");
 }
 
 function sanitizeTagId(raw: string): string {

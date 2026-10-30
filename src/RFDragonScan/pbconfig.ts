@@ -4,7 +4,7 @@ import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/typ
 export default {
   name: "RF Dragon Scan",
   description: "Extensão oficial da RF Dragon Scan especializada em manhwas, manhuas e webtoons.",
-  version: "1.0.0",
+  version: "1.0.1",
   icon: "icon.png",
   language: "pt-BR",
   contentRating: ContentRating.EVERYONE,

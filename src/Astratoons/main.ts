@@ -34,9 +34,15 @@ const BASE_URL = "https://new.astratoons.com";
 
 function cleanCoverUrl(url: string | null | undefined): string {
   if (!url) return "";
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  const path = url.replace(/^\/?(storage\/)?/, "");
-  return `${BASE_URL}/storage/${path}`;
+  let full = url;
+  if (!full.startsWith("http://") && !full.startsWith("https://")) {
+    const path = full.replace(/^\/?(storage\/)?/, "");
+    full = `${BASE_URL}/storage/${path}`;
+  }
+  try {
+    full = decodeURI(full);
+  } catch {}
+  return encodeURI(full).replace(/%2520/g, "%20").replace(/ /g, "%20");
 }
 
 function sanitizeTagId(raw: string): string {

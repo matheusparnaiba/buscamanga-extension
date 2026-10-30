@@ -35,6 +35,17 @@ declare const App: any;
 
 const BASE_URL = "https://rfdragonscan.net";
 
+function sanitizeImageUrl(raw: string | null | undefined): string {
+  if (!raw) return "";
+  let src = raw.trim();
+  if (src.startsWith("//")) src = "https:" + src;
+  else if (src.startsWith("/")) src = BASE_URL + src;
+  try {
+    src = decodeURI(src);
+  } catch {}
+  return encodeURI(src).replace(/%2520/g, "%20").replace(/ /g, "%20");
+}
+
 let actionIds: Record<string, string> = {
   getOne: "6075432a2003e67d4025a0b390a5b52df9e61a84df",
   getAllChapters: "608dc929646b92127012e8d8d5b8bebae1c2cae8cc",
@@ -239,7 +250,7 @@ export class RFDragonScanExtension implements ExtensionImpl<typeof RFDragonScanC
         const title = p.title?.trim() || "Sem título";
         const mangaId = `${p.id}/${p.link}`;
         const imageUrl =
-          p.cover_image ||
+          sanitizeImageUrl(p.cover_image) ||
           `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
 
         if (section.id === "updates") {
@@ -312,7 +323,7 @@ export class RFDragonScanExtension implements ExtensionImpl<typeof RFDragonScanC
         const title = p.title?.trim() || "Sem título";
         const mangaId = `${p.id}/${p.link}`;
         const imageUrl =
-          p.cover_image ||
+          sanitizeImageUrl(p.cover_image) ||
           `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
 
         items.push({
@@ -356,7 +367,7 @@ export class RFDragonScanExtension implements ExtensionImpl<typeof RFDragonScanC
 
       if (dto) {
         title = dto.title || title;
-        thumbnailUrl = dto.cover_image || thumbnailUrl;
+        thumbnailUrl = sanitizeImageUrl(dto.cover_image) || thumbnailUrl;
         synopsis = dto.synopsis || "";
         const s = (dto.status || "").toUpperCase();
         if (s === "FINISHED") {
