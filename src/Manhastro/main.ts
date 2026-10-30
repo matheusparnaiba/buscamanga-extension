@@ -40,10 +40,15 @@ function getCoverUrl(imagem: string | null | undefined, title: string): string {
   if (!imagem) {
     return "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
   }
-  if (imagem.startsWith("http://") || imagem.startsWith("https://")) {
-    return imagem;
+  let src = imagem.trim();
+  if (!src.startsWith("http://") && !src.startsWith("https://")) {
+    src = "https://" + src.replace(/^\/+/, "");
   }
-  return "https://" + imagem.replace(/^\/+/, "");
+  try {
+    return encodeURI(decodeURI(src));
+  } catch {
+    return src.replace(/\s+/g, "%20");
+  }
 }
 
 function sanitizeTagId(raw: string): string {

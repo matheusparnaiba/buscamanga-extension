@@ -27,6 +27,20 @@ declare const App: any;
 
 const BASE_URL = "https://mugiwarasoficial.org";
 
+function sanitizeTagId(raw: string): string {
+  return (
+    raw
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/['’]/g, "")
+      .replace(/[^a-zA-Z0-9._\-@()[\]%?#+=/&:]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "") || "tag"
+  );
+}
+
 // Pure TypeScript SHA-256 and HMAC-SHA256 for cross-platform decryption
 const SHA256_K = [
   0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
@@ -211,6 +225,18 @@ function decryptAurora(payload: string, keyB64: string): string {
   return new TextDecoder("utf-8").decode(decrypted);
 }
 
+function sanitizeImageUrl(raw: string): string {
+  if (!raw) return "";
+  let src = raw.trim().replace(/-\d+x\d+(\.[a-zA-Z0-9]+)$/, "$1");
+  if (src.startsWith("//")) src = "https:" + src;
+  else if (src.startsWith("/")) src = BASE_URL + src;
+  try {
+    return encodeURI(decodeURI(src));
+  } catch {
+    return src.replace(/\s+/g, "%20");
+  }
+}
+
 function getImageSrc($img: cheerio.Cheerio<any>): string {
   let src = $img.attr("data-src") || $img.attr("data-lazy-src") || $img.attr("src") || "";
 
@@ -221,10 +247,7 @@ function getImageSrc($img: cheerio.Cheerio<any>): string {
     }
   }
 
-  src = src.trim();
-  if (src.startsWith("//")) src = "https:" + src;
-  else if (src.startsWith("/")) src = BASE_URL + src;
-  return src;
+  return sanitizeImageUrl(src);
 }
 
 function parsePortugueseDate(dateStr: string | null | undefined): Date | undefined {
@@ -479,7 +502,7 @@ export class MugiwarasOficialExtension implements ExtensionImpl<typeof Mugiwaras
     $("a[href*='/genero/'], a[href*='/categoria/'], span.badge").each((_, el) => {
       const g = $(el).text().trim();
       if (g) {
-        const id = g.toLowerCase().replace(/\s+/g, "-");
+        const id = sanitizeTagId(g);
         if (!seenGenres.has(id)) {
           seenGenres.add(id);
           genres.push({ id, title: g });

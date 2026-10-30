@@ -30,6 +30,20 @@ declare const App: any;
 
 const API_BASE = "https://app.mangasbrasuka.com.br/v1/www";
 
+function sanitizeTagId(raw: string): string {
+  return (
+    raw
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/['’]/g, "")
+      .replace(/[^a-zA-Z0-9._\-@()[\]%?#+=/&:]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "") || "tag"
+  );
+}
+
 export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTemplateConfig> {
   constructor(public cheerioInstance?: any) {
     this.getHomePageSections = this.getHomePageSections.bind(this);
@@ -761,7 +775,7 @@ export class MangasBrasukaExtension implements ExtensionImpl<typeof ContentTempl
 
     const genres: Tag[] =
       manga.tags?.map((t: string, idx: number) => ({
-        id: String(idx),
+        id: sanitizeTagId(String(t)) || String(idx),
         title: String(t),
       })) || [];
 

@@ -38,6 +38,18 @@ function parseHTML(buffer?: ArrayBuffer | null | string): cheerio.CheerioAPI {
   }
 }
 
+function sanitizeImageUrl(raw: string): string {
+  if (!raw) return "";
+  let src = raw.trim().replace(/-\d+x\d+(\.[a-zA-Z0-9]+)$/, "$1");
+  if (src.startsWith("//")) src = "https:" + src;
+  else if (src.startsWith("/")) src = BASE_URL + src;
+  try {
+    return encodeURI(decodeURI(src));
+  } catch {
+    return src.replace(/\s+/g, "%20");
+  }
+}
+
 function getImageSrc($img: cheerio.Cheerio<any>): string {
   let src =
     $img.attr("data-lzl-src") ||
@@ -66,10 +78,7 @@ function getImageSrc($img: cheerio.Cheerio<any>): string {
     if (match?.[1]) src = match[1];
   }
 
-  src = src.trim().replace(/-\d+x\d+(\.[a-zA-Z0-9]+)$/, "$1");
-  if (src.startsWith("//")) src = "https:" + src;
-  else if (src.startsWith("/")) src = BASE_URL + src;
-  return src;
+  return sanitizeImageUrl(src);
 }
 
 function sanitizeTagId(raw: string): string {

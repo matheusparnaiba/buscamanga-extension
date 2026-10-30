@@ -34,6 +34,20 @@ import type TaiyoConfig from "./pbconfig";
 declare const App: any;
 
 const BASE_URL = "https://taiyo.moe";
+
+function sanitizeTagId(raw: string): string {
+  return (
+    raw
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/['’]/g, "")
+      .replace(/[^a-zA-Z0-9._\-@()[\]%?#+=/&:]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "") || "tag"
+  );
+}
 const MEILISEARCH_URL = "https://meilisearch.taiyo.moe/multi-search";
 const DEFAULT_BEARER_TOKEN = "48aa86f73de09a7705a2938a1a35e5a12cff6519695fcad395161315182286e5";
 const IMG_CDN = "https://cdn.taiyo.moe/medias";
@@ -316,7 +330,7 @@ export class TaiyoExtension implements ExtensionImpl<typeof TaiyoConfig> {
       if (g && !seenGenres.has(g.toLowerCase())) {
         seenGenres.add(g.toLowerCase());
         genres.push({
-          id: g.toLowerCase().replace(/\s+/g, "-"),
+          id: sanitizeTagId(g),
           title: g,
         });
       }

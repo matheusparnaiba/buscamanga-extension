@@ -33,6 +33,20 @@ import type TaimuMangasConfig from "./pbconfig";
 declare const App: any;
 
 const BASE_URL = "https://taimumangas.com";
+
+function sanitizeTagId(raw: string): string {
+  return (
+    raw
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/['’]/g, "")
+      .replace(/[^a-zA-Z0-9._\-@()[\]%?#+=/&:]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "") || "tag"
+  );
+}
 const API_BASE_URL = "https://api.taimumangas.com/api/v1/reader";
 
 export class TaimuMangasExtension implements ExtensionImpl<typeof TaimuMangasConfig> {
@@ -217,7 +231,7 @@ export class TaimuMangasExtension implements ExtensionImpl<typeof TaimuMangasCon
     const author = authors || artists || "Desconhecido";
 
     const genres: Tag[] = (detail.genres ?? []).map((g) => ({
-      id: g.name.toLowerCase().replace(/\s+/g, "-"),
+      id: sanitizeTagId(g.name),
       title: g.name,
     }));
 

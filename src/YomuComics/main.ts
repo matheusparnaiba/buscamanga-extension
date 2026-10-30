@@ -33,6 +33,20 @@ import type YomuComicsConfig from "./pbconfig";
 declare const App: any;
 
 const BASE_URL = "https://yomumangas.com";
+
+function sanitizeTagId(raw: string): string {
+  return (
+    raw
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/['’]/g, "")
+      .replace(/[^a-zA-Z0-9._\-@()[\]%?#+=/&:]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "") || "tag"
+  );
+}
 const API_URL = "https://api.yomumangas.com";
 const B2_URL = "https://b2.yomumangas.com/";
 
@@ -243,7 +257,7 @@ export class YomuComicsExtension implements ExtensionImpl<typeof YomuComicsConfi
       if (t.name && !seenGenres.has(t.name)) {
         seenGenres.add(t.name);
         genres.push({
-          id: t.name.toLowerCase().replace(/\s+/g, "-"),
+          id: sanitizeTagId(t.name),
           title: t.name,
         });
       }

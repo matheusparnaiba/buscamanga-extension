@@ -34,10 +34,30 @@ const BASE_URL = "https://toonbr.com";
 const API_URL = "https://api.toonbr.com";
 const CDN_URL = "https://cdn2.toonbr.com";
 
+function sanitizeTagId(raw: string): string {
+  return (
+    raw
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/['’]/g, "")
+      .replace(/[^a-zA-Z0-9._\-@()[\]%?#+=/&:]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "") || "tag"
+  );
+}
+
 function getCoverUrl(coverPath: string | null | undefined): string {
   if (!coverPath) return "";
-  if (coverPath.startsWith("http")) return coverPath;
-  return `${CDN_URL}${coverPath.startsWith("/") ? "" : "/"}${coverPath}`;
+  const src = coverPath.startsWith("http")
+    ? coverPath
+    : `${CDN_URL}${coverPath.startsWith("/") ? "" : "/"}${coverPath}`;
+  try {
+    return encodeURI(decodeURI(src.trim()));
+  } catch {
+    return src.trim().replace(/\s+/g, "%20");
+  }
 }
 
 export class ToonBrExtension implements ExtensionImpl<typeof ToonBrConfig> {
@@ -206,7 +226,7 @@ export class ToonBrExtension implements ExtensionImpl<typeof ToonBrConfig> {
     const author = dto.author || dto.artist || "Desconhecido";
 
     const genres: Tag[] = (dto.categories ?? []).map((c) => ({
-      id: c.id,
+      id: sanitizeTagId(c.id || c.name || "tag"),
       title: c.name,
     }));
 

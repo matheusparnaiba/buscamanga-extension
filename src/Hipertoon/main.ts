@@ -27,6 +27,20 @@ import type ContentTemplateConfig from "./pbconfig";
 
 declare const App: any;
 
+function sanitizeTagId(raw: string): string {
+  return (
+    raw
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/['’]/g, "")
+      .replace(/[^a-zA-Z0-9._\-@()[\]%?#+=/&:]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "") || "tag"
+  );
+}
+
 export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateConfig> {
   constructor(public cheerioInstance?: any) {
     this.getHomePageSections = this.getHomePageSections.bind(this);
@@ -378,7 +392,8 @@ export class HipertoonExtension implements ExtensionImpl<typeof ContentTemplateC
     const genres: Tag[] =
       manga.genres
         ?.filter((g: any) => g && g.id != null && g.name != null)
-        .map((g: any) => ({ id: String(g.id), title: String(g.name) })) || [];
+        .map((g: any) => ({ id: sanitizeTagId(String(g.id || g.name)), title: String(g.name) })) ||
+      [];
 
     const fallbackImage =
       "https://ui-avatars.com/api/?name=" +

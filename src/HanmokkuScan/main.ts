@@ -57,16 +57,27 @@ interface BloggerFeedResponse {
 
 function cleanThumbnail(url: string | undefined): string {
   if (!url) return "";
-  return url
+  const src = url
     .replace(/\/s\d+(-c)?\//g, "/w600/")
     .replace(/\/s\d+-w\d+-c-h\d+\//g, "/w600/")
     .replace(/=s\d+(-c)?$/g, "=w600");
+  try {
+    return encodeURI(decodeURI(src));
+  } catch {
+    return src.replace(/\s+/g, "%20");
+  }
 }
 
 function extractFirstImgFromHtml(html: string | undefined): string {
   if (!html) return "";
   const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
-  return match?.[1] ? cleanThumbnail(match[1]) : "";
+  const src = match && match[1] ? match[1] : "";
+  if (!src) return "";
+  try {
+    return encodeURI(decodeURI(src));
+  } catch {
+    return src.replace(/\s+/g, "%20");
+  }
 }
 
 function sanitizeTagId(raw: string): string {

@@ -73,6 +73,18 @@ function slugFromUrl(href: string | undefined): string | undefined {
   return clean && !clean.includes("?") && !clean.includes("#") ? clean : undefined;
 }
 
+function sanitizeImageUrl(raw: string): string {
+  if (!raw) return "";
+  let src = raw.trim();
+  if (src.startsWith("//")) src = "https:" + src;
+  else if (src.startsWith("/")) src = BASE_URL + src;
+  try {
+    return encodeURI(decodeURI(src));
+  } catch {
+    return src.replace(/\s+/g, "%20");
+  }
+}
+
 function imageFrom($img: cheerio.Cheerio<any>): string {
   const candidates = [
     $img.attr("data-src"),
@@ -81,9 +93,7 @@ function imageFrom($img: cheerio.Cheerio<any>): string {
     $img.attr("src"),
   ];
   let src = (candidates.find((c) => c && !c.startsWith("data:")) ?? "").trim();
-  if (src.startsWith("//")) src = "https:" + src;
-  else if (src.startsWith("/")) src = BASE_URL + src;
-  return src;
+  return sanitizeImageUrl(src);
 }
 
 async function fetchHtml(url: string): Promise<cheerio.CheerioAPI> {

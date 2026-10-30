@@ -27,6 +27,20 @@ import type ContentTemplateConfig from "./pbconfig";
 
 const API_BASE = "https://app.manganyx.com/v1/www";
 
+function sanitizeTagId(raw: string): string {
+  return (
+    raw
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/['’]/g, "")
+      .replace(/[^a-zA-Z0-9._\-@()[\]%?#+=/&:]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "") || "tag"
+  );
+}
+
 export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateConfig> {
   mainRateLimiter = new BasicRateLimiter("main", {
     numberOfRequests: 15,
@@ -535,7 +549,7 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
 
     const genres: Tag[] =
       manga.tags?.map((t: string, idx: number) => ({
-        id: String(idx),
+        id: sanitizeTagId(String(t)) || String(idx),
         title: String(t),
       })) || [];
 

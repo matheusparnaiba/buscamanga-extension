@@ -25,6 +25,20 @@ import type KuroMangasConfig from "./pbconfig";
 declare const App: any;
 
 const BASE_URL = "https://kuromangas.com";
+
+function sanitizeTagId(raw: string): string {
+  return (
+    raw
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/['’]/g, "")
+      .replace(/[^a-zA-Z0-9._\-@()[\]%?#+=/&:]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "") || "tag"
+  );
+}
 const API_URL = "https://kuromangas.com/api";
 const CDN_URL = "https://cdn.kuromangas.com";
 
@@ -282,7 +296,7 @@ export class KuroMangasExtension implements ExtensionImpl<typeof KuroMangasConfi
         const gName = typeof g === "string" ? g : g.name;
         if (gName) {
           genres.push({
-            id: gName.toLowerCase().replace(/\s+/g, "-"),
+            id: sanitizeTagId(gName),
             title: gName,
           });
         }

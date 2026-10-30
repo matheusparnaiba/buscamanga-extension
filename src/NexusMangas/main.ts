@@ -25,6 +25,20 @@ import type NexusMangasConfig from "./pbconfig";
 declare const App: any;
 
 const BASE_URL = "https://www.nexusmangas.com";
+
+function sanitizeTagId(raw: string): string {
+  return (
+    raw
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/['’]/g, "")
+      .replace(/[^a-zA-Z0-9._\-@()[\]%?#+=/&:]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "") || "tag"
+  );
+}
 const REST_URL = "https://supabase.nexusmangas.com/rest/v1";
 const FUNCTIONS_URL = "https://supabase.nexusmangas.com/functions/v1";
 const ANON_KEY =
@@ -288,19 +302,16 @@ export class NexusMangasExtension implements ExtensionImpl<typeof NexusMangasCon
 
     const genres: Tag[] = [];
     if (work.type) {
-      genres.push({ id: work.type.toLowerCase(), title: work.type });
+      genres.push({ id: sanitizeTagId(work.type), title: work.type });
     }
     if (work.demographic && work.demographic !== "NONE") {
-      genres.push({ id: work.demographic.toLowerCase(), title: work.demographic });
+      genres.push({ id: sanitizeTagId(work.demographic), title: work.demographic });
     }
     if (Array.isArray(work.work_genres)) {
       for (const wg of work.work_genres) {
         const gName = wg.genres?.name;
         if (gName) {
-          genres.push({
-            id: gName.toLowerCase().replace(/\s+/g, "-"),
-            title: gName,
-          });
+          genres.push({ id: sanitizeTagId(gName), title: gName });
         }
       }
     }

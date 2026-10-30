@@ -31,7 +31,11 @@ function getCoverUrl(posterUrl: string | null | undefined, title: string): strin
   if (!posterUrl) {
     return "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
   }
-  return posterUrl;
+  try {
+    return encodeURI(decodeURI(posterUrl.trim()));
+  } catch {
+    return posterUrl.trim().replace(/\s+/g, "%20");
+  }
 }
 
 function sanitizeTagId(raw: string): string {
