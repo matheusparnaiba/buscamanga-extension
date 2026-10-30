@@ -4,7 +4,7 @@ export default {
   name: "Hipercool",
   description:
     'Extensão adulta oficial da LerHentais / Hipercool ("https://lerhentais.com") com acervo de mangás e quadrinhos adultos.',
-  version: "1.0.0",
+  version: "1.0.1",
   icon: "icon.png",
   language: "pt-BR",
   contentRating: ContentRating.ADULT,

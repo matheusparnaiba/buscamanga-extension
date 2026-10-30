@@ -37,6 +37,32 @@ declare const App: any;
 const BASE_URL = "https://lerhentais.com";
 const PAGE_SIZE = 30;
 
+function sanitizeTagId(raw: string): string {
+  return (
+    raw
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/['’]/g, "")
+      .replace(/[^a-zA-Z0-9._\-@()[\]%?#+=/&:]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "") || "tag"
+  );
+}
+
+function sanitizeImageUrl(raw: string): string {
+  if (!raw) return "";
+  let src = raw.trim();
+  if (src.startsWith("//")) src = "https:" + src;
+  else if (src.startsWith("/")) src = BASE_URL + src;
+  try {
+    return encodeURI(decodeURI(src));
+  } catch {
+    return src.replace(/\s+/g, "%20");
+  }
+}
+
 function mapStatus(status?: string | null): string {
   switch (status?.toLowerCase()) {
     case "ongoing":
@@ -185,7 +211,7 @@ export class HipercoolExtension
       for (const hit of hits) {
         const mangaId = hit.slug;
         const title = hit.title || "Sem título";
-        const imageUrl = hit.coverUrl || "";
+        const imageUrl = sanitizeImageUrl(hit.coverUrl || "");
 
         if (section.id === "updates") {
           items.push({
@@ -290,7 +316,7 @@ export class HipercoolExtension
         items.push({
           mangaId: hit.slug,
           title: hit.title || "Sem título",
-          imageUrl: hit.coverUrl || "",
+          imageUrl: sanitizeImageUrl(hit.coverUrl || ""),
           subtitle: hit.status ?? undefined,
         });
       }
@@ -338,12 +364,19 @@ export class HipercoolExtension
     const synopsis = manga.synopsis
       ? manga.synopsis.replace(/<[^>]*>/g, "").trim()
       : "Sem sinopse disponível.";
-    const thumbnailUrl = manga.coverUrl || "";
+    const thumbnailUrl = sanitizeImageUrl(manga.coverUrl || "");
 
     const tags: Tag[] = [];
+    const seenTagIds = new Set<string>();
     if (manga.genres && Array.isArray(manga.genres)) {
       for (const g of manga.genres) {
-        tags.push({ id: g, title: g });
+        if (typeof g === "string" && g.trim()) {
+          const id = sanitizeTagId(g);
+          if (!seenTagIds.has(id)) {
+            seenTagIds.add(id);
+            tags.push({ id, title: g.trim() });
+          }
+        }
       }
     }
 
@@ -493,7 +526,7 @@ export class HipercoolExtension
     const pages: string[] = [];
     for (const p of pagesDto) {
       const pageUrl = p.avifUrl || p.webpUrl;
-      if (pageUrl) pages.push(pageUrl);
+      if (pageUrl) pages.push(sanitizeImageUrl(pageUrl));
     }
 
     return {

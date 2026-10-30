@@ -4,7 +4,7 @@ export default {
   name: "Roxinha",
   description:
     'Extensão oficial da Roxinha ("https://roxinha.online") com catálogo diversificado de obras traduzidas.',
-  version: "1.0.0",
+  version: "1.0.1",
   icon: "icon.png",
   language: "pt-BR",
   contentRating: ContentRating.EVERYONE,

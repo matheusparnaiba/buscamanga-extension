@@ -39,6 +39,20 @@ const BASE_URL = "https://onereader.net";
 const API_URL = "https://api.onereader.net";
 const PAGE_SIZE = 24;
 
+function sanitizeTagId(raw: string): string {
+  return (
+    raw
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/['’]/g, "")
+      .replace(/[^a-zA-Z0-9._\-@()[\]%?#+=/&:]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "") || "tag"
+  );
+}
+
 function mapStatus(status?: string | null): string {
   switch (status?.trim().toLowerCase()) {
     case "em lançamento":
@@ -250,9 +264,16 @@ export class OneReaderExtension
     const thumbnailUrl = dto.cover_image || "";
 
     const tags: Tag[] = [];
+    const seenTagIds = new Set<string>();
     if (dto.tags && Array.isArray(dto.tags)) {
       for (const t of dto.tags) {
-        if (t) tags.push({ id: t, title: t });
+        if (t && typeof t === "string" && t.trim()) {
+          const id = sanitizeTagId(t);
+          if (!seenTagIds.has(id)) {
+            seenTagIds.add(id);
+            tags.push({ id, title: t.trim() });
+          }
+        }
       }
     }
 

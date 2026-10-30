@@ -38,6 +38,20 @@ const BASE_URL = "https://roxinha.online";
 const API_URL = "https://roxinha.online/api";
 const PAGE_SIZE = 24;
 
+function sanitizeTagId(raw: string): string {
+  return (
+    raw
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/['’]/g, "")
+      .replace(/[^a-zA-Z0-9._\-@()[\]%?#+=/&:]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "") || "tag"
+  );
+}
+
 function cleanCoverUrl(cover?: string | null): string {
   if (!cover) return "";
   if (cover.startsWith("http")) return cover;
@@ -260,11 +274,18 @@ export class RoxinhaExtension
     const thumbnailUrl = cleanCoverUrl(dto.cover);
 
     const tags: Tag[] = [];
+    const seenTagIds = new Set<string>();
     if (dto.genres) {
       const splitGenres = dto.genres.split(",");
       for (const g of splitGenres) {
         const trimmed = g.trim();
-        if (trimmed) tags.push({ id: trimmed, title: trimmed });
+        if (trimmed) {
+          const id = sanitizeTagId(trimmed);
+          if (!seenTagIds.has(id)) {
+            seenTagIds.add(id);
+            tags.push({ id, title: trimmed });
+          }
+        }
       }
     }
 

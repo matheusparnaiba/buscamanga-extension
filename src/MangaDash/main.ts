@@ -31,13 +31,35 @@ declare const App: any;
 
 const BASE_URL = "https://mangadash.net";
 
+function sanitizeTagId(raw: string): string {
+  return (
+    raw
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/['’]/g, "")
+      .replace(/[^a-zA-Z0-9._\-@()[\]%?#+=/&:]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "") || "tag"
+  );
+}
+
 function cleanCoverUrl(capa?: string | null): string {
   if (!capa) return "";
-  if (capa.startsWith("http")) return capa;
-  if (capa.startsWith("../")) {
-    return `${BASE_URL}/static/${capa.slice(3)}`;
+  let src = capa.trim();
+  if (src.startsWith("http")) {
+    // keep
+  } else if (src.startsWith("../")) {
+    src = `${BASE_URL}/static/${src.slice(3)}`;
+  } else {
+    src = `${BASE_URL}${src.startsWith("/") ? "" : "/"}${src}`;
   }
-  return `${BASE_URL}${capa.startsWith("/") ? "" : "/"}${capa}`;
+  try {
+    return encodeURI(decodeURI(src));
+  } catch {
+    return src.replace(/\s+/g, "%20");
+  }
 }
 
 export class MangaDashExtension
@@ -220,18 +242,23 @@ export class MangaDashExtension
     const $ = cheerio.load(html);
 
     const title = $(".neon-title").text().trim() || slug;
-    let cover = $(".cover-3d img").attr("src")?.trim() || "";
-    if (cover && !cover.startsWith("http")) {
-      cover = `${BASE_URL}${cover.startsWith("/") ? "" : "/"}${cover}`;
-    }
+    const coverRaw = $(".cover-3d img").attr("src")?.trim() || "";
+    const cover = cleanCoverUrl(coverRaw);
 
     const author = $(".tag-author").text().trim() || "Desconhecido";
     const synopsis = $(".manga-description").text().trim() || "Sem sinopse disponível.";
 
     const tags: Tag[] = [];
+    const seenTagIds = new Set<string>();
     $(".manga-tags a.tag:not(.tag-author)").each((_, el) => {
       const g = $(el).text().trim();
-      if (g) tags.push({ id: g, title: g });
+      if (g) {
+        const id = sanitizeTagId(g);
+        if (!seenTagIds.has(id)) {
+          seenTagIds.add(id);
+          tags.push({ id, title: g });
+        }
+      }
     });
 
     const statsText = $(".stats-row .stat-item").text();

@@ -4,7 +4,7 @@ export default {
   name: "Vegitoons",
   description:
     "Extensão oficial da Vegitoons com acervo de mangás, manhwas e manhuas em português.",
-  version: "1.0.0",
+  version: "1.0.1",
   icon: "icon.png",
   language: "pt-BR",
   contentRating: ContentRating.EVERYONE,

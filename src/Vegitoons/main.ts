@@ -39,6 +39,20 @@ const CDN_URL = "https://cdn.vegitoons.black";
 const SCAN_ID = "1";
 const LIMIT_PER_PAGE = 26;
 
+function sanitizeTagId(raw: string): string {
+  return (
+    raw
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/['’]/g, "")
+      .replace(/[^a-zA-Z0-9._\-@()[\]%?#+=/&:]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "") || "tag"
+  );
+}
+
 function isWpLikePath(src: string): boolean {
   return (
     src.startsWith("uploads/") ||
@@ -335,13 +349,20 @@ export class VegitoonsExtension
     );
 
     const tags: Tag[] = [];
-    if (dto.genero?.gen_nome) {
-      tags.push({ id: dto.genero.gen_nome, title: dto.genero.gen_nome });
+    const seenTagIds = new Set<string>();
+    if (dto.genero?.gen_nome && dto.genero.gen_nome.trim()) {
+      const id = sanitizeTagId(dto.genero.gen_nome);
+      seenTagIds.add(id);
+      tags.push({ id, title: dto.genero.gen_nome.trim() });
     }
     if (dto.tags && Array.isArray(dto.tags)) {
       for (const t of dto.tags) {
-        if (t.tag_nome) {
-          tags.push({ id: t.tag_nome, title: t.tag_nome });
+        if (t?.tag_nome && t.tag_nome.trim()) {
+          const id = sanitizeTagId(t.tag_nome);
+          if (!seenTagIds.has(id)) {
+            seenTagIds.add(id);
+            tags.push({ id, title: t.tag_nome.trim() });
+          }
         }
       }
     }
