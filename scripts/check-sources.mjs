@@ -16,7 +16,6 @@ const SOURCES = [
   { id: "BrasilHentai", name: "Brasil Hentai", url: "https://brasilhentai.com" },
   { id: "BRScans", name: "BRScans", url: "https://brscans.vercel.app" },
   { id: "Capitoons", name: "Capitoons", url: "https://capitoons.com" },
-  { id: "CovenScan", name: "Coven Scan", url: "https://covendasbruxonas.com" },
   { id: "EgoToons", name: "Ego Toons", url: "https://egotoons.com" },
   { id: "Fliptru", name: "Fliptru", url: "https://fliptru.com.br" },
   { id: "FlowerManga", name: "Flower Mangas", url: "https://flowermangas.net" },

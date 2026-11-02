@@ -9,7 +9,7 @@
 Coleção otimizada de fontes para leitura de mangás, manhwas, manhuas e quadrinhos nacionais diretamente no aplicativo Paperback.
 
 [![Paperback v0.9+](https://img.shields.io/badge/Paperback-v0.9+-F97316?style=for-the-badge&logo=apple&logoColor=white)](https://paperback.moe/)
-[![Fontes Disponíveis](https://img.shields.io/badge/Fontes-60%20Dispon%C3%ADveis-10B981?style=for-the-badge&logo=safari&logoColor=white)](#-fontes-disponíveis)
+[![Fontes Disponíveis](https://img.shields.io/badge/Fontes-59%20Dispon%C3%ADveis-10B981?style=for-the-badge&logo=safari&logoColor=white)](#-fontes-disponíveis)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](LICENSE)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Ativo-success?style=for-the-badge&logo=github)](https://matheusparnaiba.github.io/buscamanga-extension/)
@@ -32,7 +32,7 @@ O **BuscaMangá Extension** é um repositório desenvolvido para suprir a demand
 
 ## 📦 Fontes Disponíveis
 
-Todas as 60 extensões estão catalogadas e sincronizadas no GitHub Pages:
+Todas as 59 extensões estão catalogadas e sincronizadas no GitHub Pages:
 
 |                                            Ícone                                            | Nome                   |  Versão  | Site Oficial                                                         | Categoria / Recurso                     |   Status    |
 | :-----------------------------------------------------------------------------------------: | :--------------------- | :------: | :------------------------------------------------------------------- | :-------------------------------------- | :---------: |
@@ -45,7 +45,6 @@ Todas as 60 extensões estão catalogadas e sincronizadas no GitHub Pages:
 |     <img src="src/BrasilHentai/icon.png" width="28" height="28" alt="Brasil Hentai" />      | **Brasil Hentai**      | `1.0.3`  | [brasilhentai.com](https://brasilhentai.com)                         | Doujinshis & Mangás • +18               |  🟢 Ativo   |
 |           <img src="src/BRScans/icon.png" width="28" height="28" alt="BRScans" />           | **BRScans**            | `1.0.1`  | [brscans.com](https://brscans.com)                                   | Leitor Ágil na Vercel                   |  🟢 Ativo   |
 |         <img src="src/Capitoons/icon.png" width="28" height="28" alt="Capitoons" />         | **Capitoons**          | `1.0.1`  | [capitoons.com](https://capitoons.com)                               | Webtoons & Manhwas                      |  🟢 Ativo   |
-|        <img src="src/CovenScan/icon.png" width="28" height="28" alt="Coven Scan" />         | **Coven Scan**         | `1.0.4`  | [covendasbruxonas.com](https://covendasbruxonas.com)                 | Manhwas Adultos • +18                   |  🟢 Ativo   |
 |         <img src="src/EgoToons/icon.png" width="28" height="28" alt="Ego Toons" />          | **Ego Toons**          | `1.0.1`  | [egotoons.com](https://egotoons.com)                                 | Manhwas & Webtoons (API)                |  🟢 Ativo   |
 |           <img src="src/Fliptru/icon.png" width="28" height="28" alt="Fliptru" />           | **Fliptru**            | `1.0.4`  | [fliptru.com.br](https://fliptru.com.br)                             | Quadrinhos Nacionais Independentes      |  🟢 Ativo   |
 |      <img src="src/FlowerManga/icon.png" width="28" height="28" alt="Flower Mangas" />      | **Flower Mangas**      | `1.0.3`  | [flowermangas.net](https://flowermangas.net)                         | Mangás & Manhwas                        |  🟢 Ativo   |

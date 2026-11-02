@@ -66,7 +66,6 @@ jobs:
               BrasilHentai: [{ label: 'Doujinshis & Mangás', textColor: '#ffffff', backgroundColor: '#8b5cf6' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
               BRScans: [{ label: 'Manhwas & Webtoons', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
               Capitoons: [{ label: 'Webtoons & Shonen', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
-              CovenScan: [{ label: 'Webtoons +18', textColor: '#ffffff', backgroundColor: '#ec4899' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
               EgoToons: [{ label: 'Manhwas & Manhuas', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
               Fliptru: [{ label: 'Quadrinhos Nacionais', textColor: '#ffffff', backgroundColor: '#10b981' }],
               FlowerManga: [{ label: 'Shoujo & Romance', textColor: '#ffffff', backgroundColor: '#ec4899' }],
