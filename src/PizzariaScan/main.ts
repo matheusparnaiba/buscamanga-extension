@@ -338,8 +338,37 @@ export class PizzariaScanExtension implements ExtensionImpl<typeof PizzariaScanC
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
 
-    const title =
-      $("h1.text-4xl.font-bold, h1").first().text().trim() || mangaId.replace(/-/g, " ");
+    let title =
+      $("#manga-info h1, h1.text-4xl, .infox h1, .entry-title")
+        .filter((_, el) => !$(el).closest("#east_login_user, form, .modal").length)
+        .first()
+        .text()
+        .trim();
+
+    if (!title || title.toLowerCase() === "entrar na conta") {
+      $("h1").each((_, el) => {
+        const text = $(el).text().trim();
+        if (
+          text &&
+          !text.toLowerCase().includes("entrar na conta") &&
+          !$(el).closest("#east_login_user, form, .modal").length
+        ) {
+          title = text;
+          return false;
+        }
+      });
+    }
+
+    if (!title || title.toLowerCase() === "entrar na conta") {
+      const ogTitle = $('meta[property="og:title"]').attr("content")?.trim();
+      if (ogTitle) {
+        title = ogTitle.replace(/\s*-\s*Pizzaria.*$/i, "").trim();
+      }
+    }
+
+    if (!title || title.toLowerCase() === "entrar na conta") {
+      title = mangaId.replace(/-/g, " ");
+    }
 
     const image = getImageSrc($("img[itemprop=image], [itemprop=image] img, .w-full img").first());
     const thumbnailUrl =
