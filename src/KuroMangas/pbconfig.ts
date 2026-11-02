@@ -4,7 +4,7 @@ export default {
   name: "Kuro Mangás",
   description:
     "Extensão oficial do Kuro Mangás com catálogo diversificado de mangás, manhwas e novels.",
-  version: "1.0.3",
+  version: "1.0.4",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

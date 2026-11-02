@@ -2,9 +2,12 @@
 import {
   AdvancedSearchForm,
   Form,
+  InputRow,
   LabelRow,
   Section,
   SelectRow,
+  WebViewRow,
+  type Cookie,
   type SearchQuery,
 } from "@paperback/types";
 
@@ -16,8 +19,40 @@ import {
 } from "./models";
 
 export class SettingsForm extends Form {
+  private customCookie: string;
+
+  constructor() {
+    super();
+    this.customCookie = (Application.getState("kuro_cookie_header") as string | undefined) ?? "";
+  }
+
   override getSections() {
+    const hasSession =
+      this.customCookie.length > 0 || Boolean(Application.getState("kuro_saved_cookies"));
+
     return [
+      Section("cloudflare", [
+        WebViewRow("cf_webview", {
+          title: "Autenticar / Resolver Cloudflare (Webview)",
+          request: {
+            url: "https://kuromangas.com/login",
+            method: "GET",
+          },
+          onComplete: Application.Selector(this as SettingsForm, "handleWebviewComplete"),
+          onCancel: Application.Selector(this as SettingsForm, "handleWebviewCancel"),
+        }),
+        InputRow("custom_cookie", {
+          title: "Cookie Customizado / Sessão",
+          value: this.customCookie,
+          onValueChange: Application.Selector(this as SettingsForm, "handleCookieChange"),
+        }),
+        LabelRow("cf_status", {
+          title: "Status de Autenticação",
+          value: hasSession
+            ? { text: "Sessão / Cookies Salvos", style: "success" }
+            : { text: "Não Autenticado / Pendente", style: "warning" },
+        }),
+      ]),
       Section("info", [
         LabelRow("source_info", {
           title: "Fonte Oficial",
@@ -25,7 +60,7 @@ export class SettingsForm extends Form {
         }),
         LabelRow("status_info", {
           title: "Status da Scan",
-          value: { text: "Operacional", style: "success" },
+          value: { text: "Requer Login / Turnstile", style: "warning" },
         }),
         LabelRow("repo_info", {
           title: "BuscaMangá Extension",
@@ -34,6 +69,38 @@ export class SettingsForm extends Form {
         }),
       ]),
     ];
+  }
+
+  async handleWebviewComplete(_request?: any, cookies?: Cookie[]): Promise<void> {
+    if (cookies && Array.isArray(cookies)) {
+      const headerParts: string[] = [];
+      let vx = "";
+      for (const c of cookies) {
+        if (!c || !c.name || !c.value) continue;
+        headerParts.push(`${c.name}=${c.value}`);
+        if (c.name === "_vx") {
+          vx = c.value;
+        }
+      }
+      if (headerParts.length > 0) {
+        Application.setState(cookies, "kuro_saved_cookies");
+        Application.setState(headerParts.join("; "), "kuro_cookie_header");
+      }
+      if (vx) {
+        Application.setState(vx, "kuro_x_request_ctx");
+      }
+    }
+  }
+
+  async handleWebviewCancel(): Promise<void> {}
+
+  async handleCookieChange(value: string): Promise<void> {
+    const trimmed = (value ?? "").trim();
+    Application.setState(trimmed, "kuro_cookie_header");
+    const vxMatch = trimmed.match(/(?:^|;\s*)_vx=([^;]+)/);
+    if (vxMatch?.[1]) {
+      Application.setState(decodeURIComponent(vxMatch[1]), "kuro_x_request_ctx");
+    }
   }
 }
 
@@ -111,6 +178,10 @@ export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
   }
 
   override getSearchQueryMetadata(): KuroMangasSearchMetadata {
-    return { sort: this.sort, genre: this.genre, status: this.status };
+    return {
+      sort: this.sort,
+      genre: this.genre,
+      status: this.status,
+    };
   }
 }

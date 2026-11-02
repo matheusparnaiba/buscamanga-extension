@@ -92,6 +92,54 @@ function sanitizeTagId(raw: string): string {
   );
 }
 
+async function resolveCubariPages(cubariUrl: string): Promise<string[]> {
+  try {
+    const gistMatch = cubariUrl.match(/cubari\.moe\/read\/gist\/([^/]+)(?:\/([^/]+))?/);
+    if (!gistMatch || !gistMatch[1]) return [];
+    const gistId = gistMatch[1];
+    const targetChap = gistMatch[2];
+
+    const apiUrl = `https://cubari.moe/read/api/gist/series/${gistId}/`;
+    const [_, buffer] = await Application.scheduleRequest({ url: apiUrl, method: "GET" });
+    const jsonStr = Application.arrayBufferToUTF8String(buffer);
+    const data = JSON.parse(jsonStr);
+
+    const chapters = data.chapters;
+    if (!chapters || typeof chapters !== "object") return [];
+
+    let ch = targetChap ? chapters[targetChap] : undefined;
+    if (!ch && targetChap) {
+      const norm = String(parseFloat(targetChap));
+      ch = chapters[norm];
+    }
+    if (!ch) {
+      const keys = Object.keys(chapters);
+      if (keys.length > 0 && keys[0]) ch = chapters[keys[0]];
+    }
+
+    if (!ch || !ch.groups) return [];
+
+    const firstGroup = Object.values(ch.groups)[0];
+    if (Array.isArray(firstGroup)) {
+      return firstGroup.filter((p: any) => typeof p === "string" && p.startsWith("http"));
+    }
+
+    if (typeof firstGroup === "string") {
+      const fullUrl = firstGroup.startsWith("http")
+        ? firstGroup
+        : `https://cubari.moe${firstGroup}`;
+      const [_2, buf2] = await Application.scheduleRequest({ url: fullUrl, method: "GET" });
+      const groupData = JSON.parse(Application.arrayBufferToUTF8String(buf2));
+      if (Array.isArray(groupData)) {
+        return groupData.filter((p: any) => typeof p === "string" && p.startsWith("http"));
+      }
+    }
+  } catch (e) {
+    console.error("Erro ao resolver páginas do Cubari no GalaxScans:", e);
+  }
+  return [];
+}
+
 export class GalaxScansExtension implements ExtensionImpl<typeof ContentTemplateConfig> {
   constructor(public cheerioInstance?: any) {
     this.getHomePageSections = this.getHomePageSections.bind(this);
@@ -494,6 +542,69 @@ export class GalaxScansExtension implements ExtensionImpl<typeof ContentTemplate
     const html = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(html);
 
+    const rawText = $("#zeist-raw-data").text().trim();
+    const fullHtml = html + "\n" + rawText;
+
+    // Check for Cubari link or redirect
+    const cubariMatch =
+      fullHtml.match(/https?:\/\/(?:www\.)?cubari\.moe\/read\/[^\s"'<>]+/i) ||
+      $("a[href*='cubari.moe']").attr("href");
+
+    if (cubariMatch) {
+      const cubariUrl = typeof cubariMatch === "string" ? cubariMatch : cubariMatch[0];
+      const cubariPages = await resolveCubariPages(cubariUrl);
+      if (cubariPages.length > 0) {
+        return {
+          id: chapter.chapterId,
+          mangaId: chapter.sourceManga.mangaId,
+          pages: cubariPages,
+        };
+      }
+    }
+
+    // Check for generic window.location redirect
+    const redirectMatch =
+      fullHtml.match(/(?:window\.)?location\.(?:replace|assign)\s*\(\s*["']([^"']+)["']\)/i) ||
+      fullHtml.match(/(?:window\.)?location\.href\s*=\s*["']([^"']+)["']/i);
+
+    if (redirectMatch?.[1]) {
+      const targetUrl = redirectMatch[1];
+      if (targetUrl.includes("cubari.moe")) {
+        const cubariPages = await resolveCubariPages(targetUrl);
+        if (cubariPages.length > 0) {
+          return {
+            id: chapter.chapterId,
+            mangaId: chapter.sourceManga.mangaId,
+            pages: cubariPages,
+          };
+        }
+      } else if (
+        targetUrl.startsWith("http") &&
+        targetUrl !== chapterUrl &&
+        targetUrl.includes(BASE_URL.replace("https://", ""))
+      ) {
+        try {
+          const [_r, rBuf] = await Application.scheduleRequest({ url: targetUrl, method: "GET" });
+          const rHtml = Application.arrayBufferToUTF8String(rBuf);
+          const $r = cheerio.load(rHtml);
+          const rPages: string[] = [];
+          $r(".separator img, #reader img, .chapter img, div.post-body img").each((_, el) => {
+            const src = $r(el).attr("src") || $r(el).attr("data-src");
+            if (src && src.startsWith("http")) rPages.push(src);
+          });
+          if (rPages.length > 0) {
+            return {
+              id: chapter.chapterId,
+              mangaId: chapter.sourceManga.mangaId,
+              pages: rPages,
+            };
+          }
+        } catch {
+          // Ignore redirect fetch errors
+        }
+      }
+    }
+
     const pages: string[] = [];
     const seenPages = new Set<string>();
 
@@ -517,7 +628,10 @@ export class GalaxScansExtension implements ExtensionImpl<typeof ContentTemplate
         lower.includes("favicon") ||
         lower.includes("banner") ||
         lower.includes("icon") ||
-        lower.includes("widget")
+        lower.includes("widget") ||
+        lower.includes("red.png") ||
+        lower.includes("01-red") ||
+        lower.includes("redireciona")
       ) {
         return;
       }
@@ -528,7 +642,6 @@ export class GalaxScansExtension implements ExtensionImpl<typeof ContentTemplate
       }
     };
 
-    const rawText = $("#zeist-raw-data").text().trim();
     if (rawText) {
       const $raw = cheerio.load(rawText);
       $raw(".separator img, img").each((_, el) => {

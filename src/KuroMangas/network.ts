@@ -6,15 +6,19 @@ import {
   type Response,
 } from "@paperback/types";
 
+import { decryptKuroPayload } from "./crypto";
+
 const BASE_URL = "https://kuromangas.com";
 
 export class MainInterceptor extends PaperbackInterceptor {
   override async interceptRequest(request: Request): Promise<Request> {
     const cfUserAgent = Application.getState("kuro_cf_user_agent") as string | undefined;
     const customCookie = Application.getState("kuro_cookie_header") as string | undefined;
+    const savedCtx = Application.getState("kuro_x_request_ctx") as string | undefined;
 
     const headers: Record<string, string> = {
       ...request.headers,
+      origin: BASE_URL,
       referer: request.headers?.referer || `${BASE_URL}/catalogo`,
       "user-agent":
         request.headers?.["user-agent"] || cfUserAgent || (await Application.getDefaultUserAgent()),
@@ -25,6 +29,19 @@ export class MainInterceptor extends PaperbackInterceptor {
 
     if (customCookie && !headers.cookie) {
       headers.cookie = customCookie;
+    }
+
+    if (!headers["x-request-ctx"] && !headers["X-Request-Ctx"]) {
+      let ctx = savedCtx;
+      if (!ctx && headers.cookie) {
+        const vxMatch = headers.cookie.match(/(?:^|;\s*)_vx=([^;]+)/);
+        if (vxMatch?.[1]) {
+          ctx = decodeURIComponent(vxMatch[1]);
+        }
+      }
+      if (ctx) {
+        headers["X-Request-Ctx"] = ctx;
+      }
     }
 
     request.headers = headers;
@@ -70,6 +87,21 @@ export class MainInterceptor extends PaperbackInterceptor {
           : "Proteção Cloudflare ativa no Kuro Mangás! Toque para resolver.";
 
         throw new CloudflareError(resolutionRequest, msg);
+      }
+
+      if (text.includes('"_v_secure"')) {
+        try {
+          const parsed = JSON.parse(text);
+          if (parsed && typeof parsed === "object" && "_v_secure" in parsed) {
+            const datakey = response.headers?.["x-kuro-datakey"] as string | undefined;
+            const decrypted = decryptKuroPayload(parsed, datakey);
+            const decryptedStr = JSON.stringify(decrypted);
+            const encoded = new TextEncoder().encode(decryptedStr);
+            return encoded.buffer as ArrayBuffer;
+          }
+        } catch (e) {
+          console.error("Erro ao descriptografar resposta do Kuro Mangás:", e);
+        }
       }
     }
 

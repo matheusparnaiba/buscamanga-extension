@@ -268,8 +268,9 @@ export class NexusMangasExtension implements ExtensionImpl<typeof NexusMangasCon
       params.set("limit", String(PAGE_SIZE));
       params.set("offset", String(offset));
 
+      const queryString = params.toString().replace(/%2C/g, ",");
       const request = {
-        url: `${REST_URL}/works?${params.toString()}`,
+        url: `${REST_URL}/works?${queryString}`,
         method: "GET",
         headers: {
           apikey: ANON_KEY,
@@ -377,7 +378,8 @@ export class NexusMangasExtension implements ExtensionImpl<typeof NexusMangasCon
     if (demographic) params.append("demographic", `eq.${demographic}`);
     if (genre) params.append("work_genres.genres.name", `eq.${genre}`);
 
-    const url = `${REST_URL}/works?${params.toString()}`;
+    const queryString = params.toString().replace(/%2C/g, ",");
+    const url = `${REST_URL}/works?${queryString}`;
     const request = {
       url,
       method: "GET",

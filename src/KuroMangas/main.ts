@@ -113,6 +113,7 @@ export class KuroMangasExtension implements ExtensionImpl<typeof KuroMangasConfi
 
     const cleanCookies: Array<{ name: string; value: string; domain: string; path: string }> = [];
     const headerParts: string[] = [];
+    let vx = "";
 
     for (const c of cookies) {
       if (!c || !c.name || !c.value) continue;
@@ -128,11 +129,17 @@ export class KuroMangasExtension implements ExtensionImpl<typeof KuroMangasConfi
       });
 
       headerParts.push(`${c.name}=${c.value}`);
+      if (c.name === "_vx") {
+        vx = c.value;
+      }
     }
 
     if (cleanCookies.length > 0) {
       Application.setState(cleanCookies, "kuro_saved_cookies");
       Application.setState(headerParts.join("; "), "kuro_cookie_header");
+    }
+    if (vx) {
+      Application.setState(vx, "kuro_x_request_ctx");
     }
   }
 

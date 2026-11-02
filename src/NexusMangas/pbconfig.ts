@@ -4,7 +4,7 @@ export default {
   name: "Nexus Mangás",
   description:
     "Extensão oficial do Nexus Mangás com acervo de manhwas, webtoons e mangás modernos.",
-  version: "1.0.2",
+  version: "1.0.3",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,
