@@ -10,7 +10,7 @@ import {
   type SearchQuery,
 } from "@paperback/types";
 
-import { ORDER_OPTIONS, type ContentTemplateSearchMetadata } from "./models";
+import { CONTENT_TYPE_OPTIONS, ORDER_OPTIONS, type ContentTemplateSearchMetadata } from "./models";
 
 export class SettingsForm extends Form {
   override getSections() {
@@ -36,10 +36,12 @@ export class SettingsForm extends Form {
 
 export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
   private orderBy: string;
+  private contentType: string;
 
   constructor(searchQuery: SearchQuery<ContentTemplateSearchMetadata>) {
     super();
-    this.orderBy = searchQuery.metadata?.orderBy ?? "view";
+    this.orderBy = searchQuery.metadata?.orderBy ?? "time";
+    this.contentType = searchQuery.metadata?.contentType ?? "all";
   }
 
   override getSections() {
@@ -56,15 +58,33 @@ export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
             "handleOrderChange",
           ),
         }),
+        SelectRow("contentType", {
+          title: "Tipo de Conteúdo",
+          value: [this.contentType],
+          options: CONTENT_TYPE_OPTIONS,
+          minItemCount: 1,
+          maxItemCount: 1,
+          onValueChange: Application.Selector(
+            this as ContentTemplateAdvancedSearchForm,
+            "handleContentTypeChange",
+          ),
+        }),
       ]),
     ];
   }
 
   async handleOrderChange(value: string[]): Promise<void> {
-    this.orderBy = value[0] ?? "view";
+    this.orderBy = value[0] ?? "time";
+  }
+
+  async handleContentTypeChange(value: string[]): Promise<void> {
+    this.contentType = value[0] ?? "all";
   }
 
   override getSearchQueryMetadata(): ContentTemplateSearchMetadata {
-    return { orderBy: this.orderBy };
+    return {
+      orderBy: this.orderBy,
+      contentType: this.contentType,
+    };
   }
 }

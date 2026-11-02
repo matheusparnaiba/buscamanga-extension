@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
 import {
   BasicRateLimiter,
   ContentRating,
@@ -16,57 +17,33 @@ import {
   type SourceManga,
   type Tag,
 } from "@paperback/types";
-import * as cheerio from "cheerio";
 
 import { ContentTemplateAdvancedSearchForm, SettingsForm } from "./forms";
-import type { ContentTemplateSearchMetadata } from "./models";
+import type {
+  AzureChapterDto,
+  AzureChapterReadDto,
+  AzureObraDto,
+  ContentTemplateSearchMetadata,
+} from "./models";
 import { MainInterceptor } from "./network";
 import type ContentTemplateConfig from "./pbconfig";
 
 declare const App: any;
 
 const BASE_URL = "https://azuretoons.com";
+const API_URL = "https://azuretoons.com/api";
 
-function sanitizeImageUrl(raw: string): string {
-  if (!raw) return "";
-  let src = raw.trim().replace(/-\d+x\d+(\.[a-zA-Z0-9]+)$/, "$1");
-  if (src.startsWith("//")) src = "https:" + src;
-  else if (src.startsWith("/")) src = BASE_URL + src;
+function cleanCoverUrl(url: string | null | undefined): string {
+  if (!url) return "";
+  let full = url.trim();
+  if (full.startsWith("//")) full = "https:" + full;
+  else if (!full.startsWith("http://") && !full.startsWith("https://")) {
+    full = `${BASE_URL}/${full.replace(/^\//, "")}`;
+  }
   try {
-    src = decodeURI(src);
+    full = decodeURI(full);
   } catch {}
-  return encodeURI(src).replace(/%2520/g, "%20").replace(/ /g, "%20");
-}
-
-function getImageSrc($img: cheerio.Cheerio<any>): string {
-  let src =
-    $img.attr("data-lzl-src") ||
-    $img.attr("data-src") ||
-    $img.attr("data-lazy-src") ||
-    $img.attr("data-original") ||
-    "";
-
-  if (!src) {
-    const srcset = $img.attr("data-lzl-srcset") || $img.attr("srcset");
-    if (srcset) {
-      src = srcset.split(",")[0]?.trim()?.split(" ")[0]?.trim() || "";
-    }
-  }
-
-  if (!src || src.startsWith("data:")) {
-    const rawSrc = $img.attr("src") || $img.attr("data-cfsrc") || "";
-    if (rawSrc && !rawSrc.startsWith("data:")) {
-      src = rawSrc;
-    }
-  }
-
-  if (!src || src.startsWith("data:")) {
-    const noscript = $img.parent().find("noscript").text();
-    const match = noscript.match(/src=["']([^"']+)["']/i);
-    if (match?.[1]) src = match[1];
-  }
-
-  return sanitizeImageUrl(src);
+  return encodeURI(full).replace(/%2520/g, "%20").replace(/ /g, "%20");
 }
 
 function sanitizeTagId(raw: string): string {
@@ -81,148 +58,6 @@ function sanitizeTagId(raw: string): string {
       .replace(/-+/g, "-")
       .replace(/^-+|-+$/g, "") || "tag"
   );
-}
-
-function parsePortugueseDate(dateStr: string | null | undefined): Date | undefined {
-  if (!dateStr) return undefined;
-  const str = dateStr
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-  const now = new Date();
-
-  if (
-    str.includes("agora") ||
-    str.includes("just now") ||
-    str.includes("segundo") ||
-    str.includes("second") ||
-    str === "hoje" ||
-    str === "today"
-  ) {
-    return now;
-  }
-
-  if (str.includes("ontem") || str.includes("yesterday")) {
-    return new Date(now.getTime() - 86400 * 1000);
-  }
-
-  const minMatch = str.match(/(?:ha\s*)?(\d+)\s*(?:minutos?|mins?|minutes?)(?:\s*(?:atras|ago))?/);
-  if (minMatch?.[1]) {
-    return new Date(now.getTime() - parseInt(minMatch[1], 10) * 60 * 1000);
-  }
-
-  const hourMatch = str.match(/(?:ha\s*)?(\d+)\s*(?:horas?|hours?|\bh\b)(?:\s*(?:atras|ago))?/);
-  if (hourMatch?.[1]) {
-    return new Date(now.getTime() - parseInt(hourMatch[1], 10) * 3600 * 1000);
-  }
-
-  const dayMatch = str.match(/(?:ha\s*)?(\d+)\s*(?:dias?|days?)(?:\s*(?:atras|ago))?/);
-  if (dayMatch?.[1]) {
-    return new Date(now.getTime() - parseInt(dayMatch[1], 10) * 86400 * 1000);
-  }
-
-  const weekMatch = str.match(/(?:ha\s*)?(\d+)\s*(?:semanas?|weeks?)(?:\s*(?:atras|ago))?/);
-  if (weekMatch?.[1]) {
-    return new Date(now.getTime() - parseInt(weekMatch[1], 10) * 7 * 86400 * 1000);
-  }
-
-  const monthMatch = str.match(/(?:ha\s*)?(\d+)\s*(?:mes|meses|months?)(?:\s*(?:atras|ago))?/);
-  if (monthMatch?.[1]) {
-    return new Date(now.getTime() - parseInt(monthMatch[1], 10) * 30 * 86400 * 1000);
-  }
-
-  const yearMatch = str.match(/(?:ha\s*)?(\d+)\s*(?:anos?|years?)(?:\s*(?:atras|ago))?/);
-  if (yearMatch?.[1]) {
-    return new Date(now.getTime() - parseInt(yearMatch[1], 10) * 365 * 86400 * 1000);
-  }
-
-  const MONTHS_PT: Record<string, number> = {
-    janeiro: 0,
-    jan: 0,
-    january: 0,
-    fevereiro: 1,
-    fev: 1,
-    february: 1,
-    feb: 1,
-    marco: 2,
-    mar: 2,
-    march: 2,
-    abril: 3,
-    abr: 3,
-    april: 3,
-    apr: 3,
-    maio: 4,
-    mai: 4,
-    may: 4,
-    junho: 5,
-    jun: 5,
-    june: 5,
-    julho: 6,
-    jul: 6,
-    july: 6,
-    agosto: 7,
-    ago: 7,
-    august: 7,
-    setembro: 8,
-    set: 8,
-    september: 8,
-    sep: 8,
-    outubro: 9,
-    out: 9,
-    october: 9,
-    oct: 9,
-    novembro: 10,
-    nov: 10,
-    november: 10,
-    dezembro: 11,
-    dez: 11,
-    december: 11,
-    dec: 11,
-  };
-
-  const mdyMatch = str.match(/([a-z]+)\s+(\d{1,2}),?\s+(\d{4})/);
-  if (mdyMatch?.[1] && mdyMatch[2] && mdyMatch[3]) {
-    const mIdx = MONTHS_PT[mdyMatch[1]];
-    if (mIdx !== undefined) {
-      return new Date(parseInt(mdyMatch[3], 10), mIdx, parseInt(mdyMatch[2], 10));
-    }
-  }
-
-  const dmyMatch = str.match(/(\d{1,2})\s*(?:de)?\s*([a-z]+)\s*(?:de)?,?\s*(\d{4})/);
-  if (dmyMatch?.[1] && dmyMatch[2] && dmyMatch[3]) {
-    const mIdx = MONTHS_PT[dmyMatch[2]];
-    if (mIdx !== undefined) {
-      return new Date(parseInt(dmyMatch[3], 10), mIdx, parseInt(dmyMatch[1], 10));
-    }
-  }
-
-  const slashMatch = str.match(/(\d{1,2})[/-](\d{1,2})[/-](\d{4})/);
-  if (slashMatch?.[1] && slashMatch[2] && slashMatch[3]) {
-    return new Date(
-      parseInt(slashMatch[3], 10),
-      parseInt(slashMatch[2], 10) - 1,
-      parseInt(slashMatch[1], 10),
-    );
-  }
-
-  const ymdMatch = str.match(/(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
-  if (ymdMatch?.[1] && ymdMatch[2] && ymdMatch[3]) {
-    return new Date(
-      parseInt(ymdMatch[1], 10),
-      parseInt(ymdMatch[2], 10) - 1,
-      parseInt(ymdMatch[3], 10),
-    );
-  }
-
-  const shortYearMatch = str.match(/(\d{1,2})[/-](\d{1,2})[/-](\d{2})/);
-  if (shortYearMatch?.[1] && shortYearMatch[2] && shortYearMatch[3]) {
-    const yr = 2000 + parseInt(shortYearMatch[3], 10);
-    return new Date(yr, parseInt(shortYearMatch[2], 10) - 1, parseInt(shortYearMatch[1], 10));
-  }
-
-  const parsed = new Date(dateStr);
-  return isNaN(parsed.getTime()) ? undefined : parsed;
 }
 
 export class AzuretoonsExtension implements ExtensionImpl<typeof ContentTemplateConfig> {
@@ -248,6 +83,13 @@ export class AzuretoonsExtension implements ExtensionImpl<typeof ContentTemplate
     return new SettingsForm();
   }
 
+  async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
+    return new ContentTemplateAdvancedSearchForm({
+      title: "",
+      metadata: { orderBy: "latest", genre: "all", status: "all" },
+    });
+  }
+
   async getDiscoverSections(): Promise<DiscoverSection[]> {
     return [
       {
@@ -265,254 +107,147 @@ export class AzuretoonsExtension implements ExtensionImpl<typeof ContentTemplate
 
   async getDiscoverSectionItems(
     section: DiscoverSection,
-    metadata: number | undefined,
+    _metadata: number | undefined,
   ): Promise<PagedResults<DiscoverSectionItem>> {
-    const page = metadata ?? 1;
+    try {
+      let url = `${API_URL}/obras?lang=pt`;
+      if (section.id === "popular") {
+        url = `${API_URL}/obras/ranking?period=all`;
+      }
 
-    if (section.id === "popular" && page > 1) {
-      return { items: [], metadata: undefined };
-    }
+      const [_, buffer] = await Application.scheduleRequest({ url, method: "GET" });
+      const rawText = Application.arrayBufferToUTF8String(buffer);
+      let list: AzureObraDto[] = [];
+      try {
+        const json = JSON.parse(rawText);
+        list = Array.isArray(json) ? json : (json.data ?? []);
+      } catch {
+        list = [];
+      }
 
-    const url =
-      section.id === "popular"
-        ? page === 1
-          ? `${BASE_URL}/manga/?m_orderby=views`
-          : `${BASE_URL}/manga/page/${page}/?m_orderby=views`
-        : page === 1
-          ? `${BASE_URL}/manga/?m_orderby=latest`
-          : `${BASE_URL}/manga/page/${page}/?m_orderby=latest`;
+      const items: DiscoverSectionItem[] = [];
+      for (const item of list) {
+        if (!item || !item.slug) continue;
+        const title = item.title?.trim() || item.slug;
+        const mangaId = item.slug;
+        const imageUrl =
+          cleanCoverUrl(item.coverUrl) ||
+          `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
 
-    const request = {
-      url,
-      method: "GET",
-    };
+        const latestChap = item.chapters?.[0];
+        const chapNum = latestChap?.num ?? latestChap?.chapterNumber;
+        const subtitle = chapNum !== undefined ? `Capítulo ${chapNum}` : item.status || undefined;
 
-    const [_, buffer] = await Application.scheduleRequest(request);
-    const data = Application.arrayBufferToUTF8String(buffer);
-    const $ = cheerio.load(data);
-    const items: DiscoverSectionItem[] = [];
-    const seenIds = new Set<string>();
-
-    if (section.id === "popular") {
-      $(".page-item-detail, .c-tabs-item__content, .manga__item, .manga-item").each((_, el) => {
-        const titleEl = $(el)
-          .find(
-            ".post-title h2 a, .post-title h3 a, .post-title a, .slider__content h4 a, h2 a, h3 a, h4 a, h5 a",
-          )
-          .first();
-        const title = titleEl.text().replace(/\s+/g, " ").trim();
-        const linkEl = $(el).find(".post-title h2 a, .post-title a, a[href*='/manga/'], a").first();
-        const href = linkEl.attr("href");
-        const img = getImageSrc($(el).find("img").first());
-
-        if (href && title) {
-          const idMatch = href.match(/\/manga\/([^/]+)/);
-          const mangaId = idMatch ? (idMatch[1] as string) : href;
-
-          if (!seenIds.has(mangaId)) {
-            seenIds.add(mangaId);
-            items.push({
-              mangaId,
-              title,
-              imageUrl:
-                img ||
-                "https://ui-avatars.com/api/?name=" +
-                  encodeURIComponent(title) +
-                  "&background=random",
-              type: "prominentCarouselItem",
-              contentRating: ContentRating.EVERYONE,
-            });
-          }
-        }
-      });
-      return { items, metadata: undefined };
-    }
-
-    if (section.id === "updates") {
-      $(".page-item-detail, .c-tabs-item__content, .manga__item, .manga-item").each((_, el) => {
-        const titleEl = $(el)
-          .find(
-            ".post-title h2 a, .post-title h3 a, .post-title a, .item-title a, h2 a, h3 a, h4 a, h5 a",
-          )
-          .first();
-        const title = titleEl.text().replace(/\s+/g, " ").trim();
-        const linkEl = $(el).find(".post-title h2 a, .post-title a, a[href*='/manga/'], a").first();
-        const href = linkEl.attr("href");
-        const img = getImageSrc($(el).find("img").first());
-
-        const chapEl = $(el)
-          .find(
-            ".list-chapter .chapter-item .chapter, .chapter-item a, .list-chapter a, .chapter a",
-          )
-          .first();
-        const chapHref = chapEl.closest("a").attr("href") || chapEl.attr("href");
-        const chapName = chapEl.text().replace(/\s+/g, " ").trim();
-
-        if (href && title) {
-          const idMatch = href.match(/\/manga\/([^/]+)/);
-          const mangaId = idMatch ? (idMatch[1] as string) : href;
-
-          let chapterId = mangaId;
-          if (chapHref) {
-            const chapMatch = chapHref.match(/\/manga\/[^/]+\/([^/]+)/);
-            if (chapMatch) chapterId = chapMatch[1] as string;
-            else chapterId = chapHref;
-          }
-
-          if (!seenIds.has(mangaId)) {
-            seenIds.add(mangaId);
-            items.push({
-              mangaId,
-              chapterId,
-              title,
-              subtitle: chapName,
-              imageUrl:
-                img ||
-                "https://ui-avatars.com/api/?name=" +
-                  encodeURIComponent(title) +
-                  "&background=random",
-              type: "chapterUpdatesCarouselItem",
-              contentRating: ContentRating.EVERYONE,
-            });
-          }
-        }
-      });
-
-      return {
-        items,
-        metadata: items.length > 0 ? page + 1 : undefined,
-      };
-    }
-
-    return { items, metadata: undefined };
-  }
-
-  async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
-    return new ContentTemplateAdvancedSearchForm({
-      title: "",
-      metadata: { orderBy: "views" },
-    });
-  }
-
-  async getSearchResults(
-    query: SearchQuery<ContentTemplateSearchMetadata>,
-    metadata?: number,
-    _sortingOption?: SortingOption,
-  ): Promise<PagedResults<SearchResultItem>> {
-    const page = metadata ?? 1;
-    const title = query.title?.trim() ?? "";
-    const orderBy = query.metadata?.orderBy ?? "views";
-    const genre =
-      query.metadata?.genre && query.metadata.genre !== "all" ? query.metadata.genre : "";
-    const genreParam = genre ? `&genre[]=${encodeURIComponent(genre)}` : "";
-    const status =
-      query.metadata?.status && query.metadata.status !== "all" ? query.metadata.status : "";
-    const statusParam = status ? `&status[]=${encodeURIComponent(status)}` : "";
-
-    const url = title
-      ? `${BASE_URL}/page/${page}/?s=${encodeURIComponent(title)}&post_type=wp-manga&m_orderby=${orderBy}${genreParam}${statusParam}`
-      : `${BASE_URL}/manga/page/${page}/?m_orderby=${orderBy}${genreParam}${statusParam}`;
-
-    const request = {
-      url,
-      method: "GET",
-    };
-
-    const [_, buffer] = await Application.scheduleRequest(request);
-    const data = Application.arrayBufferToUTF8String(buffer);
-    const $ = cheerio.load(data);
-    const items: SearchResultItem[] = [];
-    const seenIds = new Set<string>();
-
-    $(
-      ".manga__item, .c-tabs-item__content, .page-item-detail, .search-wrap .row, .manga-item",
-    ).each((_, el) => {
-      const titleEl = $(el)
-        .find(".post-title h2 a, .post-title h3 a, .post-title a, h2 a, h3 a, h4 a, h5 a, h3")
-        .first();
-      const mangaTitle = titleEl.text().replace(/\s+/g, " ").trim();
-      const linkEl = $(el).find(".post-title h2 a, .post-title a, a[href*='/manga/'], a").first();
-      const href = linkEl.attr("href");
-      const img = getImageSrc($(el).find("img").first());
-
-      if (href && mangaTitle) {
-        const idMatch = href.match(/\/manga\/([^/]+)/);
-        const mangaId = idMatch ? (idMatch[1] as string) : href;
-
-        if (!seenIds.has(mangaId)) {
-          seenIds.add(mangaId);
+        if (section.id === "updates") {
           items.push({
             mangaId,
-            title: mangaTitle,
-            imageUrl:
-              img ||
-              "https://ui-avatars.com/api/?name=" +
-                encodeURIComponent(mangaTitle) +
-                "&background=random",
+            chapterId: mangaId,
+            title,
+            subtitle,
+            imageUrl,
+            type: "chapterUpdatesCarouselItem",
+            contentRating: ContentRating.EVERYONE,
+          });
+        } else {
+          items.push({
+            mangaId,
+            title,
+            imageUrl,
+            type: "prominentCarouselItem",
             contentRating: ContentRating.EVERYONE,
           });
         }
       }
-    });
 
-    return {
-      items,
-      metadata: items.length > 0 ? page + 1 : undefined,
-    };
+      return {
+        items,
+        metadata: undefined,
+      };
+    } catch (e) {
+      console.error(`Erro ao carregar seção AzureToons ${section.id}:`, e);
+      return { items: [], metadata: undefined };
+    }
+  }
+
+  async getSearchResults(
+    query: SearchQuery<ContentTemplateSearchMetadata>,
+    _metadata?: number,
+    _sortingOption?: SortingOption,
+  ): Promise<PagedResults<SearchResultItem>> {
+    try {
+      const searchTerm = query.title?.trim() || "";
+      const url = searchTerm
+        ? `${API_URL}/obras?lang=pt&search=${encodeURIComponent(searchTerm)}`
+        : `${API_URL}/obras?lang=pt`;
+
+      const [_, buffer] = await Application.scheduleRequest({ url, method: "GET" });
+      const rawText = Application.arrayBufferToUTF8String(buffer);
+      let list: AzureObraDto[] = [];
+      try {
+        const json = JSON.parse(rawText);
+        list = Array.isArray(json) ? json : (json.data ?? []);
+      } catch {
+        list = [];
+      }
+
+      const items: SearchResultItem[] = [];
+      for (const item of list) {
+        if (!item || !item.slug) continue;
+        const title = item.title?.trim() || item.slug;
+        const mangaId = item.slug;
+        const imageUrl =
+          cleanCoverUrl(item.coverUrl) ||
+          `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
+
+        items.push({
+          mangaId,
+          title,
+          imageUrl,
+          contentRating: ContentRating.EVERYONE,
+        });
+      }
+
+      return {
+        items,
+        metadata: undefined,
+      };
+    } catch (e) {
+      console.error("Erro na busca AzureToons:", e);
+      return { items: [], metadata: undefined };
+    }
   }
 
   async getMangaDetails(mangaId: string): Promise<SourceManga> {
-    const url = `${BASE_URL}/manga/${mangaId}/`;
-    const request = { url, method: "GET" };
-    const [_, buffer] = await Application.scheduleRequest(request);
-    const data = Application.arrayBufferToUTF8String(buffer);
-    const $ = cheerio.load(data);
+    const slug = mangaId.replace(/^\/obra\//, "").replace(/^\//, "");
+    const url = `${API_URL}/obras/slug/${slug}?lang=pt`;
 
-    const title =
-      $(".post-title h1, .post-title h3, h1").first().text().trim() || mangaId.replace(/-/g, " ");
-    const image = getImageSrc($(".summary_image img, .tab-summary img").first());
+    const [_, buffer] = await Application.scheduleRequest({ url, method: "GET" });
+    const rawText = Application.arrayBufferToUTF8String(buffer);
+    const work: AzureObraDto = JSON.parse(rawText);
+
+    const title = work.title?.trim() || slug;
     const thumbnailUrl =
-      image ||
-      "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
+      cleanCoverUrl(work.coverUrl) ||
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
 
-    const synopsis =
-      $(".description-summary .summary__content, .summary__content, .manga-excerpt, .post-content")
-        .first()
-        .text()
-        .trim() || "";
+    const synopsis = work.synopsis?.trim() || work.description?.trim() || "";
 
+    const rawStatus = (work.status || "").toLowerCase();
     let status = "ongoing";
-    const statusText = $(
-      ".post-status .summary-content, .summary-heading:contains('Status') + .summary-content",
-    )
-      .text()
-      .trim()
-      .toLowerCase();
-    if (statusText.includes("completo") || statusText.includes("completed")) {
+    if (rawStatus.includes("completo") || rawStatus === "completed" || rawStatus === "end") {
       status = "completed";
+    } else if (rawStatus.includes("hiato") || rawStatus === "hiatus") {
+      status = "hiatus";
     }
 
-    const author =
-      $(
-        ".author-content a, .summary-heading:contains('Autor') + .summary-content, .summary-heading:contains('Author') + .summary-content",
-      )
-        .first()
-        .text()
-        .trim() || "Desconhecido";
-
-    const genres: Tag[] = [];
-    const seenGenres = new Set<string>();
-
-    $(".genres-content a").each((_, el) => {
-      const g = $(el).text().trim();
-      if (g) {
-        const id = sanitizeTagId(g);
-        if (!seenGenres.has(id)) {
-          seenGenres.add(id);
-          genres.push({ id, title: g });
+    const tagList: Tag[] = [];
+    if (work.genres && Array.isArray(work.genres)) {
+      for (const g of work.genres) {
+        if (g) {
+          tagList.push({ id: sanitizeTagId(g), title: g });
         }
       }
-    });
+    }
 
     return {
       mangaId,
@@ -523,117 +258,75 @@ export class AzuretoonsExtension implements ExtensionImpl<typeof ContentTemplate
         synopsis,
         contentRating: ContentRating.EVERYONE,
         status,
-        author,
-        tagGroups: [{ id: "genres", title: "Gêneros", tags: genres }],
-        artworkUrls: image ? [image] : [thumbnailUrl],
-        shareUrl: url,
+        author: work.originalAuthor?.trim() || "AzureToons",
+        artist: work.artist?.trim() || work.originalAuthor?.trim() || "AzureToons",
+        tagGroups: tagList.length > 0 ? [{ id: "genres", title: "Gêneros", tags: tagList }] : [],
+        artworkUrls: [thumbnailUrl],
+        shareUrl: `${BASE_URL}/obra/${slug}`,
       },
     };
   }
 
   async getChapters(sourceManga: SourceManga, _sinceDate?: Date): Promise<Chapter[]> {
-    const slug = sourceManga.mangaId;
-    let chaptersData = "";
+    const slug = sourceManga.mangaId.replace(/^\/obra\//, "").replace(/^\//, "");
+    const url = `${API_URL}/obras/slug/${slug}?lang=pt`;
 
-    try {
-      const ajaxReq = {
-        url: `${BASE_URL}/manga/${slug}/ajax/chapters/`,
-        method: "POST",
-      };
-      const [_, ajaxBuffer] = await Application.scheduleRequest(ajaxReq);
-      chaptersData = Application.arrayBufferToUTF8String(ajaxBuffer);
-    } catch (e) {
-      console.error("Erro ao buscar capítulos via ajax/chapters:", e);
-    }
+    const [_, buffer] = await Application.scheduleRequest({ url, method: "GET" });
+    const rawText = Application.arrayBufferToUTF8String(buffer);
+    const work: AzureObraDto = JSON.parse(rawText);
 
-    let $ = cheerio.load(chaptersData);
-
-    if ($("li.wp-manga-chapter").length === 0) {
-      const pageReq = {
-        url: `${BASE_URL}/manga/${slug}/`,
-        method: "GET",
-      };
-      const [_, pageBuf] = await Application.scheduleRequest(pageReq);
-      const pageData = Application.arrayBufferToUTF8String(pageBuf);
-      const $page = cheerio.load(pageData);
-
-      const mangaIdAttr =
-        $page("#manga-chapters-holder").attr("data-id") ||
-        $page(".wp-manga-action-button[data-post]").attr("data-post");
-      if (mangaIdAttr) {
-        try {
-          const adminReq = {
-            url: `${BASE_URL}/wp-admin/admin-ajax.php`,
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `action=manga_get_chapters&manga=${mangaIdAttr}`,
-          };
-          const [_, adminBuf] = await Application.scheduleRequest(adminReq);
-          chaptersData = Application.arrayBufferToUTF8String(adminBuf);
-          $ = cheerio.load(chaptersData);
-        } catch (err) {
-          console.error("Erro ao buscar capítulos via admin-ajax:", err);
-        }
-      } else {
-        $ = $page;
-      }
-    }
-
+    const chaptersList: AzureChapterDto[] = work.chapters ?? [];
     const chapters: Chapter[] = [];
-    const seenChapters = new Set<string>();
 
-    $("li.wp-manga-chapter, li.chapter-item").each((_, el) => {
-      const a = $(el).find("a").first();
-      const href = a.attr("href")?.trim() ?? "";
-      const name = a.text().trim();
-      const numMatch = name.match(/[\d.]+/);
-      const chapNum = numMatch ? parseFloat(numMatch[0]) : 0;
+    for (const c of chaptersList) {
+      const numRaw = c.num ?? c.chapterNumber ?? 0;
+      const num = typeof numRaw === "number" ? numRaw : parseFloat(String(numRaw)) || 0;
+      const numStr = String(numRaw);
+      const chapterIdentifier = `${slug}/${numStr}`;
+      const title =
+        c.title && !c.title.startsWith("Capítulo")
+          ? `Capítulo ${numStr} - ${c.title}`
+          : `Capítulo ${numStr}`;
 
-      if (href && !seenChapters.has(href)) {
-        seenChapters.add(href);
-        const rawDate = $(el)
-          .find(".chapter-release-date, i, .c-new-tag, time")
-          .first()
-          .text()
-          .trim();
-        const publishDate = parsePortugueseDate(rawDate);
+      const dateStr = c.releaseDate || c.createdAt;
+      const publishDate = dateStr ? new Date(dateStr) : undefined;
 
-        chapters.push({
-          chapterId: href,
-          sourceManga,
-          langCode: "PT-BR",
-          chapNum,
-          title: name,
-          volume: 0,
-          publishDate,
-        });
-      }
-    });
+      chapters.push({
+        chapterId: chapterIdentifier,
+        sourceManga,
+        langCode: "PT-BR",
+        chapNum: num,
+        title,
+        volume: 0,
+        publishDate: publishDate && !isNaN(publishDate.getTime()) ? publishDate : undefined,
+      });
+    }
 
+    chapters.sort((a, b) => b.chapNum - a.chapNum);
     return chapters;
   }
 
   async getChapterDetails(chapter: Chapter): Promise<ChapterDetails> {
-    const url = chapter.chapterId.startsWith("http")
-      ? chapter.chapterId
-      : `${BASE_URL}${chapter.chapterId.startsWith("/") ? "" : "/"}${chapter.chapterId}`;
-    const request = { url, method: "GET" };
-    const [_, buffer] = await Application.scheduleRequest(request);
-    const data = Application.arrayBufferToUTF8String(buffer);
-    const $ = cheerio.load(data);
+    const parts = chapter.chapterId.split("/");
+    const slug = parts[0] || chapter.sourceManga.mangaId;
+    const number = parts[1] || String(chapter.chapNum);
 
+    const url = `${API_URL}/chapters/read/${slug}/${number}?lang=pt`;
+    const [_, buffer] = await Application.scheduleRequest({ url, method: "GET" });
+    const rawText = Application.arrayBufferToUTF8String(buffer);
+    const data: AzureChapterReadDto = JSON.parse(rawText);
+
+    const rawPages = data.images ?? data.pages ?? [];
     const pages: string[] = [];
-    const seenPages = new Set<string>();
 
-    $(".reading-content img, .entry-content img, .chapter-images img, .page-break img").each(
-      (_, el) => {
-        const src = getImageSrc($(el));
-        if (src && src.startsWith("http") && !seenPages.has(src)) {
-          seenPages.add(src);
-          pages.push(src);
-        }
-      },
-    );
+    for (const p of rawPages) {
+      if (!p) continue;
+      let pageUrl = p.startsWith("http") ? p : `${BASE_URL}/${p.replace(/^\//, "")}`;
+      try {
+        pageUrl = decodeURI(pageUrl);
+      } catch {}
+      pages.push(encodeURI(pageUrl).replace(/%2520/g, "%20").replace(/ /g, "%20"));
+    }
 
     return {
       id: chapter.chapterId,
@@ -651,13 +344,13 @@ export class AzuretoonsExtension implements ExtensionImpl<typeof ContentTemplate
           ? appGlobal.createHomeSection({
               id: sec.id,
               title: sec.title,
-              containsMoreItems: true,
+              containsMoreItems: false,
               type: "singleRowNormal",
             })
           : {
               id: sec.id,
               title: sec.title,
-              containsMoreItems: true,
+              containsMoreItems: false,
               type: "singleRowNormal",
               items: [],
             };
@@ -698,6 +391,7 @@ export class AzuretoonsExtension implements ExtensionImpl<typeof ContentTemplate
     const sec = sections.find((s) => s.id === homepageSectionId) || {
       id: homepageSectionId,
       title: homepageSectionId,
+      type: DiscoverSectionType.simpleCarousel,
     };
     const paged = await this.getDiscoverSectionItems(sec as any, metadata);
     const appGlobal = (typeof App !== "undefined" ? App : undefined) as any;

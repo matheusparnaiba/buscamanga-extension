@@ -251,14 +251,54 @@ export class MonteTaiExtension implements ExtensionImpl<typeof ContentTemplateCo
   async getDiscoverSections(): Promise<DiscoverSection[]> {
     return [
       {
+        id: "featured",
+        title: "Destaques",
+        type: DiscoverSectionType.prominentCarousel,
+      },
+      {
         id: "updates",
         title: "Últimas Atualizações",
         type: DiscoverSectionType.chapterUpdates,
       },
       {
         id: "popular",
-        title: "Mais Lidos",
-        type: DiscoverSectionType.prominentCarousel,
+        title: "Obras Populares",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "new_manga",
+        title: "Mais Novos",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "manhwa",
+        title: "Manhwas",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "manhua",
+        title: "Manhuas & Cultivação",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "artes_marciais",
+        title: "Artes Marciais",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "sistema",
+        title: "Sistema",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "acao",
+        title: "Ação",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "fantasia",
+        title: "Fantasia",
+        type: DiscoverSectionType.simpleCarousel,
       },
     ];
   }
@@ -269,46 +309,37 @@ export class MonteTaiExtension implements ExtensionImpl<typeof ContentTemplateCo
   ): Promise<PagedResults<DiscoverSectionItem>> {
     const page = metadata ?? 1;
 
-    const url =
-      section.id === "popular"
-        ? `${BASE_URL}/manga/?ordem=views&pg=${page}`
-        : `${BASE_URL}/manga/?ordem=latest&pg=${page}`;
+    try {
+      if (section.id === "featured") {
+        if (page > 1) return { items: [], metadata: undefined };
+        const [_, buffer] = await Application.scheduleRequest({
+          url: `${BASE_URL}/`,
+          method: "GET",
+        });
+        const html = Application.arrayBufferToUTF8String(buffer);
+        const $ = cheerio.load(html);
+        const items: DiscoverSectionItem[] = [];
 
-    const request = {
-      url,
-      method: "GET",
-    };
-
-    const [_, buffer] = await Application.scheduleRequest(request);
-    const data = Application.arrayBufferToUTF8String(buffer);
-    const $ = cheerio.load(data);
-    const items: DiscoverSectionItem[] = [];
-    const seenIds = new Set<string>();
-
-    if (section.id === "popular") {
-      $(
-        "article.mt-manga-catalog-card, .page-item-detail, .c-tabs-item__content, .manga__item, .manga-item",
-      ).each((_, el) => {
-        const titleEl = $(el)
-          .find(
-            ".mt-manga-catalog-card__title a, .post-title h2 a, .post-title h3 a, .post-title a, .slider__content h4 a, h2 a, h3 a, h4 a, h5 a",
-          )
-          .first();
-        const title = titleEl.text().replace(/\s+/g, " ").trim();
-        const linkEl = $(el)
-          .find(
-            ".mt-manga-catalog-card__title a, .post-title h2 a, .post-title a, a[href*='/manga/'], a",
-          )
-          .first();
-        const href = linkEl.attr("href");
-        const img = getImageSrc($(el).find(".mt-manga-catalog-card__poster img, img").first());
-
-        if (href && title) {
+        $(".mt-featured-slider article.mt-featured-slide").each((_, el) => {
+          const title = $(el)
+            .find(".mt-featured-slide__title a, h2 a, h3 a, .mt-featured-slide__title")
+            .first()
+            .text()
+            .replace(/\s+/g, " ")
+            .trim();
+          const href = $(el).find("a[href*='/manga/']").first().attr("href") || "";
+          const style = $(el).attr("style") || "";
+          const bgMatch = style.match(/--mt-hero-bg\s*:\s*url\(['"]?([^'")]+)['"]?\)/i);
+          const img = sanitizeImageUrl((bgMatch?.[1] || $(el).find("img").attr("src")) ?? "");
+          const pills = $(el)
+            .find(".mt-featured-pill")
+            .map((_, p) => $(p).text().trim())
+            .get()
+            .join(" • ");
           const idMatch = href.match(/\/manga\/([^/]+)/);
-          const mangaId = idMatch ? (idMatch[1] as string) : href;
+          const mangaId = (idMatch?.[1] ?? href) as string;
 
-          if (!seenIds.has(mangaId)) {
-            seenIds.add(mangaId);
+          if (mangaId && title) {
             items.push({
               mangaId,
               title,
@@ -317,61 +348,60 @@ export class MonteTaiExtension implements ExtensionImpl<typeof ContentTemplateCo
                 "https://ui-avatars.com/api/?name=" +
                   encodeURIComponent(title) +
                   "&background=random",
+              subtitle: pills || undefined,
               type: "prominentCarouselItem",
               contentRating: ContentRating.EVERYONE,
             });
           }
-        }
-      });
-      return {
-        items,
-        metadata: items.length > 0 ? page + 1 : undefined,
-      };
-    }
+        });
 
-    if (section.id === "updates") {
-      $(
-        "article.mt-manga-catalog-card, .page-item-detail, .c-tabs-item__content, .manga__item, .manga-item",
-      ).each((_, el) => {
-        const titleEl = $(el)
-          .find(
-            ".mt-manga-catalog-card__title a, .post-title h2 a, .post-title h3 a, .post-title a, .item-title a, h2 a, h3 a, h4 a, h5 a",
-          )
-          .first();
-        const title = titleEl.text().replace(/\s+/g, " ").trim();
-        const linkEl = $(el)
-          .find(
-            ".mt-manga-catalog-card__title a, .post-title h2 a, .post-title a, a[href*='/manga/'], a",
-          )
-          .first();
-        const href = linkEl.attr("href");
-        const img = getImageSrc($(el).find(".mt-manga-catalog-card__poster img, img").first());
+        return { items, metadata: undefined };
+      }
 
-        const subtitle =
-          $(el)
-            .find(".mt-manga-catalog-card__type, .mt-manga-catalog-card__status")
-            .first()
-            .text()
-            .trim() ||
-          $(el)
-            .find(
-              ".list-chapter .chapter-item .chapter, .chapter-item a, .list-chapter a, .chapter a",
-            )
+      if (section.id === "updates") {
+        const url = page === 1 ? `${BASE_URL}/` : `${BASE_URL}/page/${page}/`;
+        const [_, buffer] = await Application.scheduleRequest({
+          url,
+          method: "GET",
+        });
+        const html = Application.arrayBufferToUTF8String(buffer);
+        const $ = cheerio.load(html);
+        const items: DiscoverSectionItem[] = [];
+        const seenIds = new Set<string>();
+
+        $(".mt-home-lab-catalog__grid article.mt-manga-catalog-card").each((_, el) => {
+          const title = $(el)
+            .find(".mt-manga-catalog-card__title a, h2 a")
             .first()
             .text()
             .replace(/\s+/g, " ")
-            .trim() ||
-          "Capítulo";
+            .trim();
+          const href =
+            $(el)
+              .find(".mt-manga-catalog-card__title a, a.mt-manga-catalog-card__poster")
+              .first()
+              .attr("href") || "";
+          const img = getImageSrc($(el).find(".mt-manga-catalog-card__poster img, img").first());
 
-        if (href && title) {
+          const firstChap = $(el)
+            .find(".mt-manga-catalog-card__chapters a.mt-manga-catalog-card__chapter")
+            .first();
+          const chapHref = firstChap.attr("href") || "";
+          const chapLabel = firstChap.find(".mt-manga-catalog-card__chapter-label").text().trim();
+          const chapDate = firstChap.find(".mt-manga-catalog-card__chapter-side").text().trim();
+          const subtitle =
+            [chapLabel, chapDate].filter(Boolean).join(" • ") ||
+            $(el).find(".mt-manga-catalog-card__type").text().trim() ||
+            "Capítulo";
+
           const idMatch = href.match(/\/manga\/([^/]+)/);
-          const mangaId = idMatch ? (idMatch[1] as string) : href;
+          const mangaId = (idMatch?.[1] ?? href) as string;
 
-          if (!seenIds.has(mangaId)) {
+          if (mangaId && title && !seenIds.has(mangaId)) {
             seenIds.add(mangaId);
             items.push({
               mangaId,
-              chapterId: mangaId,
+              chapterId: chapHref || mangaId,
               title,
               subtitle,
               imageUrl:
@@ -383,16 +413,135 @@ export class MonteTaiExtension implements ExtensionImpl<typeof ContentTemplateCo
               contentRating: ContentRating.EVERYONE,
             });
           }
+        });
+
+        const hasNextPage =
+          $(".pagination a, .nav-links a, a[href*='/page/" + (page + 1) + "/']").length > 0 ||
+          items.length >= 18;
+        return {
+          items,
+          metadata: hasNextPage ? page + 1 : undefined,
+        };
+      }
+
+      if (section.id === "popular" && page === 1) {
+        const [_, buffer] = await Application.scheduleRequest({
+          url: `${BASE_URL}/`,
+          method: "GET",
+        });
+        const html = Application.arrayBufferToUTF8String(buffer);
+        const $ = cheerio.load(html);
+        const items: DiscoverSectionItem[] = [];
+        const seenIds = new Set<string>();
+
+        $(".mt-popular-home article.mt-popular-home__card").each((_, el) => {
+          const title = $(el)
+            .find(".mt-popular-home__title a, h3 a")
+            .first()
+            .text()
+            .replace(/\s+/g, " ")
+            .trim();
+          const href =
+            $(el).find("a.mt-popular-home__thumb, a[href*='/manga/']").first().attr("href") || "";
+          const img = getImageSrc($(el).find("img").first());
+          const rank = $(el).find(".mt-popular-home__rank").text().trim();
+          const views = $(el).find(".mt-popular-home__views").text().trim();
+          const subtitle = [rank, views].filter(Boolean).join(" • ");
+          const idMatch = href.match(/\/manga\/([^/]+)/);
+          const mangaId = (idMatch?.[1] ?? href) as string;
+
+          if (mangaId && title && !seenIds.has(mangaId)) {
+            seenIds.add(mangaId);
+            items.push({
+              mangaId,
+              title,
+              imageUrl:
+                img ||
+                "https://ui-avatars.com/api/?name=" +
+                  encodeURIComponent(title) +
+                  "&background=random",
+              subtitle: subtitle || undefined,
+              type: "simpleCarouselItem",
+              contentRating: ContentRating.EVERYONE,
+            });
+          }
+        });
+
+        if (items.length > 0) {
+          return { items, metadata: 2 };
+        }
+      }
+
+      let catalogUrl = `${BASE_URL}/manga/?pg=${page}`;
+      if (section.id === "popular") {
+        catalogUrl = `${BASE_URL}/manga/?ordem=views&pg=${page}`;
+      } else if (section.id === "new_manga") {
+        catalogUrl = `${BASE_URL}/manga/?ordem=new-manga&pg=${page}`;
+      } else if (section.id === "manhwa") {
+        catalogUrl = `${BASE_URL}/manga/?genero=manhwa&pg=${page}`;
+      } else if (section.id === "manhua") {
+        catalogUrl = `${BASE_URL}/manga/?tipo=manhua&pg=${page}`;
+      } else if (section.id === "artes_marciais") {
+        catalogUrl = `${BASE_URL}/manga/?genero=artes-marciais&pg=${page}`;
+      } else if (section.id === "sistema") {
+        catalogUrl = `${BASE_URL}/manga/?genero=sistema&pg=${page}`;
+      } else if (section.id === "acao") {
+        catalogUrl = `${BASE_URL}/manga/?genero=acao&pg=${page}`;
+      } else if (section.id === "fantasia") {
+        catalogUrl = `${BASE_URL}/manga/?genero=fantasia&pg=${page}`;
+      }
+
+      const [_, buffer] = await Application.scheduleRequest({
+        url: catalogUrl,
+        method: "GET",
+      });
+      const html = Application.arrayBufferToUTF8String(buffer);
+      const $ = cheerio.load(html);
+      const items: DiscoverSectionItem[] = [];
+      const seenIds = new Set<string>();
+
+      $("article.mt-manga-catalog-card").each((_, el) => {
+        const title = $(el)
+          .find(".mt-manga-catalog-card__title a, h2 a")
+          .first()
+          .text()
+          .replace(/\s+/g, " ")
+          .trim();
+        const href =
+          $(el)
+            .find(".mt-manga-catalog-card__title a, a.mt-manga-catalog-card__poster")
+            .first()
+            .attr("href") || "";
+        const img = getImageSrc($(el).find(".mt-manga-catalog-card__poster img, img").first());
+        const type = $(el).find(".mt-manga-catalog-card__type").text().trim();
+        const views = $(el).find(".mt-manga-catalog-card__metric").first().text().trim();
+        const subtitle = views || type || undefined;
+        const idMatch = href.match(/\/manga\/([^/]+)/);
+        const mangaId = (idMatch?.[1] ?? href) as string;
+
+        if (mangaId && title && !seenIds.has(mangaId)) {
+          seenIds.add(mangaId);
+          items.push({
+            mangaId,
+            title,
+            imageUrl:
+              img ||
+              "https://ui-avatars.com/api/?name=" +
+                encodeURIComponent(title) +
+                "&background=random",
+            subtitle,
+            type: "simpleCarouselItem",
+            contentRating: ContentRating.EVERYONE,
+          });
         }
       });
 
-      return {
-        items,
-        metadata: items.length > 0 ? page + 1 : undefined,
-      };
+      const hasNextPage = items.length >= 20;
+      return { items, metadata: hasNextPage ? page + 1 : undefined };
+    } catch (e) {
+      console.error(`Erro ao carregar seção ${section.id} no Monte Tai:`, e);
+      return { items: [], metadata: undefined };
     }
-
-    return { items, metadata: undefined };
   }
 
   async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
@@ -410,10 +559,20 @@ export class MonteTaiExtension implements ExtensionImpl<typeof ContentTemplateCo
     const page = metadata ?? 1;
     const title = query.title?.trim() ?? "";
     const orderBy = query.metadata?.orderBy ?? "views";
+    const genre = query.metadata?.genre;
+    const status = query.metadata?.status;
 
-    const url = title
-      ? `${BASE_URL}/manga/?busca=${encodeURIComponent(title)}&pg=${page}`
-      : `${BASE_URL}/manga/?ordem=${orderBy === "views" ? "views" : "latest"}&pg=${page}`;
+    let url: string;
+    if (title) {
+      url = `${BASE_URL}/manga/?busca=${encodeURIComponent(title)}&pg=${page}`;
+    } else {
+      const params = new URLSearchParams();
+      if (orderBy) params.set("ordem", orderBy);
+      if (genre && genre !== "all") params.set("genero", genre);
+      if (status && status !== "all") params.set("status", status);
+      params.set("pg", String(page));
+      url = `${BASE_URL}/manga/?${params.toString()}`;
+    }
 
     const request = {
       url,
@@ -463,9 +622,10 @@ export class MonteTaiExtension implements ExtensionImpl<typeof ContentTemplateCo
       }
     });
 
+    const hasNextPage = items.length >= 20;
     return {
       items,
-      metadata: items.length > 0 ? page + 1 : undefined,
+      metadata: hasNextPage ? page + 1 : undefined,
     };
   }
 

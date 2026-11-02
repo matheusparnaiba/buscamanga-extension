@@ -9,6 +9,7 @@ import {
 } from "@paperback/types";
 
 import {
+  GENRE_OPTIONS,
   ORDER_OPTIONS,
   STATUS_OPTIONS,
   TYPE_OPTIONS,
@@ -41,12 +42,14 @@ export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
   private orderBy: string;
   private status: string;
   private type: string;
+  private genre: string;
 
   constructor(searchQuery: SearchQuery<ContentTemplateSearchMetadata>) {
     super();
     this.orderBy = searchQuery.metadata?.orderBy ?? "updated_at";
     this.status = searchQuery.metadata?.status ?? "all";
     this.type = searchQuery.metadata?.type ?? "all";
+    this.genre = searchQuery.metadata?.genre ?? "all";
   }
 
   override getSections() {
@@ -85,6 +88,17 @@ export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
             "handleTypeChange",
           ),
         }),
+        SelectRow("genre", {
+          title: "Gênero / Categoria",
+          value: [this.genre],
+          options: GENRE_OPTIONS,
+          minItemCount: 1,
+          maxItemCount: 1,
+          onValueChange: Application.Selector(
+            this as ContentTemplateAdvancedSearchForm,
+            "handleGenreChange",
+          ),
+        }),
       ]),
     ];
   }
@@ -101,11 +115,16 @@ export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
     this.type = value[0] ?? "all";
   }
 
+  async handleGenreChange(value: string[]): Promise<void> {
+    this.genre = value[0] ?? "all";
+  }
+
   override getSearchQueryMetadata(): ContentTemplateSearchMetadata {
     return {
       orderBy: this.orderBy,
       status: this.status,
       type: this.type,
+      genre: this.genre,
     };
   }
 }

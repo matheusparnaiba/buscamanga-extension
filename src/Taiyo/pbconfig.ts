@@ -4,7 +4,7 @@ export default {
   name: "Taiyo",
   description:
     "Extensão oficial do Taiyo com suporte a catálogo e leitor moderno de mangás e webtoons.",
-  version: "1.0.1",
+  version: "1.0.2",
   icon: "icon.png",
   language: "pt-BR",
   contentRating: ContentRating.EVERYONE,

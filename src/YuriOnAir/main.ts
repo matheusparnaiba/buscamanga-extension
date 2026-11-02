@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright © 2025 Inkdex */
+
 import {
   BasicRateLimiter,
   ContentRating,
@@ -234,13 +237,53 @@ export class YuriOnAirExtension implements ExtensionImpl<typeof ContentTemplateC
     return [
       {
         id: "updates",
-        title: "Últimas Atualizações",
+        title: "Novos Capítulos",
         type: DiscoverSectionType.chapterUpdates,
       },
       {
-        id: "popular",
-        title: "Mais Lidos",
+        id: "hot",
+        title: "Mais Quentes",
         type: DiscoverSectionType.prominentCarousel,
+      },
+      {
+        id: "featured_hq",
+        title: "HQ's em Destaque",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "for_you",
+        title: "For You",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "top_yuri",
+        title: "Top Yuri",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "completed",
+        title: "Finalizados Recentes",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "manga",
+        title: "Mangás",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "manhwa",
+        title: "Manhwas",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "manhua",
+        title: "Manhuas",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "hq",
+        title: "HQs",
+        type: DiscoverSectionType.simpleCarousel,
       },
     ];
   }
@@ -251,18 +294,51 @@ export class YuriOnAirExtension implements ExtensionImpl<typeof ContentTemplateC
   ): Promise<PagedResults<DiscoverSectionItem>> {
     const page = metadata ?? 1;
 
-    if (section.id === "popular" && page > 1) {
-      return { items: [], metadata: undefined };
+    let url = "";
+    if (page === 1) {
+      if (
+        section.id === "updates" ||
+        section.id === "hot" ||
+        section.id === "featured_hq" ||
+        section.id === "for_you" ||
+        section.id === "top_yuri" ||
+        section.id === "completed"
+      ) {
+        url = `${BASE_URL}/`;
+      } else if (section.id === "manga") {
+        url = `${BASE_URL}/manga-tag/manga/`;
+      } else if (section.id === "manhwa") {
+        url = `${BASE_URL}/manga-tag/manhwa/`;
+      } else if (section.id === "manhua") {
+        url = `${BASE_URL}/manga-tag/manhua/`;
+      } else if (section.id === "hq") {
+        url = `${BASE_URL}/manga-genero/hq/`;
+      } else {
+        url = `${BASE_URL}/manga/?m_orderby=views`;
+      }
+    } else {
+      if (section.id === "updates") {
+        url = `${BASE_URL}/manga/page/${page}/?m_orderby=latest`;
+      } else if (section.id === "hot") {
+        url = `${BASE_URL}/manga/page/${page}/?m_orderby=trending`;
+      } else if (section.id === "featured_hq") {
+        url = `${BASE_URL}/manga-genero/hq/page/${page}/`;
+      } else if (section.id === "for_you" || section.id === "top_yuri") {
+        url = `${BASE_URL}/manga/page/${page}/?m_orderby=views`;
+      } else if (section.id === "completed") {
+        url = `${BASE_URL}/page/${page}/?s=&post_type=wp-manga&status[]=end`;
+      } else if (section.id === "manga") {
+        url = `${BASE_URL}/manga-tag/manga/page/${page}/`;
+      } else if (section.id === "manhwa") {
+        url = `${BASE_URL}/manga-tag/manhwa/page/${page}/`;
+      } else if (section.id === "manhua") {
+        url = `${BASE_URL}/manga-tag/manhua/page/${page}/`;
+      } else if (section.id === "hq") {
+        url = `${BASE_URL}/manga-genero/hq/page/${page}/`;
+      } else {
+        url = `${BASE_URL}/manga/page/${page}/?m_orderby=views`;
+      }
     }
-
-    const url =
-      section.id === "popular"
-        ? page === 1
-          ? `${BASE_URL}/manga/?m_orderby=views`
-          : `${BASE_URL}/manga/page/${page}/?m_orderby=views`
-        : page === 1
-          ? `${BASE_URL}/manga/?m_orderby=latest`
-          : `${BASE_URL}/manga/page/${page}/?m_orderby=latest`;
 
     const request = {
       url,
@@ -275,48 +351,52 @@ export class YuriOnAirExtension implements ExtensionImpl<typeof ContentTemplateC
     const items: DiscoverSectionItem[] = [];
     const seenIds = new Set<string>();
 
-    if (section.id === "popular") {
-      $(".c-tabs-item__content, .page-item-detail, .manga-item").each((_, el) => {
-        const titleEl = $(el).find(".post-title a, .manga-title, h3 a, h3, h5 a").first();
-        const title = titleEl.text().trim();
-        const linkEl = $(el).find(".post-title a, a[href*='/manga/'], a").first();
-        const href = linkEl.attr("href");
-        const img = getImageSrc($(el).find("img").first());
-
-        if (href && title) {
-          const idMatch = href.match(/\/manga\/([^/]+)/);
-          const mangaId = idMatch ? (idMatch[1] as string) : href;
-
-          if (!seenIds.has(mangaId)) {
-            seenIds.add(mangaId);
-            items.push({
-              mangaId,
-              title,
-              imageUrl:
-                img ||
-                "https://ui-avatars.com/api/?name=" +
-                  encodeURIComponent(title) +
-                  "&background=random",
-              type: "prominentCarouselItem",
-              contentRating: ContentRating.EVERYONE,
-            });
-          }
-        }
-      });
-      return { items, metadata: undefined };
+    let container: cheerio.Cheerio<any> | null = null;
+    if (page === 1) {
+      if (section.id === "updates") {
+        container = $(".c-blog-listing.manga_content");
+      } else if (section.id === "hot") {
+        container = $("#manga-slider-7");
+      } else if (section.id === "featured_hq") {
+        container = $("#manga-popular-slider-6");
+      } else if (section.id === "for_you") {
+        container = $("#manga-slider-8");
+      } else if (section.id === "top_yuri") {
+        container = $("#manga-slider-10");
+      } else if (section.id === "completed") {
+        container = $("#text-42");
+      }
     }
 
-    if (section.id === "updates") {
-      $(
-        ".page-item-detail, .c-tabs-item__content, .manga-item, .col-6.col-md-2, .col-12.col-md-6",
-      ).each((_, el) => {
-        const titleEl = $(el).find(".post-title a, .item-title a, h3 a, h5 a, h3").first();
-        const title = titleEl.text().trim();
-        const linkEl = $(el).find(".post-title a, a[href*='/manga/'], a").first();
+    const root = container && container.length > 0 ? container : $("body");
+    root
+      .find(
+        ".slider__item, .page-item-detail, .col-6, .col-12.col-md-6, .c-tabs-item__content, .manga-item",
+      )
+      .each((_, el) => {
+        const postTitle = $(el).find(".post-title, .title, .item-title").clone();
+        postTitle.find(".manga-title-badges, .badge").remove();
+        let title = postTitle.find("a[href*='/manga/']").first().text().trim();
+        if (!title) {
+          title = postTitle.text().trim();
+        }
+        if (!title) {
+          title = $(el).find("h3 a, h5 a, h3, h5").first().text().trim();
+        }
+
+        const linkEl = $(el)
+          .find(
+            ".post-title a[href*='/manga/'], h3 a[href*='/manga/'], h5 a[href*='/manga/'], a[href*='/manga/']",
+          )
+          .first();
         const href = linkEl.attr("href");
         const img = getImageSrc($(el).find("img").first());
 
-        const chapEl = $(el).find(".chapter-item a, .list-chapter a, .chapter a").first();
+        const chapEl = $(el)
+          .find(
+            ".list-chapter .chapter-item a, .chapter-item a, .list-chapter a, .chapter a, .slider__sub-title a",
+          )
+          .first();
         const chapHref = chapEl.attr("href");
         const chapName = chapEl.text().trim();
 
@@ -324,45 +404,64 @@ export class YuriOnAirExtension implements ExtensionImpl<typeof ContentTemplateC
           const idMatch = href.match(/\/manga\/([^/]+)/);
           const mangaId = idMatch ? (idMatch[1] as string) : href;
 
-          let chapterId = mangaId;
-          if (chapHref) {
-            const chapMatch = chapHref.match(/\/manga\/[^/]+\/([^/]+)/);
-            if (chapMatch) chapterId = chapMatch[1] as string;
-            else chapterId = chapHref;
-          }
-
-          if (!seenIds.has(mangaId)) {
+          if (!mangaId.includes("#") && mangaId !== "manga" && !seenIds.has(mangaId)) {
             seenIds.add(mangaId);
-            items.push({
-              mangaId,
-              chapterId,
-              title,
-              subtitle: chapName,
-              imageUrl:
-                img ||
-                "https://ui-avatars.com/api/?name=" +
-                  encodeURIComponent(title) +
-                  "&background=random",
-              type: "chapterUpdatesCarouselItem",
-              contentRating: ContentRating.EVERYONE,
-            });
+            let chapterId = mangaId;
+            if (chapHref) {
+              const chapMatch = chapHref.match(/\/manga\/[^/]+\/([^/]+)/);
+              if (chapMatch) chapterId = chapMatch[1] as string;
+              else chapterId = chapHref;
+            }
+
+            const imageUrl =
+              img ||
+              "https://ui-avatars.com/api/?name=" +
+                encodeURIComponent(title) +
+                "&background=random";
+
+            if (section.type === DiscoverSectionType.chapterUpdates) {
+              items.push({
+                mangaId,
+                chapterId,
+                title,
+                subtitle: chapName || undefined,
+                imageUrl,
+                type: "chapterUpdatesCarouselItem",
+                contentRating: ContentRating.EVERYONE,
+              });
+            } else if (section.type === DiscoverSectionType.prominentCarousel) {
+              items.push({
+                mangaId,
+                title,
+                subtitle: chapName || undefined,
+                imageUrl,
+                type: "prominentCarouselItem",
+                contentRating: ContentRating.EVERYONE,
+              });
+            } else {
+              items.push({
+                mangaId,
+                title,
+                subtitle: chapName || undefined,
+                imageUrl,
+                type: "simpleCarouselItem",
+                contentRating: ContentRating.EVERYONE,
+              });
+            }
           }
         }
       });
 
-      return {
-        items,
-        metadata: items.length > 0 ? page + 1 : undefined,
-      };
-    }
-
-    return { items, metadata: undefined };
+    return {
+      items,
+      metadata: items.length > 0 ? page + 1 : undefined,
+    };
   }
 
   async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
     return new ContentTemplateAdvancedSearchForm({
       title: "",
-      metadata: { orderBy: "views" },
+      metadata: { orderBy: "views", type: "all", genre: "all", status: "all" },
     });
   }
 
@@ -374,16 +473,49 @@ export class YuriOnAirExtension implements ExtensionImpl<typeof ContentTemplateC
     const page = metadata ?? 1;
     const title = query.title?.trim() ?? "";
     const orderBy = query.metadata?.orderBy ?? "views";
+    const type = query.metadata?.type && query.metadata.type !== "all" ? query.metadata.type : "";
     const genre =
       query.metadata?.genre && query.metadata.genre !== "all" ? query.metadata.genre : "";
-    const genreParam = genre ? `&genre[]=${encodeURIComponent(genre)}` : "";
     const status =
       query.metadata?.status && query.metadata.status !== "all" ? query.metadata.status : "";
-    const statusParam = status ? `&status[]=${encodeURIComponent(status)}` : "";
 
-    const url = title
-      ? `${BASE_URL}/page/${page}/?s=${encodeURIComponent(title)}&post_type=wp-manga&m_orderby=${encodeURIComponent(orderBy)}${genreParam}${statusParam}`
-      : `${BASE_URL}/manga/page/${page}/?m_orderby=${encodeURIComponent(orderBy)}${genreParam}${statusParam}`;
+    let url = "";
+    if (!title && type && !genre && !status) {
+      if (type === "hq") {
+        url =
+          page === 1
+            ? `${BASE_URL}/manga-genero/hq/?m_orderby=${encodeURIComponent(orderBy)}`
+            : `${BASE_URL}/manga-genero/hq/page/${page}/?m_orderby=${encodeURIComponent(orderBy)}`;
+      } else {
+        url =
+          page === 1
+            ? `${BASE_URL}/manga-tag/${encodeURIComponent(type)}/?m_orderby=${encodeURIComponent(orderBy)}`
+            : `${BASE_URL}/manga-tag/${encodeURIComponent(type)}/page/${page}/?m_orderby=${encodeURIComponent(orderBy)}`;
+      }
+    } else if (!title && genre && !type && !status) {
+      url =
+        page === 1
+          ? `${BASE_URL}/manga-genero/${encodeURIComponent(genre)}/?m_orderby=${encodeURIComponent(orderBy)}`
+          : `${BASE_URL}/manga-genero/${encodeURIComponent(genre)}/page/${page}/?m_orderby=${encodeURIComponent(orderBy)}`;
+    } else if (!title && !type && !genre && !status) {
+      url =
+        page === 1
+          ? `${BASE_URL}/manga/?m_orderby=${encodeURIComponent(orderBy)}`
+          : `${BASE_URL}/manga/page/${page}/?m_orderby=${encodeURIComponent(orderBy)}`;
+    } else {
+      const params = new URLSearchParams();
+      params.set("s", title);
+      params.set("post_type", "wp-manga");
+      if (genre) params.append("genre[]", genre);
+      if (type) {
+        if (type === "hq") params.append("genre[]", "hq");
+        else params.append("tag[]", type);
+      }
+      if (status) params.append("status[]", status);
+      if (orderBy) params.set("m_orderby", orderBy);
+
+      url = `${BASE_URL}/page/${page}/?${params.toString()}`;
+    }
 
     const request = {
       url,
@@ -397,9 +529,21 @@ export class YuriOnAirExtension implements ExtensionImpl<typeof ContentTemplateC
     const seenIds = new Set<string>();
 
     $(".c-tabs-item__content, .page-item-detail, .search-wrap .row, .manga-item").each((_, el) => {
-      const titleEl = $(el).find(".post-title a, h3 a, h5 a, h3").first();
-      const mangaTitle = titleEl.text().trim();
-      const linkEl = $(el).find(".post-title a, a[href*='/manga/'], a").first();
+      const postTitle = $(el).find(".post-title, .title, .item-title").clone();
+      postTitle.find(".manga-title-badges, .badge").remove();
+      let mangaTitle = postTitle.find("a[href*='/manga/']").first().text().trim();
+      if (!mangaTitle) {
+        mangaTitle = postTitle.text().trim();
+      }
+      if (!mangaTitle) {
+        mangaTitle = $(el).find("h3 a, h5 a, h3, h5").first().text().trim();
+      }
+
+      const linkEl = $(el)
+        .find(
+          ".post-title a[href*='/manga/'], h3 a[href*='/manga/'], h5 a[href*='/manga/'], a[href*='/manga/']",
+        )
+        .first();
       const href = linkEl.attr("href");
       const img = getImageSrc($(el).find("img").first());
 
@@ -407,7 +551,7 @@ export class YuriOnAirExtension implements ExtensionImpl<typeof ContentTemplateC
         const idMatch = href.match(/\/manga\/([^/]+)/);
         const mangaId = idMatch ? (idMatch[1] as string) : href;
 
-        if (!seenIds.has(mangaId)) {
+        if (!mangaId.includes("#") && mangaId !== "manga" && !seenIds.has(mangaId)) {
           seenIds.add(mangaId);
           items.push({
             mangaId,
@@ -458,6 +602,14 @@ export class YuriOnAirExtension implements ExtensionImpl<typeof ContentTemplateC
       .toLowerCase();
     if (statusText.includes("completo") || statusText.includes("completed")) {
       status = "completed";
+    } else if (statusText.includes("cancelado") || statusText.includes("canceled")) {
+      status = "canceled";
+    } else if (
+      statusText.includes("espera") ||
+      statusText.includes("on-hold") ||
+      statusText.includes("pausado")
+    ) {
+      status = "on-hold";
     }
 
     const author =
@@ -468,10 +620,18 @@ export class YuriOnAirExtension implements ExtensionImpl<typeof ContentTemplateC
         .text()
         .trim() || "Desconhecido";
 
+    const artist =
+      $(
+        ".artist-content a, .summary-heading:contains('Artista') + .summary-content, .summary-heading:contains('Artist') + .summary-content",
+      )
+        .first()
+        .text()
+        .trim() || undefined;
+
     const genres: Tag[] = [];
     const seenGenres = new Set<string>();
 
-    $(".genres-content a").each((_, el) => {
+    $(".genres-content a, .tags-content a").each((_, el) => {
       const g = $(el).text().trim();
       if (g) {
         const id = sanitizeTagId(g);
@@ -492,7 +652,8 @@ export class YuriOnAirExtension implements ExtensionImpl<typeof ContentTemplateC
         contentRating: ContentRating.EVERYONE,
         status,
         author,
-        tagGroups: [{ id: "genres", title: "Gêneros", tags: genres }],
+        artist,
+        tagGroups: [{ id: "genres", title: "Gêneros e Categorias", tags: genres }],
         artworkUrls: image ? [image] : [thumbnailUrl],
         shareUrl: url,
       },

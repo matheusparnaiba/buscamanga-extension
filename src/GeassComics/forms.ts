@@ -9,8 +9,10 @@ import {
 } from "@paperback/types";
 
 import {
+  GENRE_OPTIONS,
   ORDER_OPTIONS,
   STATUS_OPTIONS,
+  TAG_OPTIONS,
   TYPE_OPTIONS,
   type ContentTemplateSearchMetadata,
 } from "./models";
@@ -39,14 +41,18 @@ export class SettingsForm extends Form {
 
 export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
   private orderBy: string;
+  private genre: string;
   private type: string;
   private status: string;
+  private tag: string;
 
   constructor(searchQuery: SearchQuery<ContentTemplateSearchMetadata>) {
     super();
     this.orderBy = searchQuery.metadata?.orderBy ?? "recent";
+    this.genre = searchQuery.metadata?.genre ?? "all";
     this.type = searchQuery.metadata?.type ?? "all";
     this.status = searchQuery.metadata?.status ?? "all";
+    this.tag = searchQuery.metadata?.tag ?? "all";
   }
 
   override getSections() {
@@ -61,6 +67,17 @@ export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
           onValueChange: Application.Selector(
             this as ContentTemplateAdvancedSearchForm,
             "handleOrderChange",
+          ),
+        }),
+        SelectRow("genre", {
+          title: "Gênero / Categoria",
+          value: [this.genre],
+          options: GENRE_OPTIONS,
+          minItemCount: 1,
+          maxItemCount: 1,
+          onValueChange: Application.Selector(
+            this as ContentTemplateAdvancedSearchForm,
+            "handleGenreChange",
           ),
         }),
         SelectRow("type", {
@@ -85,12 +102,27 @@ export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
             "handleStatusChange",
           ),
         }),
+        SelectRow("tag", {
+          title: "Tag / Tema",
+          value: [this.tag],
+          options: TAG_OPTIONS,
+          minItemCount: 1,
+          maxItemCount: 1,
+          onValueChange: Application.Selector(
+            this as ContentTemplateAdvancedSearchForm,
+            "handleTagChange",
+          ),
+        }),
       ]),
     ];
   }
 
   async handleOrderChange(value: string[]): Promise<void> {
     this.orderBy = value[0] ?? "recent";
+  }
+
+  async handleGenreChange(value: string[]): Promise<void> {
+    this.genre = value[0] ?? "all";
   }
 
   async handleTypeChange(value: string[]): Promise<void> {
@@ -101,11 +133,17 @@ export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
     this.status = value[0] ?? "all";
   }
 
+  async handleTagChange(value: string[]): Promise<void> {
+    this.tag = value[0] ?? "all";
+  }
+
   override getSearchQueryMetadata(): ContentTemplateSearchMetadata {
     return {
       orderBy: this.orderBy,
+      genre: this.genre,
       type: this.type,
       status: this.status,
+      tag: this.tag,
     };
   }
 }

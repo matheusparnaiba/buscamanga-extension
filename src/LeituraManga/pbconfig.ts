@@ -2,8 +2,9 @@ import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/typ
 
 export default {
   name: "Leitura Manga",
-  description: 'Extensão do "https://leituramanga.net"',
-  version: "1.0.4",
+  description:
+    "Extensão oficial do Leitura Manga com amplo acervo de mangás, manhwas, manhuas e novels em português.",
+  version: "1.0.5",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

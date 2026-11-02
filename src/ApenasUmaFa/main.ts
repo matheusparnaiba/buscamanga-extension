@@ -55,6 +55,15 @@ interface BloggerFeedResponse {
   };
 }
 
+interface SeriesInfo {
+  title: string;
+  link: string;
+  thumb: string;
+}
+
+let seriesMapCache: Map<string, SeriesInfo> | null = null;
+let lastSeriesMapFetch = 0;
+
 function cleanThumbnail(url: string | undefined): string {
   if (!url) return "";
   let src = url
@@ -92,6 +101,61 @@ function sanitizeTagId(raw: string): string {
   );
 }
 
+async function getSeriesMap(): Promise<Map<string, SeriesInfo>> {
+  const now = Date.now();
+  if (seriesMapCache && now - lastSeriesMapFetch < 300000) {
+    return seriesMapCache;
+  }
+
+  const map = new Map<string, SeriesInfo>();
+  try {
+    const url = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}?alt=json&max-results=50`;
+    const [_, buffer] = await Application.scheduleRequest({ url, method: "GET" });
+    const json: BloggerFeedResponse = JSON.parse(Application.arrayBufferToUTF8String(buffer));
+    const entries = json.feed?.entry ?? [];
+
+    for (const e of entries) {
+      const title = e.title?.$t?.trim() || "Sem título";
+      const link = e.link?.find((l) => l.rel === "alternate")?.href || "";
+      if (!link) continue;
+
+      const thumb =
+        cleanThumbnail(e.media$thumbnail?.url) ||
+        extractFirstImgFromHtml(e.content?.$t) ||
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
+
+      const info: SeriesInfo = { title, link, thumb };
+      map.set(title.toLowerCase(), info);
+
+      const content = e.content?.$t || "";
+      const match = content.match(/data-labelchapter=["']([^"']+)["']/i);
+      if (match?.[1]) {
+        map.set(match[1].trim().toLowerCase(), info);
+      }
+
+      (e.category || []).forEach((c) => {
+        const term = c.term?.trim();
+        if (
+          term &&
+          term !== "Series" &&
+          !["manhwa", "manhua", "manga", "novel", "drama", "comédia", "romance"].includes(
+            term.toLowerCase(),
+          )
+        ) {
+          map.set(term.toLowerCase(), info);
+        }
+      });
+    }
+
+    seriesMapCache = map;
+    lastSeriesMapFetch = now;
+  } catch (err) {
+    console.error("Erro ao buscar mapa de séries ApenasUmaFa:", err);
+  }
+
+  return map;
+}
+
 export class ApenasUmaFaExtension implements ExtensionImpl<typeof ContentTemplateConfig> {
   constructor(public cheerioInstance?: any) {
     this.getHomePageSections = this.getHomePageSections.bind(this);
@@ -118,7 +182,7 @@ export class ApenasUmaFaExtension implements ExtensionImpl<typeof ContentTemplat
   async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
     return new ContentTemplateAdvancedSearchForm({
       title: "",
-      metadata: { orderBy: "published", genre: "all", status: "all" },
+      metadata: { orderBy: "published", genre: "all", status: "all", type: "all" },
     });
   }
 
@@ -126,17 +190,52 @@ export class ApenasUmaFaExtension implements ExtensionImpl<typeof ContentTemplat
     return [
       {
         id: "updates",
-        title: "Últimas Atualizações",
+        title: "Últimos Capítulos",
         type: DiscoverSectionType.chapterUpdates,
       },
       {
-        id: "popular",
+        id: "destaques",
         title: "Obras em Destaque",
         type: DiscoverSectionType.prominentCarousel,
       },
       {
         id: "all",
         title: "Todas as Obras",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "manhwa",
+        title: "Manhwas",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "romance",
+        title: "Romance",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "drama",
+        title: "Drama",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "idols",
+        title: "Idols & Showbiz",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "comedia",
+        title: "Comédia",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "fantasia",
+        title: "Fantasia",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "shounen_ai",
+        title: "Shounen Ai",
         type: DiscoverSectionType.simpleCarousel,
       },
     ];
@@ -149,16 +248,88 @@ export class ApenasUmaFaExtension implements ExtensionImpl<typeof ContentTemplat
     const page = metadata ?? 1;
     const startIndex = (page - 1) * 20 + 1;
 
-    let feedUrl: string;
-    if (section.id === "updates") {
-      feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}?alt=json&orderby=updated&start-index=${startIndex}&max-results=21`;
-    } else if (section.id === "popular") {
-      feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}?alt=json&orderby=published&start-index=1&max-results=15`;
-    } else {
-      feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}?alt=json&orderby=published&start-index=${startIndex}&max-results=21`;
-    }
-
     try {
+      if (section.id === "updates") {
+        const [seriesMap, [_, buffer]] = await Promise.all([
+          getSeriesMap(),
+          Application.scheduleRequest({
+            url: `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(CHAPTER_CATEGORY)}?alt=json&start-index=${startIndex}&max-results=21`,
+            method: "GET",
+          }),
+        ]);
+
+        const json: BloggerFeedResponse = JSON.parse(Application.arrayBufferToUTF8String(buffer));
+        const entries = json.feed?.entry ?? [];
+        const items: DiscoverSectionItem[] = [];
+
+        for (const entry of entries) {
+          const chapterLink = entry.link?.find((l) => l.rel === "alternate")?.href || "";
+          if (!chapterLink) continue;
+
+          const chapterTitle = entry.title?.$t?.trim() || "Capítulo";
+          const cats = (entry.category || []).map((c) => c.term);
+
+          let seriesInfo: SeriesInfo | undefined;
+          for (const c of cats) {
+            if (c === CHAPTER_CATEGORY) continue;
+            const found = seriesMap.get(c.toLowerCase());
+            if (found) {
+              seriesInfo = found;
+              break;
+            }
+          }
+
+          const mangaId = seriesInfo?.link || chapterLink;
+          const title = seriesInfo?.title || chapterTitle;
+          const imageUrl =
+            seriesInfo?.thumb ||
+            cleanThumbnail(entry.media$thumbnail?.url) ||
+            extractFirstImgFromHtml(entry.content?.$t) ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
+
+          items.push({
+            mangaId,
+            chapterId: chapterLink,
+            title,
+            subtitle: chapterTitle,
+            imageUrl,
+            type: "chapterUpdatesCarouselItem",
+            contentRating: ContentRating.EVERYONE,
+          });
+        }
+
+        const hasNextPage = items.length > 20;
+        if (hasNextPage) items.pop();
+
+        return {
+          items,
+          metadata: hasNextPage ? page + 1 : undefined,
+        };
+      }
+
+      let feedUrl = "";
+      if (section.id === "destaques") {
+        feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}?alt=json&orderby=published&start-index=1&max-results=10`;
+      } else if (section.id === "all") {
+        feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}?alt=json&orderby=published&start-index=${startIndex}&max-results=21`;
+      } else if (section.id === "manhwa") {
+        feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}/Manhwa?alt=json&start-index=${startIndex}&max-results=21`;
+      } else if (section.id === "romance") {
+        feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}/Romance?alt=json&start-index=${startIndex}&max-results=21`;
+      } else if (section.id === "drama") {
+        feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}/Drama?alt=json&start-index=${startIndex}&max-results=21`;
+      } else if (section.id === "idols") {
+        feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}/Idols?alt=json&start-index=${startIndex}&max-results=21`;
+      } else if (section.id === "comedia") {
+        feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}/${encodeURIComponent("Comédia")}?alt=json&start-index=${startIndex}&max-results=21`;
+      } else if (section.id === "fantasia") {
+        feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}/Fantasia?alt=json&start-index=${startIndex}&max-results=21`;
+      } else if (section.id === "shounen_ai") {
+        feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}/${encodeURIComponent("Shounen ai")}?alt=json&start-index=${startIndex}&max-results=21`;
+      } else {
+        feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}?alt=json&orderby=published&start-index=${startIndex}&max-results=21`;
+      }
+
       const [_, buffer] = await Application.scheduleRequest({ url: feedUrl, method: "GET" });
       const json: BloggerFeedResponse = JSON.parse(Application.arrayBufferToUTF8String(buffer));
       const entries = json.feed?.entry ?? [];
@@ -174,17 +345,7 @@ export class ApenasUmaFaExtension implements ExtensionImpl<typeof ContentTemplat
           extractFirstImgFromHtml(entry.content?.$t) ||
           `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
 
-        if (section.id === "updates") {
-          items.push({
-            mangaId: link,
-            chapterId: link,
-            title,
-            subtitle: "Atualizado recentemente",
-            imageUrl: thumb,
-            type: "chapterUpdatesCarouselItem",
-            contentRating: ContentRating.EVERYONE,
-          });
-        } else if (section.id === "popular") {
+        if (section.type === DiscoverSectionType.prominentCarousel) {
           items.push({
             mangaId: link,
             title,
@@ -204,9 +365,7 @@ export class ApenasUmaFaExtension implements ExtensionImpl<typeof ContentTemplat
       }
 
       const hasNextPage = items.length > 20;
-      if (hasNextPage) {
-        items.pop();
-      }
+      if (hasNextPage) items.pop();
 
       return {
         items,
@@ -228,14 +387,20 @@ export class ApenasUmaFaExtension implements ExtensionImpl<typeof ContentTemplat
     const titleQuery = query.title?.trim() ?? "";
     const orderBy = query.metadata?.orderBy ?? "published";
     const genre = query.metadata?.genre;
+    const status = query.metadata?.status;
+    const type = query.metadata?.type;
 
-    let feedUrl: string;
+    const labels: string[] = [MANGA_CATEGORY];
+    if (genre && genre !== "all") labels.push(genre);
+    if (status && status !== "all") labels.push(status);
+    if (type && type !== "all") labels.push(type);
+
+    let feedUrl = `${BASE_URL}/feeds/posts/default/-/${labels.map(encodeURIComponent).join("/")}?alt=json&start-index=${startIndex}&max-results=21`;
+
     if (titleQuery) {
-      feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}?alt=json&q=${encodeURIComponent(titleQuery)}&start-index=${startIndex}&max-results=21`;
-    } else if (genre && genre !== "all") {
-      feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}/${encodeURIComponent(genre)}?alt=json&orderby=${orderBy}&start-index=${startIndex}&max-results=21`;
+      feedUrl += `&q=${encodeURIComponent(titleQuery)}`;
     } else {
-      feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}?alt=json&orderby=${orderBy}&start-index=${startIndex}&max-results=21`;
+      feedUrl += `&orderby=${orderBy}`;
     }
 
     try {
@@ -263,16 +428,14 @@ export class ApenasUmaFaExtension implements ExtensionImpl<typeof ContentTemplat
       }
 
       const hasNextPage = items.length > 20;
-      if (hasNextPage) {
-        items.pop();
-      }
+      if (hasNextPage) items.pop();
 
       return {
         items,
         metadata: hasNextPage ? page + 1 : undefined,
       };
     } catch (e) {
-      console.error("Erro na busca Apenas Uma Fã:", e);
+      console.error("Erro na busca ApenasUmaFa:", e);
       return { items: [], metadata: undefined };
     }
   }
@@ -286,16 +449,14 @@ export class ApenasUmaFaExtension implements ExtensionImpl<typeof ContentTemplat
     const html = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(html);
 
-    let title =
-      $("#main h1, h1.entry-title, h1.post-title, h1").first().text().trim() ||
+    const title =
+      $("h1, .post-title, .entry-title").first().text().trim() ||
       $('meta[property="og:title"]').attr("content") ||
       "Sem título";
 
-    title = title.split(" - ")[0]?.trim() || title;
-
     const rawThumb =
-      $('meta[property="og:image"]').attr("content") ||
-      $("#main .hidden img, #main img, .entry-content img, .post-body img").first().attr("src");
+      $("div.thumb img, .post-body img, #syn_bod img, .entry-content img").first().attr("src") ||
+      $('meta[property="og:image"]').attr("content");
     const thumbnailUrl =
       cleanThumbnail(rawThumb) ||
       `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
@@ -307,13 +468,22 @@ export class ApenasUmaFaExtension implements ExtensionImpl<typeof ContentTemplat
     ).trim();
 
     const author =
-      $("span#tauther, span#author, li:contains('Autor') > span").first().text().trim() ||
-      "Apenas Uma Fã";
+      $("span#tauther, span#author, li:contains('Autor') > span, span:contains('Autor')")
+        .first()
+        .text()
+        .trim() || "Apenas Uma Fã";
     const artist =
-      $("span#tartist, span#artist, li:contains('Artista') > span").first().text().trim() || author;
+      $("span#tartist, span#artist, li:contains('Artista') > span, span:contains('Artista')")
+        .first()
+        .text()
+        .trim() || author;
 
     const statusText = (
-      $("div[class*='bg-green'] span, .status, span[data-status]").first().text() || ""
+      $(
+        "div[class*='bg-green'] span, .status, span[data-status], span:contains('Lançamento'), span:contains('Completo')",
+      )
+        .first()
+        .text() || ""
     ).toLowerCase();
     const status =
       statusText.includes("completo") || statusText.includes("finalizado")
@@ -376,23 +546,33 @@ export class ApenasUmaFaExtension implements ExtensionImpl<typeof ContentTemplat
 
     const candidates = [
       projectLabel
-        ? `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(CHAPTER_CATEGORY)}/${encodeURIComponent(projectLabel)}?alt=json&max-results=150`
+        ? `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(CHAPTER_CATEGORY)}/${encodeURIComponent(projectLabel)}?alt=json`
         : null,
       projectLabel
-        ? `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(projectLabel)}?alt=json&max-results=150`
+        ? `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(projectLabel)}?alt=json`
         : null,
       sourceManga.mangaInfo?.primaryTitle
-        ? `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(CHAPTER_CATEGORY)}/${encodeURIComponent(sourceManga.mangaInfo.primaryTitle)}?alt=json&max-results=150`
+        ? `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(CHAPTER_CATEGORY)}/${encodeURIComponent(sourceManga.mangaInfo.primaryTitle)}?alt=json`
         : null,
     ].filter((u): u is string => Boolean(u));
 
-    for (const url of candidates) {
+    for (const baseUrl of candidates) {
       try {
-        const [__, feedBuf] = await Application.scheduleRequest({ url, method: "GET" });
-        const json: BloggerFeedResponse = JSON.parse(Application.arrayBufferToUTF8String(feedBuf));
-        const resEntries = json.feed?.entry ?? [];
-        if (resEntries.length > 0) {
-          entries = resEntries;
+        let startIndex = 1;
+        const collected: BloggerEntry[] = [];
+        while (true) {
+          const url = `${baseUrl}&start-index=${startIndex}&max-results=150`;
+          const [__, feedBuf] = await Application.scheduleRequest({ url, method: "GET" });
+          const json: BloggerFeedResponse = JSON.parse(
+            Application.arrayBufferToUTF8String(feedBuf),
+          );
+          const resEntries = json.feed?.entry ?? [];
+          collected.push(...resEntries);
+          if (resEntries.length < 150) break;
+          startIndex += 150;
+        }
+        if (collected.length > 0) {
+          entries = collected;
           break;
         }
       } catch {
@@ -487,6 +667,7 @@ export class ApenasUmaFaExtension implements ExtensionImpl<typeof ContentTemplat
 
       const lower = url.toLowerCase();
       if (
+        lower.includes("iconify") ||
         lower.includes("error.png") ||
         lower.includes("avatar") ||
         lower.includes("logo") ||
@@ -561,6 +742,10 @@ export class ApenasUmaFaExtension implements ExtensionImpl<typeof ContentTemplat
       "#reader img",
       ".chapter img",
       "div.post-body img",
+      "#image_wrapper img",
+      "article img",
+      ".entry-content img",
+      "img[src*='googleusercontent']",
     ];
 
     for (const sel of selectors) {

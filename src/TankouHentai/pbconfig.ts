@@ -3,7 +3,7 @@ import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/typ
 export default {
   name: "Tankou Hentai",
   description: "Extensão da Tankou Hentai com foco em mangás e doujins adultos (+18).",
-  version: "1.0.1",
+  version: "1.0.2",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

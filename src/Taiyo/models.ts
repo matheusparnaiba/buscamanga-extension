@@ -12,6 +12,8 @@ export const STATUS_OPTIONS: Tag[] = [
   { id: "all", title: "Todos os Status" },
   { id: "RELEASING", title: "Em Lançamento" },
   { id: "FINISHED", title: "Finalizado" },
+  { id: "HIATUS", title: "Hiato" },
+  { id: "CANCELLED", title: "Cancelado" },
 ];
 
 export const GENRE_OPTIONS: Tag[] = [
@@ -20,13 +22,20 @@ export const GENRE_OPTIONS: Tag[] = [
   { id: "ADVENTURE", title: "Aventura" },
   { id: "COMEDY", title: "Comédia" },
   { id: "DRAMA", title: "Drama" },
+  { id: "ECCHI", title: "Ecchi" },
   { id: "FANTASY", title: "Fantasia" },
   { id: "HORROR", title: "Terror" },
+  { id: "MAHOU_SHOUJO", title: "Mahou Shoujo" },
+  { id: "MECHA", title: "Mecha" },
+  { id: "MUSIC", title: "Música" },
   { id: "MYSTERY", title: "Mistério" },
+  { id: "PSYCHOLOGICAL", title: "Psicológico" },
   { id: "ROMANCE", title: "Romance" },
   { id: "SCI_FI", title: "Ficção Científica" },
   { id: "SLICE_OF_LIFE", title: "Slice of Life" },
+  { id: "SPORTS", title: "Esportes" },
   { id: "SUPERNATURAL", title: "Sobrenatural" },
+  { id: "THRILLER", title: "Suspense" },
 ];
 
 export type TaiyoSearchMetadata = {
@@ -81,6 +90,27 @@ export interface TaiyoTrpcChapter {
   title?: string | null;
   volume?: number;
   createdAt: string;
+}
+
+export interface TaiyoTrpcLatestChapter {
+  id: string;
+  createdAt: string;
+  number: number;
+  volume?: number | null;
+  title?: string | null;
+  uploader?: {
+    id: string;
+    name: string;
+  };
+  scans?: Array<{
+    id: string;
+    name: string;
+  }>;
+  media: {
+    id: string;
+    coverId?: string;
+    mainTitle: string;
+  };
 }
 
 export interface TaiyoTrpcResponse {

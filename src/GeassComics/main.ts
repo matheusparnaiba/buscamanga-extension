@@ -23,8 +23,10 @@ import type {
   ContentTemplateSearchMetadata,
   GeassApiResponse,
   GeassChapterPagesDto,
+  GeassRecommendationsDto,
   GeassWorkDto,
   GeassWorkListDto,
+  GeassWorkUpdateItemDto,
 } from "./models";
 import { MainInterceptor } from "./network";
 import type GeassComicsConfig from "./pbconfig";
@@ -86,7 +88,7 @@ export class GeassComicsExtension implements ExtensionImpl<typeof GeassComicsCon
   async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
     return new ContentTemplateAdvancedSearchForm({
       title: "",
-      metadata: { orderBy: "recent", type: "all", status: "all" },
+      metadata: { orderBy: "recent", genre: "all", type: "all", status: "all", tag: "all" },
     });
   }
 
@@ -94,13 +96,43 @@ export class GeassComicsExtension implements ExtensionImpl<typeof GeassComicsCon
     return [
       {
         id: "updates",
-        title: "Lançamentos Recentes",
+        title: "Últimas Atualizações",
         type: DiscoverSectionType.chapterUpdates,
       },
       {
-        id: "popular",
-        title: "Melhor Avaliados",
+        id: "highlights",
+        title: "Destaques",
         type: DiscoverSectionType.prominentCarousel,
+      },
+      {
+        id: "top10",
+        title: "Top 10 Mais Lidos",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "genre-hentai",
+        title: "Hentai (+18)",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "genre-livre",
+        title: "Livre",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "genre-shoujo-romance",
+        title: "Shoujo & Romance",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "genre-yaoi",
+        title: "Yaoi (+18)",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "genre-nacional",
+        title: "Nacionais",
+        type: DiscoverSectionType.simpleCarousel,
       },
       {
         id: "all",
@@ -115,11 +147,139 @@ export class GeassComicsExtension implements ExtensionImpl<typeof GeassComicsCon
     metadata?: number,
   ): Promise<PagedResults<DiscoverSectionItem>> {
     const page = metadata ?? 1;
-    const sortBy = section.id === "popular" ? "rating" : "recent";
-    const url = `${API_URL}/api/works?page=${page}&limit=24&sortBy=${sortBy}`;
 
     try {
-      const [_, buffer] = await Application.scheduleRequest({ url, method: "GET" });
+      if (section.id === "updates") {
+        const limit = 24;
+        const offset = (page - 1) * limit;
+        const url = `${API_URL}/api/work-updates?offset=${offset}&limit=${limit}`;
+
+        const [_, buffer] = await Application.scheduleRequest({ url, method: "GET" });
+        const json: GeassApiResponse<GeassWorkUpdateItemDto[]> = JSON.parse(
+          Application.arrayBufferToUTF8String(buffer),
+        );
+        const updatesList = Array.isArray(json.data) ? json.data : [];
+        const items: DiscoverSectionItem[] = [];
+
+        for (const item of updatesList) {
+          const work = item.work;
+          if (!work) continue;
+          const title = work.title?.trim() || "Sem título";
+          const mangaId = work.slug;
+          const imageUrl =
+            cleanCoverUrl(work.coverLarge || work.cover) ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
+
+          const firstChap = item.chapters?.[0];
+          const subtitle =
+            firstChap?.number !== undefined
+              ? `Capítulo ${firstChap.number}`
+              : work.status || "Atualizado";
+
+          const isAdult = Boolean(
+            work.isNsfw || work.genres?.includes("hentai") || work.genres?.includes("yaoi"),
+          );
+
+          items.push({
+            mangaId,
+            chapterId: mangaId,
+            title,
+            subtitle,
+            imageUrl,
+            type: "chapterUpdatesCarouselItem",
+            contentRating: isAdult ? ContentRating.ADULT : ContentRating.EVERYONE,
+          });
+        }
+
+        const hasNextPage = updatesList.length >= limit;
+        return {
+          items,
+          metadata: hasNextPage ? page + 1 : undefined,
+        };
+      }
+
+      if (section.id === "highlights") {
+        const url = `${API_URL}/api/recommendations`;
+        const [_, buffer] = await Application.scheduleRequest({ url, method: "GET" });
+        const json: GeassApiResponse<GeassRecommendationsDto> = JSON.parse(
+          Application.arrayBufferToUTF8String(buffer),
+        );
+        let itemsList = json.data?.items ?? [];
+
+        if (itemsList.length === 0) {
+          const [__, fallbackBuf] = await Application.scheduleRequest({
+            url: `${API_URL}/api/works?page=1&limit=10&sortBy=popular`,
+            method: "GET",
+          });
+          const fallbackJson: GeassApiResponse<GeassWorkListDto> = JSON.parse(
+            Application.arrayBufferToUTF8String(fallbackBuf),
+          );
+          itemsList = fallbackJson.data?.items ?? [];
+        }
+
+        const items: DiscoverSectionItem[] = itemsList.map((item) => {
+          const title = item.title?.trim() || "Sem título";
+          const mangaId = item.slug;
+          const imageUrl =
+            cleanCoverUrl(item.coverLarge || item.cover) ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
+
+          const isAdult = Boolean(
+            item.isNsfw || item.genres?.includes("hentai") || item.genres?.includes("yaoi"),
+          );
+
+          return {
+            mangaId,
+            title,
+            imageUrl,
+            type: "prominentCarouselItem",
+            contentRating: isAdult ? ContentRating.ADULT : ContentRating.EVERYONE,
+          };
+        });
+
+        return { items, metadata: undefined };
+      }
+
+      if (section.id === "top10") {
+        const url = `${API_URL}/api/works?page=1&limit=10&sortBy=popular`;
+        const [_, buffer] = await Application.scheduleRequest({ url, method: "GET" });
+        const json: GeassApiResponse<GeassWorkListDto> = JSON.parse(
+          Application.arrayBufferToUTF8String(buffer),
+        );
+        const itemsList = json.data?.items ?? [];
+
+        const items: DiscoverSectionItem[] = itemsList.map((item) => {
+          const title = item.title?.trim() || "Sem título";
+          const mangaId = item.slug;
+          const imageUrl =
+            cleanCoverUrl(item.coverLarge || item.cover) ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
+
+          const isAdult = Boolean(
+            item.isNsfw || item.genres?.includes("hentai") || item.genres?.includes("yaoi"),
+          );
+
+          return {
+            mangaId,
+            title,
+            imageUrl,
+            type: "simpleCarouselItem",
+            contentRating: isAdult ? ContentRating.ADULT : ContentRating.EVERYONE,
+          };
+        });
+
+        return { items, metadata: undefined };
+      }
+
+      let fetchUrl = `${API_URL}/api/works?page=${page}&limit=24`;
+      if (section.id.startsWith("genre-")) {
+        const genre = section.id.replace("genre-", "");
+        fetchUrl += `&genres=${encodeURIComponent(genre)}&sortBy=popular`;
+      } else {
+        fetchUrl += `&sortBy=popular`;
+      }
+
+      const [_, buffer] = await Application.scheduleRequest({ url: fetchUrl, method: "GET" });
       const json: GeassApiResponse<GeassWorkListDto> = JSON.parse(
         Application.arrayBufferToUTF8String(buffer),
       );
@@ -133,33 +293,17 @@ export class GeassComicsExtension implements ExtensionImpl<typeof GeassComicsCon
           cleanCoverUrl(item.coverLarge || item.cover) ||
           `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
 
-        if (section.id === "updates") {
-          items.push({
-            mangaId,
-            chapterId: mangaId,
-            title,
-            subtitle: item.status || "Atualizado",
-            imageUrl,
-            type: "chapterUpdatesCarouselItem",
-            contentRating: ContentRating.EVERYONE,
-          });
-        } else if (section.id === "popular") {
-          items.push({
-            mangaId,
-            title,
-            imageUrl,
-            type: "prominentCarouselItem",
-            contentRating: ContentRating.EVERYONE,
-          });
-        } else {
-          items.push({
-            mangaId,
-            title,
-            imageUrl,
-            type: "simpleCarouselItem",
-            contentRating: ContentRating.EVERYONE,
-          });
-        }
+        const isAdult = Boolean(
+          item.isNsfw || item.genres?.includes("hentai") || item.genres?.includes("yaoi"),
+        );
+
+        items.push({
+          mangaId,
+          title,
+          imageUrl,
+          type: "simpleCarouselItem",
+          contentRating: isAdult ? ContentRating.ADULT : ContentRating.EVERYONE,
+        });
       }
 
       const hasNextPage = json.data ? json.data.page < json.data.pageCount : false;
@@ -194,8 +338,16 @@ export class GeassComicsExtension implements ExtensionImpl<typeof GeassComicsCon
       params.set("types", query.metadata.type);
     }
 
+    if (query.metadata?.genre && query.metadata.genre !== "all") {
+      params.set("genres", query.metadata.genre);
+    }
+
     if (query.metadata?.status && query.metadata.status !== "all") {
       params.set("status", query.metadata.status);
+    }
+
+    if (query.metadata?.tag && query.metadata.tag !== "all") {
+      params.set("tags", query.metadata.tag);
     }
 
     const url = `${API_URL}/api/works?${params.toString()}`;
@@ -215,11 +367,15 @@ export class GeassComicsExtension implements ExtensionImpl<typeof GeassComicsCon
           cleanCoverUrl(item.coverLarge || item.cover) ||
           `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
 
+        const isAdult = Boolean(
+          item.isNsfw || item.genres?.includes("hentai") || item.genres?.includes("yaoi"),
+        );
+
         items.push({
           mangaId,
           title,
           imageUrl,
-          contentRating: ContentRating.EVERYONE,
+          contentRating: isAdult ? ContentRating.ADULT : ContentRating.EVERYONE,
         });
       }
 
@@ -260,6 +416,13 @@ export class GeassComicsExtension implements ExtensionImpl<typeof GeassComicsCon
     }
 
     const tagList: Tag[] = [];
+    if (work.genres && Array.isArray(work.genres)) {
+      for (const g of work.genres) {
+        if (g) {
+          tagList.push({ id: sanitizeTagId(g), title: `Gênero: ${g.toUpperCase()}` });
+        }
+      }
+    }
     if (work.tags && Array.isArray(work.tags)) {
       for (const t of work.tags) {
         if (t) {
@@ -268,6 +431,18 @@ export class GeassComicsExtension implements ExtensionImpl<typeof GeassComicsCon
       }
     }
 
+    const isAdult = Boolean(
+      work.isNsfw ||
+      work.genres?.includes("hentai") ||
+      work.genres?.includes("yaoi") ||
+      work.tags?.some(
+        (t) =>
+          t.toLowerCase().includes("adulto") ||
+          t.toLowerCase().includes("hentai") ||
+          t.toLowerCase().includes("gore"),
+      ),
+    );
+
     return {
       mangaId,
       mangaInfo: {
@@ -275,11 +450,12 @@ export class GeassComicsExtension implements ExtensionImpl<typeof GeassComicsCon
         secondaryTitles: [],
         thumbnailUrl,
         synopsis,
-        contentRating: ContentRating.EVERYONE,
+        contentRating: isAdult ? ContentRating.ADULT : ContentRating.EVERYONE,
         status,
         author: work.author?.trim() || "Geass Comics",
         artist: work.author?.trim() || "Geass Comics",
-        tagGroups: tagList.length > 0 ? [{ id: "genres", title: "Gêneros", tags: tagList }] : [],
+        tagGroups:
+          tagList.length > 0 ? [{ id: "genres", title: "Tags e Gêneros", tags: tagList }] : [],
         artworkUrls: [thumbnailUrl],
         shareUrl: `${BASE_URL}/work/${slug}`,
       },
@@ -300,11 +476,12 @@ export class GeassComicsExtension implements ExtensionImpl<typeof GeassComicsCon
 
     for (const c of chaptersList) {
       const num = typeof c.number === "number" ? c.number : parseFloat(String(c.number)) || 0;
-      const chapterIdentifier = `${slug}/${num}/${c.id}`;
+      const numStr = String(c.number);
+      const chapterIdentifier = `${slug}/${numStr}/${c.id}`;
       const title =
         c.title && !c.title.startsWith("Capítulo")
-          ? `Capítulo ${num} - ${c.title}`
-          : `Capítulo ${num}`;
+          ? `Capítulo ${numStr} - ${c.title}`
+          : `Capítulo ${numStr}`;
 
       chapters.push({
         chapterId: chapterIdentifier,
@@ -336,8 +513,11 @@ export class GeassComicsExtension implements ExtensionImpl<typeof GeassComicsCon
     const pages: string[] = [];
     for (const p of pagesList) {
       if (!p) continue;
-      const pageUrl = p.startsWith("http") ? p : `${API_URL}/${p.replace(/^\//, "")}`;
-      pages.push(pageUrl);
+      let pageUrl = p.startsWith("http") ? p : `${API_URL}/${p.replace(/^\//, "")}`;
+      try {
+        pageUrl = decodeURI(pageUrl);
+      } catch {}
+      pages.push(encodeURI(pageUrl).replace(/%2520/g, "%20").replace(/ /g, "%20"));
     }
 
     return {
@@ -403,6 +583,7 @@ export class GeassComicsExtension implements ExtensionImpl<typeof GeassComicsCon
     const sec = sections.find((s) => s.id === homepageSectionId) || {
       id: homepageSectionId,
       title: homepageSectionId,
+      type: DiscoverSectionType.simpleCarousel,
     };
     const paged = await this.getDiscoverSectionItems(sec as any, metadata);
     const appGlobal = (typeof App !== "undefined" ? App : undefined) as any;

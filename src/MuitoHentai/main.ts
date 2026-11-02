@@ -46,10 +46,28 @@ const SECTIONS: { id: string; title: string; path: string; type: DiscoverSection
     type: DiscoverSectionType.chapterUpdates,
   },
   {
-    id: "popular",
-    title: "Mais Lidos",
-    path: "/mangas/mais-vistos",
+    id: "sem_censura",
+    title: "Hentai Sem Censura",
+    path: "/genero/hentai-sem-censura",
     type: DiscoverSectionType.prominentCarousel,
+  },
+  {
+    id: "popular",
+    title: "Mais Populares",
+    path: "/mangas/mais-vistos",
+    type: DiscoverSectionType.simpleCarousel,
+  },
+  {
+    id: "anal",
+    title: "Anal",
+    path: "/mangas/genero/anal",
+    type: DiscoverSectionType.simpleCarousel,
+  },
+  {
+    id: "boquete",
+    title: "Boquete",
+    path: "/mangas/genero/boquete",
+    type: DiscoverSectionType.simpleCarousel,
   },
 ];
 

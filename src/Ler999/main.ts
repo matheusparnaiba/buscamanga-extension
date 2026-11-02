@@ -55,6 +55,66 @@ interface BloggerFeedResponse {
   };
 }
 
+interface SeriesInfo {
+  title: string;
+  link: string;
+  thumb: string;
+}
+
+let seriesMapCache: Map<string, SeriesInfo> | null = null;
+let lastSeriesMapFetch = 0;
+
+async function getSeriesMap(): Promise<Map<string, SeriesInfo>> {
+  const now = Date.now();
+  if (seriesMapCache && now - lastSeriesMapFetch < 300000) {
+    return seriesMapCache;
+  }
+
+  const map = new Map<string, SeriesInfo>();
+  try {
+    const url = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}?alt=json&max-results=50`;
+    const [_, buffer] = await Application.scheduleRequest({ url, method: "GET" });
+    const json: BloggerFeedResponse = JSON.parse(Application.arrayBufferToUTF8String(buffer));
+    const entries = json.feed?.entry ?? [];
+
+    for (const e of entries) {
+      const title = e.title?.$t?.trim() || "Sem título";
+      const link = e.link?.find((l) => l.rel === "alternate")?.href || "";
+      if (!link) continue;
+
+      const thumb =
+        cleanThumbnail(e.media$thumbnail?.url) ||
+        extractFirstImgFromHtml(e.content?.$t) ||
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
+
+      const info: SeriesInfo = { title, link, thumb };
+      map.set(title.toLowerCase(), info);
+
+      (e.category || []).forEach((c) => {
+        const term = c.term?.trim();
+        if (
+          term &&
+          term !== "Series" &&
+          term !== "Project" &&
+          term !== "Update" &&
+          !/^\d+(\.\d+)?$/.test(term) &&
+          !["manhwa", "manhua", "manga", "ongoing", "hiatus", "dropped", "completed"].includes(
+            term.toLowerCase(),
+          )
+        ) {
+          map.set(term.toLowerCase(), info);
+        }
+      });
+    }
+
+    seriesMapCache = map;
+    lastSeriesMapFetch = now;
+  } catch (err) {
+    console.error("Erro ao obter mapa de séries Ler999:", err);
+  }
+  return map;
+}
+
 function cleanThumbnail(url: string | undefined): string {
   if (!url) return "";
   let src = url
@@ -118,7 +178,7 @@ export class Ler999Extension implements ExtensionImpl<typeof ContentTemplateConf
   async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
     return new ContentTemplateAdvancedSearchForm({
       title: "",
-      metadata: { orderBy: "published", genre: "all", status: "all" },
+      metadata: { orderBy: "published", type: "all", genre: "all", status: "all" },
     });
   }
 
@@ -131,8 +191,38 @@ export class Ler999Extension implements ExtensionImpl<typeof ContentTemplateConf
       },
       {
         id: "popular",
-        title: "Obras em Destaque",
+        title: "Popular Agora",
         type: DiscoverSectionType.prominentCarousel,
+      },
+      {
+        id: "manhuas",
+        title: "Manhuas",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "manhwas",
+        title: "Manhwas",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "mangas",
+        title: "Mangás",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "action",
+        title: "Ação & Aventura",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "martial-arts",
+        title: "Cultivo & Artes Marciais",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "fantasy",
+        title: "Fantasia",
+        type: DiscoverSectionType.simpleCarousel,
       },
       {
         id: "all",
@@ -149,16 +239,73 @@ export class Ler999Extension implements ExtensionImpl<typeof ContentTemplateConf
     const page = metadata ?? 1;
     const startIndex = (page - 1) * 20 + 1;
 
-    let feedUrl: string;
-    if (section.id === "updates") {
-      feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}?alt=json&orderby=updated&start-index=${startIndex}&max-results=21`;
-    } else if (section.id === "popular") {
-      feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}?alt=json&orderby=published&start-index=1&max-results=15`;
-    } else {
-      feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}?alt=json&orderby=published&start-index=${startIndex}&max-results=21`;
-    }
-
     try {
+      if (section.id === "updates") {
+        const feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(CHAPTER_CATEGORY)}?alt=json&orderby=published&start-index=${startIndex}&max-results=25`;
+        const [_, buffer] = await Application.scheduleRequest({ url: feedUrl, method: "GET" });
+        const json: BloggerFeedResponse = JSON.parse(Application.arrayBufferToUTF8String(buffer));
+        const entries = json.feed?.entry ?? [];
+        const seriesMap = await getSeriesMap();
+
+        const items: DiscoverSectionItem[] = [];
+        const seenMangaIds = new Set<string>();
+
+        for (const entry of entries) {
+          const chapterTitle = entry.title?.$t?.trim() || "Capítulo";
+          const chapterLink = entry.link?.find((l) => l.rel === "alternate")?.href || "";
+          if (!chapterLink) continue;
+
+          let seriesInfo: SeriesInfo | undefined;
+          for (const cat of entry.category || []) {
+            const term = cat.term?.trim().toLowerCase();
+            if (term && seriesMap.has(term)) {
+              seriesInfo = seriesMap.get(term);
+              break;
+            }
+          }
+
+          if (seriesInfo) {
+            if (seenMangaIds.has(seriesInfo.link)) continue;
+            seenMangaIds.add(seriesInfo.link);
+
+            items.push({
+              mangaId: seriesInfo.link,
+              chapterId: chapterLink,
+              title: seriesInfo.title,
+              subtitle: chapterTitle,
+              imageUrl: seriesInfo.thumb,
+              type: "chapterUpdatesCarouselItem",
+              contentRating: ContentRating.EVERYONE,
+            });
+          }
+        }
+
+        const hasNextPage = entries.length >= 25;
+        return {
+          items,
+          metadata: hasNextPage ? page + 1 : undefined,
+        };
+      }
+
+      let feedUrl: string;
+      if (section.id === "popular") {
+        feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}?alt=json&orderby=published&start-index=1&max-results=10`;
+      } else if (section.id === "manhuas") {
+        feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}/Manhua?alt=json&start-index=${startIndex}&max-results=21`;
+      } else if (section.id === "manhwas") {
+        feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}/Manhwa?alt=json&start-index=${startIndex}&max-results=21`;
+      } else if (section.id === "mangas") {
+        feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}/Manga?alt=json&start-index=${startIndex}&max-results=21`;
+      } else if (section.id === "action") {
+        feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}/Action?alt=json&start-index=${startIndex}&max-results=21`;
+      } else if (section.id === "martial-arts") {
+        feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}/Martial%20Arts?alt=json&start-index=${startIndex}&max-results=21`;
+      } else if (section.id === "fantasy") {
+        feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}/Fantasy?alt=json&start-index=${startIndex}&max-results=21`;
+      } else {
+        feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}?alt=json&orderby=published&start-index=${startIndex}&max-results=21`;
+      }
+
       const [_, buffer] = await Application.scheduleRequest({ url: feedUrl, method: "GET" });
       const json: BloggerFeedResponse = JSON.parse(Application.arrayBufferToUTF8String(buffer));
       const entries = json.feed?.entry ?? [];
@@ -174,17 +321,7 @@ export class Ler999Extension implements ExtensionImpl<typeof ContentTemplateConf
           extractFirstImgFromHtml(entry.content?.$t) ||
           `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
 
-        if (section.id === "updates") {
-          items.push({
-            mangaId: link,
-            chapterId: link,
-            title,
-            subtitle: "Atualizado recentemente",
-            imageUrl: thumb,
-            type: "chapterUpdatesCarouselItem",
-            contentRating: ContentRating.EVERYONE,
-          });
-        } else if (section.id === "popular") {
+        if (section.id === "popular") {
           items.push({
             mangaId: link,
             title,
@@ -213,7 +350,7 @@ export class Ler999Extension implements ExtensionImpl<typeof ContentTemplateConf
         metadata: hasNextPage ? page + 1 : undefined,
       };
     } catch (e) {
-      console.error(`Erro ao carregar seção ${section.id}:`, e);
+      console.error(`Erro ao carregar seção Ler999 ${section.id}:`, e);
       return { items: [], metadata: undefined };
     }
   }
@@ -227,13 +364,19 @@ export class Ler999Extension implements ExtensionImpl<typeof ContentTemplateConf
     const startIndex = (page - 1) * 20 + 1;
     const titleQuery = query.title?.trim() ?? "";
     const orderBy = query.metadata?.orderBy ?? "published";
+    const type = query.metadata?.type;
     const genre = query.metadata?.genre;
+    const status = query.metadata?.status;
 
     let feedUrl: string;
     if (titleQuery) {
       feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}?alt=json&q=${encodeURIComponent(titleQuery)}&start-index=${startIndex}&max-results=21`;
+    } else if (type && type !== "all") {
+      feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}/${encodeURIComponent(type)}?alt=json&orderby=${orderBy}&start-index=${startIndex}&max-results=21`;
     } else if (genre && genre !== "all") {
       feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}/${encodeURIComponent(genre)}?alt=json&orderby=${orderBy}&start-index=${startIndex}&max-results=21`;
+    } else if (status && status !== "all") {
+      feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}/${encodeURIComponent(status)}?alt=json&orderby=${orderBy}&start-index=${startIndex}&max-results=21`;
     } else {
       feedUrl = `${BASE_URL}/feeds/posts/default/-/${encodeURIComponent(MANGA_CATEGORY)}?alt=json&orderby=${orderBy}&start-index=${startIndex}&max-results=21`;
     }
@@ -272,7 +415,7 @@ export class Ler999Extension implements ExtensionImpl<typeof ContentTemplateConf
         metadata: hasNextPage ? page + 1 : undefined,
       };
     } catch (e) {
-      console.error("Erro na busca Ler 999:", e);
+      console.error("Erro na busca Ler999:", e);
       return { items: [], metadata: undefined };
     }
   }
@@ -286,16 +429,14 @@ export class Ler999Extension implements ExtensionImpl<typeof ContentTemplateConf
     const html = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(html);
 
-    let title =
-      $(".grid.gtc-235fr h1, h1.entry-title, h1.post-title, h1").first().text().trim() ||
-      $('meta[property="og:title"]').attr("content") ||
-      "Sem título";
-
-    title = title.split(" - ")[0]?.trim() || title;
+    const title = (
+      $("h1.entry-title, h1.post-title, .post-title, h1").first().text() || "Sem título"
+    ).trim();
 
     const rawThumb =
-      $('meta[property="og:image"]').attr("content") ||
-      $(".grid.gtc-235fr img, #thumb img, .summary_image img, .post-body img").first().attr("src");
+      $(".post-body img, .entry-content img, .thumb img, .animecover img, #cover img")
+        .first()
+        .attr("src") || $('meta[property="og:image"]').attr("content");
     const thumbnailUrl =
       cleanThumbnail(rawThumb) ||
       `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
@@ -469,7 +610,7 @@ export class Ler999Extension implements ExtensionImpl<typeof ContentTemplateConf
             sourceManga,
             langCode: "PT-BR",
             chapNum,
-            title: text,
+            title: text || `Capítulo ${chapNum}`,
             volume: 0,
           });
         }
@@ -523,75 +664,18 @@ export class Ler999Extension implements ExtensionImpl<typeof ContentTemplateConf
       }
     };
 
+    $(".separator img, .post-body img, .entry-content img, #readerarea img").each((_, el) => {
+      if ($(el).closest(".header-image-wrapper").length > 0) return;
+      const src = $(el).attr("src") || $(el).attr("data-src") || $(el).attr("data-original");
+      addPage(src);
+    });
+
     const rawText = $("#zeist-raw-data").text().trim();
-    if (rawText) {
+    if (rawText && pages.length === 0) {
       const $raw = cheerio.load(rawText);
       $raw(".separator img, img").each((_, el) => {
         addPage($raw(el).attr("src") || $raw(el).attr("data-src"));
       });
-      if (pages.length > 0) {
-        return {
-          id: chapter.chapterId,
-          mangaId: chapter.sourceManga.mangaId,
-          pages,
-        };
-      }
-    }
-
-    const scripts = $("script").toArray();
-    for (const s of scripts) {
-      const content = $(s).html() || "";
-      if (
-        content.includes("http") &&
-        (content.includes(".jpg") ||
-          content.includes(".png") ||
-          content.includes(".webp") ||
-          content.includes("googleusercontent.com"))
-      ) {
-        const wzMatch = content.match(/wz_pages_chapter\s*=\s*(\[[^\]]+\])/);
-        const arrMatch = content.match(/=\s*(\[\s*["']https?:\/\/[^\]]+\])/);
-        const target = wzMatch?.[1] || arrMatch?.[1];
-        if (target) {
-          try {
-            const list = JSON.parse(target);
-            if (Array.isArray(list)) {
-              for (const item of list) {
-                if (typeof item === "string") addPage(item);
-              }
-              if (pages.length > 0) {
-                return {
-                  id: chapter.chapterId,
-                  mangaId: chapter.sourceManga.mangaId,
-                  pages,
-                };
-              }
-            }
-          } catch {
-            // Ignore parse errors
-          }
-        }
-      }
-    }
-
-    const selectors = [
-      "div.check-box div.separator img",
-      ".separator img",
-      "#reader div.separator img",
-      "#reader img",
-      ".chapter img",
-      "div.post-body img",
-    ];
-
-    for (const sel of selectors) {
-      $(sel).each((_, el) => {
-        addPage(
-          $(el).attr("src") ||
-            $(el).attr("data-src") ||
-            $(el).attr("data-lazy-src") ||
-            $(el).attr("data-original"),
-        );
-      });
-      if (pages.length > 0) break;
     }
 
     return {
@@ -610,13 +694,13 @@ export class Ler999Extension implements ExtensionImpl<typeof ContentTemplateConf
           ? appGlobal.createHomeSection({
               id: sec.id,
               title: sec.title,
-              containsMoreItems: true,
+              containsMoreItems: sec.id !== "popular",
               type: "singleRowNormal",
             })
           : {
               id: sec.id,
               title: sec.title,
-              containsMoreItems: true,
+              containsMoreItems: sec.id !== "popular",
               type: "singleRowNormal",
               items: [],
             };
@@ -657,6 +741,7 @@ export class Ler999Extension implements ExtensionImpl<typeof ContentTemplateConf
     const sec = sections.find((s) => s.id === homepageSectionId) || {
       id: homepageSectionId,
       title: homepageSectionId,
+      type: DiscoverSectionType.simpleCarousel,
     };
     const paged = await this.getDiscoverSectionItems(sec as any, metadata);
     const appGlobal = (typeof App !== "undefined" ? App : undefined) as any;

@@ -7,11 +7,13 @@ import {
   type AdvancedSearchForm,
   type Chapter,
   type ChapterDetails,
+  type Cookie,
   type DiscoverSection,
   type DiscoverSectionItem,
   type ExtensionImpl,
   type Form,
   type PagedResults,
+  type Request,
   type SearchQuery,
   type SearchResultItem,
   type SortingOption,
@@ -212,6 +214,60 @@ export class RFDragonScanExtension implements ExtensionImpl<typeof RFDragonScanC
   });
 
   mainInterceptor = new MainInterceptor("main");
+
+  async saveCloudflareBypassCookies(cookies: Cookie[]): Promise<void> {
+    await this.handleCloudflareBypass(cookies);
+  }
+
+  async cloudflareBypassCompleted(
+    request?: Request,
+    cookies?: Cookie[],
+    _localStorage?: Record<string, string>,
+  ): Promise<void> {
+    let ua: string | undefined = undefined;
+    if (request?.headers) {
+      for (const key of Object.keys(request.headers)) {
+        if (key.toLowerCase() === "user-agent") {
+          ua = request.headers[key];
+          break;
+        }
+      }
+    }
+    if (ua && typeof ua === "string") {
+      Application.setState(ua, "rfdragon_cf_user_agent");
+    }
+    if (cookies) {
+      await this.handleCloudflareBypass(cookies);
+    }
+  }
+
+  private async handleCloudflareBypass(cookies: Cookie[]): Promise<void> {
+    if (!cookies || !Array.isArray(cookies)) return;
+
+    const cleanCookies: Array<{ name: string; value: string; domain: string; path: string }> = [];
+    const headerParts: string[] = [];
+
+    for (const c of cookies) {
+      if (!c || !c.name || !c.value) continue;
+      const rawDomain = c.domain ? c.domain.replace(/^https?:\/\//, "") : "rfdragonscan.net";
+      const cleanDomain = rawDomain.replace(/^\./, "");
+      const path = c.path || "/";
+
+      cleanCookies.push({
+        name: c.name,
+        value: c.value,
+        domain: cleanDomain,
+        path,
+      });
+
+      headerParts.push(`${c.name}=${c.value}`);
+    }
+
+    if (cleanCookies.length > 0) {
+      Application.setState(cleanCookies, "rfdragon_saved_cookies");
+      Application.setState(headerParts.join("; "), "rfdragon_cookie_header");
+    }
+  }
 
   async initialise(): Promise<void> {
     this.mainRateLimiter.registerInterceptor();

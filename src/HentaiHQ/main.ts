@@ -36,10 +36,28 @@ const SECTIONS: { id: string; title: string; path: string; type: DiscoverSection
     type: DiscoverSectionType.chapterUpdates,
   },
   {
-    id: "popular",
-    title: "Mais Lidos",
-    path: "/hq-de-sexo",
+    id: "hentai",
+    title: "Mangás Hentai",
+    path: "/hentai",
     type: DiscoverSectionType.prominentCarousel,
+  },
+  {
+    id: "quadrinhos_eroticos",
+    title: "Quadrinhos Eróticos",
+    path: "/quadrinhos-eroticos",
+    type: DiscoverSectionType.simpleCarousel,
+  },
+  {
+    id: "hq_de_sexo",
+    title: "HQ de Sexo",
+    path: "/hq-de-sexo",
+    type: DiscoverSectionType.simpleCarousel,
+  },
+  {
+    id: "ben_10",
+    title: "Ben 10 Hentai",
+    path: "/ben-10-hentai",
+    type: DiscoverSectionType.simpleCarousel,
   },
 ];
 

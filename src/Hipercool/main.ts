@@ -141,6 +141,21 @@ export class HipercoolExtension
         type: DiscoverSectionType.prominentCarousel,
       },
       {
+        id: "mangas",
+        title: "Mangás Hentai",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "manhwas",
+        title: "Manhwas / Pornhwas",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "one_shot",
+        title: "One Shots",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
         id: "updates",
         title: "Lançamentos Recentes",
         type: DiscoverSectionType.chapterUpdates,
@@ -157,6 +172,27 @@ export class HipercoolExtension
     const sort = section.id === "popular" ? "popular" : "recent";
     const offset = (page - 1) * PAGE_SIZE;
 
+    const typeValue =
+      section.id === "mangas"
+        ? "manga"
+        : section.id === "manhwas"
+          ? "manhwa"
+          : section.id === "one_shot"
+            ? "one_shot"
+            : null;
+
+    const valuesMeta: Record<string, string[]> = {
+      "filters.genres": ["undefined"],
+      "filters.status": ["undefined"],
+      "filters.contentRating": ["undefined"],
+      "filters.author": ["undefined"],
+      "filters.artist": ["undefined"],
+      "filters.year": ["undefined"],
+    };
+    if (typeValue === null) {
+      valuesMeta["filters.type"] = ["undefined"];
+    }
+
     const trpcInput = {
       0: {
         json: {
@@ -164,7 +200,7 @@ export class HipercoolExtension
           sort,
           filters: {
             genres: null,
-            type: null,
+            type: typeValue,
             status: null,
             contentRating: null,
             author: null,
@@ -176,15 +212,7 @@ export class HipercoolExtension
           maxRating: "pornographic",
         },
         meta: {
-          values: {
-            "filters.genres": ["undefined"],
-            "filters.type": ["undefined"],
-            "filters.status": ["undefined"],
-            "filters.contentRating": ["undefined"],
-            "filters.author": ["undefined"],
-            "filters.artist": ["undefined"],
-            "filters.year": ["undefined"],
-          },
+          values: valuesMeta,
         },
       },
     };

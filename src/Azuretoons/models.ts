@@ -2,10 +2,10 @@
 import type { Tag } from "@paperback/types";
 
 export const ORDER_OPTIONS: Tag[] = [
-  { id: "views", title: "Mais Vistos" },
   { id: "latest", title: "Últimas Atualizações" },
-  { id: "alphabet", title: "Ordem Alfabética" },
+  { id: "views", title: "Mais Vistos" },
   { id: "rating", title: "Melhor Avaliados" },
+  { id: "alphabet", title: "Ordem Alfabética" },
 ];
 
 export const GENRE_OPTIONS: Tag[] = [
@@ -29,8 +29,9 @@ export const GENRE_OPTIONS: Tag[] = [
 
 export const STATUS_OPTIONS: Tag[] = [
   { id: "all", title: "Todos os Status" },
-  { id: "on-going", title: "Em Lançamento" },
-  { id: "end", title: "Completo" },
+  { id: "ongoing", title: "Em Lançamento" },
+  { id: "completed", title: "Completo" },
+  { id: "hiatus", title: "Em Hiato" },
 ];
 
 export type ContentTemplateSearchMetadata = {
@@ -38,3 +39,42 @@ export type ContentTemplateSearchMetadata = {
   genre?: string;
   status?: string;
 };
+
+export interface AzureChapterDto {
+  id?: number | string;
+  num?: number | string;
+  chapterNumber?: number | string;
+  title?: string | null;
+  chapterTitle?: string | null;
+  releaseDate?: string | null;
+  createdAt?: string | null;
+  language?: string | null;
+}
+
+export interface AzureObraDto {
+  id?: number | string;
+  title: string;
+  slug: string;
+  coverUrl?: string | null;
+  bannerUrl?: string | null;
+  synopsis?: string | null;
+  description?: string | null;
+  status?: string | null;
+  type?: string | null;
+  tipo?: string | null;
+  genres?: string[];
+  originalAuthor?: string | null;
+  artist?: string | null;
+  views?: number;
+  viewCount?: number;
+  rating?: number;
+  chapters?: AzureChapterDto[];
+}
+
+export interface AzureChapterReadDto {
+  id?: number | string;
+  chapterNumber?: number | string;
+  title?: string | null;
+  images?: string[];
+  pages?: string[];
+}

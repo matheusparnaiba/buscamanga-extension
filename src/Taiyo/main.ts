@@ -26,6 +26,7 @@ import type {
   TaiyoSearchMetadata,
   TaiyoTitleItem,
   TaiyoTrpcChapter,
+  TaiyoTrpcLatestChapter,
   TaiyoTrpcResponse,
 } from "./models";
 import { MainInterceptor } from "./network";
@@ -97,14 +98,54 @@ export class TaiyoExtension implements ExtensionImpl<typeof TaiyoConfig> {
   async getDiscoverSections(): Promise<DiscoverSection[]> {
     return [
       {
-        id: "popular",
-        title: "Mais Populares",
+        id: "featured",
+        title: "Destaques",
         type: DiscoverSectionType.prominentCarousel,
       },
       {
         id: "updates",
-        title: "Atualizações Recentes",
+        title: "Lançamentos Recentes",
         type: DiscoverSectionType.chapterUpdates,
+      },
+      {
+        id: "em_alta",
+        title: "Em Alta",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "recent",
+        title: "Obras Recentes",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "manhwa",
+        title: "Manhwas",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "manga",
+        title: "Mangás",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "manhua",
+        title: "Manhuas",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "action",
+        title: "Ação",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "fantasy",
+        title: "Fantasia",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "romance",
+        title: "Romance",
+        type: DiscoverSectionType.simpleCarousel,
       },
     ];
   }
@@ -114,20 +155,156 @@ export class TaiyoExtension implements ExtensionImpl<typeof TaiyoConfig> {
     metadata: number | undefined,
   ): Promise<PagedResults<DiscoverSectionItem>> {
     const page = metadata ?? 1;
+
+    if (section.id === "updates") {
+      if (page > 1) {
+        return { items: [], metadata: undefined };
+      }
+
+      const input = JSON.stringify({ "0": { json: {} } });
+      const url = `${BASE_URL}/api/trpc/chapters.getLatest?batch=1&input=${encodeURIComponent(input)}`;
+      const request = { url, method: "GET" };
+
+      const [_, buffer] = await Application.scheduleRequest(request);
+      const data = Application.arrayBufferToUTF8String(buffer);
+      const parsed: any[] = JSON.parse(data);
+      const chList: TaiyoTrpcLatestChapter[] = parsed?.[0]?.result?.data?.json ?? [];
+
+      const items: DiscoverSectionItem[] = chList.map((c) => {
+        const mangaTitle = c.media?.mainTitle || "Obra";
+        const cover = buildCoverUrl(c.media?.id, c.media?.coverId);
+        const imageUrl =
+          cover ||
+          `https://ui-avatars.com/api/?name=${encodeURIComponent(mangaTitle)}&background=random`;
+
+        let subtitle = `Capítulo ${c.number}`;
+        if (c.title && c.title.trim()) {
+          subtitle += ` — ${c.title.trim()}`;
+        }
+        const publishDate = c.createdAt ? new Date(c.createdAt) : new Date();
+
+        return {
+          mangaId: c.media?.id,
+          chapterId: c.id,
+          title: mangaTitle,
+          imageUrl,
+          subtitle,
+          publishDate: !isNaN(publishDate.getTime()) ? publishDate : new Date(),
+          type: "chapterUpdatesCarouselItem",
+          contentRating: ContentRating.EVERYONE,
+        };
+      });
+
+      return {
+        items,
+        metadata: undefined,
+      };
+    }
+
+    if (section.id === "featured") {
+      if (page > 1) {
+        return { items: [], metadata: undefined };
+      }
+
+      const FEATURED_IDS = [
+        "17b03940-450b-4b34-a904-e9b296daee9a", // Solo Leveling
+        "3cec0768-c247-468c-97fe-76e9a556d6ee", // One Piece
+        "916f78eb-d53c-4c7f-9dde-56dbe584b604", // Attack on Titan
+        "c28bdb17-d560-44ab-9ddd-b0085aa5bdb1", // Vinland Saga
+        "de26e512-d7b3-42f3-9496-5c4090a8595d", // Vagabond
+      ];
+
+      const requestBody = {
+        queries: [
+          {
+            indexUid: "medias",
+            q: "",
+            filter: [`id IN ["${FEATURED_IDS.join('", "')}"]`],
+            limit: 10,
+            offset: 0,
+          },
+        ],
+      };
+
+      const request = {
+        url: MEILISEARCH_URL,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.bearerToken}`,
+        },
+        body: JSON.stringify(requestBody),
+      };
+
+      const [_, buffer] = await Application.scheduleRequest(request);
+      const data = Application.arrayBufferToUTF8String(buffer);
+      const res: TaiyoMultiSearchResponse = JSON.parse(data);
+      const hits: TaiyoSearchHit[] = res.results?.[0]?.hits ?? [];
+
+      const items: DiscoverSectionItem[] = hits.map((hit) => {
+        const title = pickBestTitle(hit.titles);
+        const cover = buildCoverUrl(hit.id, hit.mainCoverId || hit.coverId);
+        const imageUrl =
+          cover ||
+          `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
+
+        return {
+          mangaId: hit.id,
+          title,
+          imageUrl,
+          type: "prominentCarouselItem",
+          contentRating: ContentRating.EVERYONE,
+        };
+      });
+
+      return {
+        items,
+        metadata: undefined,
+      };
+    }
+
     const limit = 21;
     const offset = limit * (page - 1);
 
-    const sortRule = section.id === "updates" ? ["updatedAt:desc"] : undefined;
+    const filters: string[] = ["deletedAt IS NULL"];
+    let sortRule: string[] = ["updatedAt:desc"];
+
+    switch (section.id) {
+      case "em_alta":
+        sortRule = ["updatedAt:desc"];
+        break;
+      case "recent":
+        sortRule = ["createdAt:desc"];
+        break;
+      case "manhwa":
+        filters.push('type = "MANHWA"');
+        break;
+      case "manga":
+        filters.push('type = "MANGA"');
+        break;
+      case "manhua":
+        filters.push('type = "MANHUA"');
+        break;
+      case "action":
+        filters.push('genres = "ACTION"');
+        break;
+      case "fantasy":
+        filters.push('genres = "FANTASY"');
+        break;
+      case "romance":
+        filters.push('genres = "ROMANCE"');
+        break;
+    }
 
     const requestBody: any = {
       queries: [
         {
           indexUid: "medias",
           q: "",
-          filter: ["deletedAt IS NULL"],
+          filter: filters,
           limit,
           offset,
-          ...(sortRule ? { sort: sortRule } : {}),
+          sort: sortRule,
         },
       ],
     };
@@ -153,22 +330,12 @@ export class TaiyoExtension implements ExtensionImpl<typeof TaiyoConfig> {
       const imageUrl =
         cover || `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
 
-      if (section.id === "popular") {
-        return {
-          mangaId: hit.id,
-          title,
-          imageUrl,
-          type: "prominentCarouselItem",
-          contentRating: ContentRating.EVERYONE,
-        };
-      }
-
       return {
         mangaId: hit.id,
-        chapterId: hit.id,
         title,
         imageUrl,
-        type: "chapterUpdatesCarouselItem",
+        subtitle: hit.type ?? undefined,
+        type: "simpleCarouselItem",
         contentRating: ContentRating.EVERYONE,
       };
     });

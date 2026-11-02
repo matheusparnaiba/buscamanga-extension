@@ -3,9 +3,11 @@ import type { Tag } from "@paperback/types";
 
 export const ORDER_OPTIONS: Tag[] = [
   { id: "views", title: "Mais Vistos" },
-  { id: "latest", title: "Últimas Atualizações" },
-  { id: "alphabet", title: "Ordem Alfabética" },
+  { id: "latest", title: "Atualizados Agora" },
+  { id: "trending", title: "Em Alta" },
+  { id: "new-manga", title: "Mais Novos" },
   { id: "rating", title: "Melhor Avaliados" },
+  { id: "alphabet", title: "Ordem Alfabética" },
 ];
 
 export const GENRE_OPTIONS: Tag[] = [
@@ -25,6 +27,7 @@ export const GENRE_OPTIONS: Tag[] = [
   { id: "reencarnacao", title: "Reencarnação" },
   { id: "romance", title: "Romance" },
   { id: "shounen", title: "Shounen" },
+  { id: "sistema", title: "Sistema" },
   { id: "sobrenatural", title: "Sobrenatural" },
   { id: "wuxia", title: "Wuxia" },
   { id: "xianxia", title: "Xianxia" },
@@ -33,12 +36,15 @@ export const GENRE_OPTIONS: Tag[] = [
 
 export const STATUS_OPTIONS: Tag[] = [
   { id: "all", title: "Todos os Status" },
-  { id: "on-going", title: "Em Lançamento" },
-  { id: "end", title: "Completo" },
+  { id: "on-going", title: "Em Progresso" },
+  { id: "end", title: "Concluído" },
+  { id: "canceled", title: "Cancelado" },
+  { id: "on-hold", title: "Em Espera" },
+  { id: "upcoming", title: "Por Vir" },
 ];
 
 export type ContentTemplateSearchMetadata = {
-  orderBy?: "views" | "latest" | "alphabet" | "rating";
+  orderBy?: "views" | "latest" | "trending" | "new-manga" | "rating" | "alphabet";
   genre?: string;
   status?: string;
 };

@@ -20,11 +20,7 @@ import {
 import * as cheerio from "cheerio";
 
 import { ContentTemplateAdvancedSearchForm, SettingsForm } from "./forms";
-import type {
-  AstraChapterListDto,
-  AstraComicsResponseDto,
-  ContentTemplateSearchMetadata,
-} from "./models";
+import type { AstraChapterListDto, ContentTemplateSearchMetadata } from "./models";
 import { MainInterceptor } from "./network";
 import type AstratoonsConfig from "./pbconfig";
 
@@ -59,6 +55,112 @@ function sanitizeTagId(raw: string): string {
   );
 }
 
+function parseHtmlComicsList(html: string): {
+  items: { mangaId: string; title: string; imageUrl: string; subtitle?: string }[];
+  hasNextPage: boolean;
+} {
+  const $ = cheerio.load(html);
+  const items: { mangaId: string; title: string; imageUrl: string; subtitle?: string }[] = [];
+
+  $("a.block.group[href*='/comics/'], a[href*='/comics/']:has(h2)").each((_, a) => {
+    const href = $(a).attr("href") || "";
+    const slugMatch = href.match(/\/comics\/([^/?#]+)/);
+    if (!slugMatch) return;
+    const slug = slugMatch[1]!;
+    if (items.some((x) => x.mangaId === slug)) return;
+
+    const title = $(a).find("h2, h3, h4").first().text().trim() || slug;
+    const rawImg = $(a).find("img.object-cover, img").first().attr("src");
+    const imageUrl =
+      cleanCoverUrl(rawImg) ||
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
+    const subtitle =
+      $(a).find("span:contains('Capítulo'), span:contains('Capítulos')").first().text().trim() ||
+      undefined;
+
+    items.push({
+      mangaId: slug,
+      title,
+      imageUrl,
+      subtitle,
+    });
+  });
+
+  const hasNextPage = $("a[rel='next'], a:contains('pagination.next')").length > 0;
+  return { items, hasNextPage };
+}
+
+function parseHomeSection(
+  html: string,
+  sectionId: "destaques" | "popular_hoje" | "ranking",
+): { mangaId: string; title: string; imageUrl: string; subtitle?: string }[] {
+  const $ = cheerio.load(html);
+  const items: { mangaId: string; title: string; imageUrl: string; subtitle?: string }[] = [];
+
+  if (sectionId === "destaques") {
+    $('div[class*="swiper"], div[class*="carousel"], div[class*="banner"], div[class*="slide"]')
+      .first()
+      .parent()
+      .find('a[href*="/comics/"]')
+      .each((_, a) => {
+        const href = $(a).attr("href") || "";
+        const slugMatch = href.match(/\/comics\/([^/?#]+)/);
+        if (!slugMatch) return;
+        const slug = slugMatch[1]!;
+        if (items.some((x) => x.mangaId === slug)) return;
+
+        const title = $(a).find("h2, h3, h4").first().text().trim() || slug;
+        const rawImg = $(a).find("img").first().attr("src");
+        const imageUrl =
+          cleanCoverUrl(rawImg) ||
+          `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
+
+        items.push({ mangaId: slug, title, imageUrl, subtitle: "Destaque" });
+      });
+  } else if (sectionId === "popular_hoje") {
+    const popH2 = $('h2:contains("Popular hoje")').first();
+    const popContainer = popH2.closest("div.w-full, section, div[class*='mx-auto']");
+    popContainer.find('a[href*="/comics/"]').each((_, a) => {
+      const href = $(a).attr("href") || "";
+      const slugMatch = href.match(/\/comics\/([^/?#]+)/);
+      if (!slugMatch) return;
+      const slug = slugMatch[1]!;
+      if (items.some((x) => x.mangaId === slug)) return;
+
+      const title =
+        $(a).find("h2, h3, h4, span.font-bold, .font-semibold").first().text().trim() || slug;
+      const rawImg = $(a).find("img").first().attr("src");
+      const imageUrl =
+        cleanCoverUrl(rawImg) ||
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
+
+      items.push({ mangaId: slug, title, imageUrl, subtitle: "Popular" });
+    });
+  } else if (sectionId === "ranking") {
+    const rankH2 = $('h2:contains("Ranking das Mais Populares")').first();
+    const rankContainer = rankH2.parent().parent();
+    rankContainer.find('a[href*="/comics/"]').each((_, a) => {
+      const href = $(a).attr("href") || "";
+      const slugMatch = href.match(/\/comics\/([^/?#]+)/);
+      if (!slugMatch) return;
+      const slug = slugMatch[1]!;
+      if (items.some((x) => x.mangaId === slug)) return;
+
+      const title =
+        $(a).find("h3, h4").first().text().trim() || $(a).find("img").first().attr("alt") || slug;
+      const rawImg = $(a).find("img").last().attr("src") || $(a).find("img").first().attr("src");
+      const imageUrl =
+        cleanCoverUrl(rawImg) ||
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
+      const subtitle = $(a).find("span:contains('Capítulos')").first().text().trim() || undefined;
+
+      items.push({ mangaId: slug, title, imageUrl, subtitle });
+    });
+  }
+
+  return items;
+}
+
 export class AstratoonsExtension implements ExtensionImpl<typeof AstratoonsConfig> {
   constructor(public cheerioInstance?: any) {
     this.getHomePageSections = this.getHomePageSections.bind(this);
@@ -85,7 +187,7 @@ export class AstratoonsExtension implements ExtensionImpl<typeof AstratoonsConfi
   async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
     return new ContentTemplateAdvancedSearchForm({
       title: "",
-      metadata: { orderBy: "updated_at", status: "all", type: "all" },
+      metadata: { orderBy: "updated_at", status: "all", type: "all", genre: "all" },
     });
   }
 
@@ -93,17 +195,67 @@ export class AstratoonsExtension implements ExtensionImpl<typeof AstratoonsConfi
     return [
       {
         id: "updates",
-        title: "Últimas Atualizações",
+        title: "Últimos Lançamentos",
         type: DiscoverSectionType.chapterUpdates,
       },
       {
-        id: "popular",
-        title: "Mais Populares",
+        id: "destaques",
+        title: "Projetos em Destaque",
         type: DiscoverSectionType.prominentCarousel,
       },
       {
-        id: "all",
-        title: "Todas as Obras",
+        id: "popular_hoje",
+        title: "Popular Hoje",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "ranking",
+        title: "Ranking das Mais Populares",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "manhwa",
+        title: "Manhwas",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "manga",
+        title: "Mangás",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "manhua",
+        title: "Manhuas",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "webtoon",
+        title: "Webtoons",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "acao",
+        title: "Ação",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "romance",
+        title: "Romance",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "fantasia",
+        title: "Fantasia",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "artes-marciais",
+        title: "Artes Marciais",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "isekai",
+        title: "Isekai",
         type: DiscoverSectionType.simpleCarousel,
       },
     ];
@@ -114,56 +266,89 @@ export class AstratoonsExtension implements ExtensionImpl<typeof AstratoonsConfi
     metadata?: number,
   ): Promise<PagedResults<DiscoverSectionItem>> {
     const page = metadata ?? 1;
-    let sortBy = "updated_at";
-    if (section.id === "popular") {
-      sortBy = "chapters_count";
-    }
-
-    const url = `${BASE_URL}/api/comics?sortBy=${sortBy}&page=${page}`;
 
     try {
-      const [_, buffer] = await Application.scheduleRequest({ url, method: "GET" });
-      const json: AstraComicsResponseDto = JSON.parse(Application.arrayBufferToUTF8String(buffer));
-      const comics = json.data ?? [];
-      const items: DiscoverSectionItem[] = [];
-
-      for (const comic of comics) {
-        const title = comic.title?.trim() || "Sem título";
-        const mangaId = `${comic.slug}:${comic.id}`;
-        const imageUrl =
-          cleanCoverUrl(comic.cover_image) ||
-          `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
-
-        if (section.id === "updates") {
-          items.push({
-            mangaId,
-            chapterId: mangaId,
-            title,
-            subtitle: comic.type || "Atualizado",
-            imageUrl,
-            type: "chapterUpdatesCarouselItem",
-            contentRating: ContentRating.EVERYONE,
-          });
-        } else if (section.id === "popular") {
-          items.push({
-            mangaId,
-            title,
-            imageUrl,
-            type: "prominentCarouselItem",
-            contentRating: ContentRating.EVERYONE,
-          });
-        } else {
-          items.push({
-            mangaId,
-            title,
-            imageUrl,
+      if (
+        (section.id === "destaques" || section.id === "popular_hoje" || section.id === "ranking") &&
+        page === 1
+      ) {
+        const [_, buffer] = await Application.scheduleRequest({ url: BASE_URL, method: "GET" });
+        const html = Application.arrayBufferToUTF8String(buffer);
+        const scraped = parseHomeSection(html, section.id as any);
+        const items: DiscoverSectionItem[] = scraped.map((it) => {
+          if (section.type === DiscoverSectionType.prominentCarousel) {
+            return {
+              mangaId: it.mangaId,
+              title: it.title,
+              imageUrl: it.imageUrl,
+              subtitle: it.subtitle,
+              type: "prominentCarouselItem",
+              contentRating: ContentRating.EVERYONE,
+            };
+          }
+          return {
+            mangaId: it.mangaId,
+            title: it.title,
+            imageUrl: it.imageUrl,
+            subtitle: it.subtitle,
             type: "simpleCarouselItem",
             contentRating: ContentRating.EVERYONE,
-          });
-        }
+          };
+        });
+        return { items, metadata: undefined };
       }
 
-      const hasNextPage = json.current_page < json.last_page;
+      if (section.id === "updates") {
+        const url = `${BASE_URL}/comics?sortBy=updated_at&page=${page}`;
+        const [_, buffer] = await Application.scheduleRequest({ url, method: "GET" });
+        const html = Application.arrayBufferToUTF8String(buffer);
+        const { items: parsed, hasNextPage } = parseHtmlComicsList(html);
+
+        const items: DiscoverSectionItem[] = parsed.map((it) => ({
+          mangaId: it.mangaId,
+          chapterId: it.mangaId,
+          title: it.title,
+          subtitle: it.subtitle || "Atualizado",
+          imageUrl: it.imageUrl,
+          type: "chapterUpdatesCarouselItem",
+          contentRating: ContentRating.EVERYONE,
+        }));
+
+        return {
+          items,
+          metadata: hasNextPage ? page + 1 : undefined,
+        };
+      }
+
+      let param = "";
+      if (section.id === "manhwa") param = "types[]=Manhwa";
+      else if (section.id === "manga") param = "types[]=Manga";
+      else if (section.id === "manhua") param = "types[]=Manhua";
+      else if (section.id === "webtoon") param = "types[]=Webtoon";
+      else if (
+        section.id === "destaques" ||
+        section.id === "popular_hoje" ||
+        section.id === "ranking"
+      ) {
+        param = "sortBy=chapters_count";
+      } else {
+        param = `tags[]=${section.id}`;
+      }
+
+      const url = `${BASE_URL}/comics?${param}&page=${page}`;
+      const [_, buffer] = await Application.scheduleRequest({ url, method: "GET" });
+      const html = Application.arrayBufferToUTF8String(buffer);
+      const { items: parsed, hasNextPage } = parseHtmlComicsList(html);
+
+      const items: DiscoverSectionItem[] = parsed.map((it) => ({
+        mangaId: it.mangaId,
+        title: it.title,
+        subtitle: it.subtitle,
+        imageUrl: it.imageUrl,
+        type: "simpleCarouselItem",
+        contentRating: ContentRating.EVERYONE,
+      }));
+
       return {
         items,
         metadata: hasNextPage ? page + 1 : undefined,
@@ -198,30 +383,24 @@ export class AstratoonsExtension implements ExtensionImpl<typeof AstratoonsConfi
       params.set("types[]", query.metadata.type);
     }
 
-    const url = `${BASE_URL}/api/comics?${params.toString()}`;
+    if (query.metadata?.genre && query.metadata.genre !== "all") {
+      params.set("tags[]", query.metadata.genre);
+    }
+
+    const url = `${BASE_URL}/comics?${params.toString()}`;
 
     try {
       const [_, buffer] = await Application.scheduleRequest({ url, method: "GET" });
-      const json: AstraComicsResponseDto = JSON.parse(Application.arrayBufferToUTF8String(buffer));
-      const comics = json.data ?? [];
-      const items: SearchResultItem[] = [];
+      const html = Application.arrayBufferToUTF8String(buffer);
+      const { items: parsed, hasNextPage } = parseHtmlComicsList(html);
 
-      for (const comic of comics) {
-        const title = comic.title?.trim() || "Sem título";
-        const mangaId = `${comic.slug}:${comic.id}`;
-        const imageUrl =
-          cleanCoverUrl(comic.cover_image) ||
-          `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`;
+      const items: SearchResultItem[] = parsed.map((it) => ({
+        mangaId: it.mangaId,
+        title: it.title,
+        imageUrl: it.imageUrl,
+        contentRating: ContentRating.EVERYONE,
+      }));
 
-        items.push({
-          mangaId,
-          title,
-          imageUrl,
-          contentRating: ContentRating.EVERYONE,
-        });
-      }
-
-      const hasNextPage = json.current_page < json.last_page;
       return {
         items,
         metadata: hasNextPage ? page + 1 : undefined,
@@ -309,7 +488,10 @@ export class AstratoonsExtension implements ExtensionImpl<typeof AstratoonsConfi
       const mangaUrl = `${BASE_URL}/comics/${slug}`;
       const [_, buffer] = await Application.scheduleRequest({ url: mangaUrl, method: "GET" });
       const html = Application.arrayBufferToUTF8String(buffer);
-      const match = html.match(/comicId:\s*(\d+)/);
+      const match =
+        html.match(/comicId:\s*['"]?(\d+)['"]?/) ||
+        html.match(/comic_id['"]?\s*:\s*['"]?(\d+)['"]?/) ||
+        html.match(/comics\/(\d+)\/chapters/);
       if (match?.[1]) {
         comicId = parseInt(match[1], 10);
       }

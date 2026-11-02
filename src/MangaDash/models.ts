@@ -20,17 +20,23 @@ export const CATEGORY_OPTIONS: Tag[] = [
   { id: "fantasia", title: "Fantasia" },
   { id: "ficcao-cientifica", title: "Ficção Científica" },
   { id: "harem", title: "Harem" },
+  { id: "hentai", title: "Hentai" },
   { id: "historico", title: "Histórico" },
   { id: "isekai", title: "Isekai" },
+  { id: "mecha", title: "Mecha" },
   { id: "misterio", title: "Mistério" },
   { id: "musica", title: "Música" },
   { id: "psicologico", title: "Psicológico" },
   { id: "romance", title: "Romance" },
+  { id: "seinen", title: "Seinen" },
+  { id: "shoujo", title: "Shoujo" },
   { id: "shounen", title: "Shounen" },
   { id: "slice-of-life", title: "Slice of Life" },
   { id: "sobrenatural", title: "Sobrenatural" },
   { id: "suspense", title: "Suspense" },
   { id: "terror", title: "Terror" },
+  { id: "tragedy", title: "Tragedy" },
+  { id: "yaoi", title: "YAOI" },
 ];
 
 export const STATUS_OPTIONS: Tag[] = [

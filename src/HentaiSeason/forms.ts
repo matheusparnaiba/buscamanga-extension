@@ -48,7 +48,7 @@ export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
     return [
       Section("filters", [
         SelectRow("category", {
-          title: "Filtrar por Categoria",
+          title: "Filtrar por Categoria ou Tag",
           value: [this.category],
           options: CATEGORY_OPTIONS,
           minItemCount: 1,

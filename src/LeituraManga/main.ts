@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
 import {
   BasicRateLimiter,
   ContentRating,
@@ -63,6 +64,11 @@ function sanitizeTagId(raw: string): string {
   );
 }
 
+function createSvgTextPage(contentHtml: string): string {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1200" viewBox="0 0 800 1200"><rect width="800" height="1200" fill="#18181b"/><foreignObject x="48" y="48" width="704" height="1104"><div xmlns="http://www.w3.org/1999/xhtml" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 21px; line-height: 1.7; color: #f4f4f5; word-break: break-word;">${contentHtml}</div></foreignObject></svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
 export class LeituraMangaExtension implements ExtensionImpl<typeof ContentTemplateConfig> {
   constructor(public cheerioInstance?: any) {
     this.getHomePageSections = this.getHomePageSections.bind(this);
@@ -91,14 +97,24 @@ export class LeituraMangaExtension implements ExtensionImpl<typeof ContentTempla
   async getDiscoverSections(): Promise<DiscoverSection[]> {
     return [
       {
+        id: "updates",
+        title: "Atualizados Recentemente",
+        type: DiscoverSectionType.chapterUpdates,
+      },
+      {
         id: "popular",
         title: "Mais Lidos (Populares)",
         type: DiscoverSectionType.prominentCarousel,
       },
       {
-        id: "updates",
-        title: "Últimas Atualizações",
-        type: DiscoverSectionType.chapterUpdates,
+        id: "recent_add",
+        title: "Adicionados Recentemente",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "novels",
+        title: "Novels Atualizadas Recentemente",
+        type: DiscoverSectionType.simpleCarousel,
       },
     ];
   }
@@ -108,10 +124,20 @@ export class LeituraMangaExtension implements ExtensionImpl<typeof ContentTempla
     metadata: number | undefined,
   ): Promise<PagedResults<DiscoverSectionItem>> {
     const page = metadata ?? 1;
-    const sortParam = section.id === "popular" ? "view" : "time";
+
+    let url: string;
+    if (section.id === "popular") {
+      url = `${API_BASE}/api/manga/?sort=view&limit=24&includeAdult=true&page=${page}`;
+    } else if (section.id === "recent_add") {
+      url = `${API_BASE}/api/manga/?sort=created&limit=24&includeAdult=true&page=${page}`;
+    } else if (section.id === "novels") {
+      url = `${API_BASE}/api/manga/?sort=time&limit=24&includeAdult=true&contentType=novel&page=${page}`;
+    } else {
+      url = `${API_BASE}/api/manga/?sort=time&limit=24&includeAdult=true&contentType=comic&page=${page}`;
+    }
 
     const request = {
-      url: `${API_BASE}/api/manga/?sort=${sortParam}&limit=24&page=${page}`,
+      url,
       method: "GET",
     };
 
@@ -134,6 +160,7 @@ export class LeituraMangaExtension implements ExtensionImpl<typeof ContentTempla
       const title = item.title || slug;
       const imageUrl = sanitizeImageUrl(`${CDN_BASE}/${slug}/cover-md.webp`);
       const isAdult = item.genres?.some((g: any) => g.isAdult);
+      const lastChap = item.chapters?.[0];
 
       if (section.id === "popular") {
         items.push({
@@ -149,10 +176,28 @@ export class LeituraMangaExtension implements ExtensionImpl<typeof ContentTempla
           type: "prominentCarouselItem",
           contentRating: isAdult ? ContentRating.ADULT : ContentRating.EVERYONE,
         });
+      } else if (section.id === "recent_add") {
+        const chapterSubtitle = lastChap ? `Cap. ${lastChap.chapterNumber}` : "Adicionado";
+        items.push({
+          mangaId: slug,
+          title,
+          subtitle: chapterSubtitle,
+          imageUrl,
+          type: "simpleCarouselItem",
+          contentRating: isAdult ? ContentRating.ADULT : ContentRating.EVERYONE,
+        });
+      } else if (section.id === "novels") {
+        const chapterSubtitle = lastChap ? `Cap. ${lastChap.chapterNumber}` : "Novel";
+        items.push({
+          mangaId: slug,
+          title,
+          subtitle: chapterSubtitle,
+          imageUrl,
+          type: "simpleCarouselItem",
+          contentRating: isAdult ? ContentRating.ADULT : ContentRating.EVERYONE,
+        });
       } else {
-        const lastChap = item.chapters?.[0];
         const chapterSubtitle = lastChap ? `Cap. ${lastChap.chapterNumber}` : undefined;
-
         items.push({
           mangaId: slug,
           chapterId: slug,
@@ -176,7 +221,7 @@ export class LeituraMangaExtension implements ExtensionImpl<typeof ContentTempla
   async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
     const query: SearchQuery<ContentTemplateSearchMetadata> = {
       title: "",
-      metadata: { orderBy: "view" },
+      metadata: { orderBy: "time", contentType: "all" },
     };
     return new ContentTemplateAdvancedSearchForm(query);
   }
@@ -187,13 +232,20 @@ export class LeituraMangaExtension implements ExtensionImpl<typeof ContentTempla
     _sortingOption?: SortingOption,
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata ?? 1;
-    const orderBy = query.metadata?.orderBy ?? "view";
+    const orderBy = query.metadata?.orderBy ?? "time";
+    const contentType = query.metadata?.contentType;
     let url: string;
 
     if (query.title && query.title.trim()) {
-      url = `${API_BASE}/api/manga/?keyword=${encodeURIComponent(query.title.trim())}&limit=24&page=${page}`;
+      url = `${API_BASE}/api/manga/?keyword=${encodeURIComponent(query.title.trim())}&limit=24&page=${page}&includeAdult=true`;
+      if (contentType && contentType !== "all") {
+        url += `&contentType=${encodeURIComponent(contentType)}`;
+      }
     } else {
-      url = `${API_BASE}/api/manga/?sort=${encodeURIComponent(orderBy)}&limit=24&page=${page}`;
+      url = `${API_BASE}/api/manga/?sort=${encodeURIComponent(orderBy)}&limit=24&page=${page}&includeAdult=true`;
+      if (contentType && contentType !== "all") {
+        url += `&contentType=${encodeURIComponent(contentType)}`;
+      }
     }
 
     const request = { url, method: "GET" };
@@ -216,10 +268,16 @@ export class LeituraMangaExtension implements ExtensionImpl<typeof ContentTempla
       const title = item.title || slug;
       const imageUrl = sanitizeImageUrl(`${CDN_BASE}/${slug}/cover-md.webp`);
       const isAdult = item.genres?.some((g: any) => g.isAdult);
+      const lastChap = item.chapters?.[0];
+      const typeLabel = item.contentType === "novel" ? "Novel" : undefined;
+      const subtitle = [typeLabel, lastChap ? `Cap. ${lastChap.chapterNumber}` : undefined]
+        .filter(Boolean)
+        .join(" • ");
 
       items.push({
         mangaId: slug,
         title,
+        subtitle: subtitle || undefined,
         imageUrl,
         contentRating: isAdult ? ContentRating.ADULT : ContentRating.EVERYONE,
       });
@@ -269,10 +327,10 @@ export class LeituraMangaExtension implements ExtensionImpl<typeof ContentTempla
       this.mangaIdCache.set(slug, mongoMatch[1] as string);
     }
 
-    let status = "ONGOING";
+    let status = "ongoing";
     const statusText = $('p:contains("Status")').text().toLowerCase();
     if (statusText.includes("completo")) {
-      status = "COMPLETED";
+      status = "completed";
     }
 
     const genres: Tag[] = [];
@@ -408,6 +466,50 @@ export class LeituraMangaExtension implements ExtensionImpl<typeof ContentTempla
       }
     }
 
+    // Novel fallback: text paragraphs rendered as SVG pages
+    if (pages.length === 0) {
+      try {
+        let html = text;
+        if (!html.includes("<p")) {
+          const htmlReq = { url, method: "GET" };
+          const [__, htmlBuf] = await Application.scheduleRequest(htmlReq);
+          html = Application.arrayBufferToUTF8String(htmlBuf);
+        }
+        const $ = cheerio.load(html);
+        const paragraphs: string[] = [];
+        $("article.novel-content p, .novel-content p, article p").each((_, p) => {
+          const t = $(p).text().trim();
+          if (t && !t.includes("Publicado em") && !t.includes("AdProvider")) {
+            paragraphs.push(t);
+          }
+        });
+
+        if (paragraphs.length > 0) {
+          const PAGE_CHAR_LIMIT = 900;
+          let currentPageHtml = "";
+          let currentLen = 0;
+
+          for (const p of paragraphs) {
+            const escaped = p.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            const pTag = `<p style="margin: 0 0 16px 0;">${escaped}</p>`;
+            if (currentLen + p.length > PAGE_CHAR_LIMIT && currentLen > 0) {
+              pages.push(createSvgTextPage(currentPageHtml));
+              currentPageHtml = pTag;
+              currentLen = p.length;
+            } else {
+              currentPageHtml += pTag;
+              currentLen += p.length;
+            }
+          }
+          if (currentPageHtml) {
+            pages.push(createSvgTextPage(currentPageHtml));
+          }
+        }
+      } catch (novelErr) {
+        console.error("Erro ao processar conteúdo da novel:", novelErr);
+      }
+    }
+
     return {
       id: chapter.chapterId,
       mangaId: chapter.sourceManga.mangaId,
@@ -426,6 +528,7 @@ export class LeituraMangaExtension implements ExtensionImpl<typeof ContentTempla
               title: sec.title,
               containsMoreItems: true,
               type: "singleRowNormal",
+              items: [],
             })
           : {
               id: sec.id,

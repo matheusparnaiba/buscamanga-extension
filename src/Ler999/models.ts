@@ -6,33 +6,51 @@ export const ORDER_OPTIONS: Tag[] = [
   { id: "updated", title: "Últimas Atualizações" },
 ];
 
-export const GENRE_OPTIONS: Tag[] = [
-  { id: "all", title: "Todos os Gêneros" },
-  { id: "action", title: "Ação" },
-  { id: "adventure", title: "Aventura" },
-  { id: "comedy", title: "Comédia" },
-  { id: "cultivo", title: "Cultivo" },
-  { id: "drama", title: "Drama" },
-  { id: "ecchi", title: "Ecchi" },
-  { id: "fantasy", title: "Fantasia" },
-  { id: "harem", title: "Harém" },
-  { id: "manhua", title: "Manhua" },
-  { id: "manhwa", title: "Manhwa" },
-  { id: "martial-arts", title: "Artes Marciais" },
-  { id: "mystery", title: "Mistério" },
-  { id: "romance", title: "Romance" },
-  { id: "sci-fi", title: "Sci-Fi" },
-  { id: "seinen", title: "Seinen" },
+export const TYPE_OPTIONS: Tag[] = [
+  { id: "all", title: "Todos os Tipos" },
+  { id: "Manhua", title: "Manhua" },
+  { id: "Manhwa", title: "Manhwa" },
+  { id: "Manga", title: "Mangá" },
 ];
 
 export const STATUS_OPTIONS: Tag[] = [
   { id: "all", title: "Todos os Status" },
-  { id: "ongoing", title: "Em Lançamento" },
-  { id: "completed", title: "Completo" },
+  { id: "Ongoing", title: "Em Lançamento" },
+  { id: "Hiatus", title: "Em Hiato" },
+  { id: "Dropped", title: "Cancelado / Dropado" },
+];
+
+export const GENRE_OPTIONS: Tag[] = [
+  { id: "all", title: "Todos os Gêneros" },
+  { id: "Action", title: "Ação" },
+  { id: "Adventure", title: "Aventura" },
+  { id: "Comedy", title: "Comédia" },
+  { id: "Cultivo", title: "Cultivo" },
+  { id: "Drama", title: "Drama" },
+  { id: "Ecchi", title: "Ecchi" },
+  { id: "Fantasy", title: "Fantasia" },
+  { id: "Harem", title: "Harém" },
+  { id: "Magic", title: "Magia" },
+  { id: "Martial Arts", title: "Artes Marciais" },
+  { id: "Mecha", title: "Mecha" },
+  { id: "Medicinal", title: "Medicinal" },
+  { id: "Military", title: "Militar" },
+  { id: "Mystery", title: "Mistério" },
+  { id: "Romance", title: "Romance" },
+  { id: "School Life", title: "Vida Escolar" },
+  { id: "Sci-Fi", title: "Ficção Científica" },
+  { id: "Seinen", title: "Seinen" },
+  { id: "Shounen", title: "Shounen" },
+  { id: "Supernatural", title: "Sobrenatural" },
+  { id: "Survival", title: "Sobrevivência" },
+  { id: "Tragedy", title: "Tragédia" },
+  { id: "Video Games", title: "Videogames" },
+  { id: "VR", title: "Realidade Virtual" },
 ];
 
 export type ContentTemplateSearchMetadata = {
   orderBy?: "published" | "updated";
+  type?: string;
   genre?: string;
   status?: string;
 };

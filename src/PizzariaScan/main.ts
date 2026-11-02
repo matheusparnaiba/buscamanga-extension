@@ -338,12 +338,11 @@ export class PizzariaScanExtension implements ExtensionImpl<typeof PizzariaScanC
     const data = Application.arrayBufferToUTF8String(buffer);
     const $ = cheerio.load(data);
 
-    let title =
-      $("#manga-info h1, h1.text-4xl, .infox h1, .entry-title")
-        .filter((_, el) => !$(el).closest("#east_login_user, form, .modal").length)
-        .first()
-        .text()
-        .trim();
+    let title = $("#manga-info h1, h1.text-4xl, .infox h1, .entry-title")
+      .filter((_, el) => !$(el).closest("#east_login_user, form, .modal").length)
+      .first()
+      .text()
+      .trim();
 
     if (!title || title.toLowerCase() === "entrar na conta") {
       $("h1").each((_, el) => {

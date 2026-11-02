@@ -1,22 +1,20 @@
-/* SPDX-License-Identifier: GPL-3.0-or-later */
 import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/types";
 
 export default {
-  name: "Pluma Comics",
+  name: "Hentai da Tia",
   description:
-    "Extensão oficial da Pluma Comics especializada em manhuas, cultivação e artes marciais.",
-  version: "1.0.2",
+    "Extensão oficial do Hentai da Tia com acervo de mangás hentai, doujinshis e galerias adultas em português (+18).",
+  version: "1.0.1",
   icon: "icon.png",
-  language: "pt-BR",
+  language: "pt-br",
   contentRating: ContentRating.EVERYONE,
   capabilities: [
     SourceIntents.SETTINGS_FORM_PROVIDING,
     SourceIntents.DISCOVER_SECTION_PROVIDING,
     SourceIntents.SEARCH_RESULT_PROVIDING,
     SourceIntents.CHAPTER_PROVIDING,
-    SourceIntents.CLOUDFLARE_BYPASS_PROVIDING,
   ],
-  badges: [{ label: "Manutenção", textColor: "#000000", backgroundColor: "#FACC15" }],
+  badges: [{ label: "18+", textColor: "#FFFFFF", backgroundColor: "#DC2626" }],
   developers: [
     {
       name: "matheusparnaiba",

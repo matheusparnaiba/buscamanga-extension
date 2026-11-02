@@ -25,11 +25,52 @@ export const TYPE_OPTIONS: Tag[] = [
   { id: "Webtoon", title: "Webtoon" },
 ];
 
+export const GENRE_OPTIONS: Tag[] = [
+  { id: "all", title: "Todos os Gêneros" },
+  { id: "acao", title: "Ação" },
+  { id: "artes-marciais", title: "Artes Marciais" },
+  { id: "aventura", title: "Aventura" },
+  { id: "comedia", title: "Comédia" },
+  { id: "crime", title: "Crime" },
+  { id: "cultivo", title: "Cultivo" },
+  { id: "danca", title: "Dança" },
+  { id: "drama", title: "Drama" },
+  { id: "ecchi", title: "Ecchi" },
+  { id: "esporte", title: "Esporte" },
+  { id: "fantasia", title: "Fantasia" },
+  { id: "harem", title: "Harém" },
+  { id: "historico", title: "Histórico" },
+  { id: "isekai", title: "Isekai" },
+  { id: "iskai", title: "Iskai" },
+  { id: "magia", title: "Magia" },
+  { id: "misterio", title: "Mistério" },
+  { id: "monstros", title: "Monstros" },
+  { id: "murim", title: "Murim" },
+  { id: "reencarnacao", title: "Reencarnação" },
+  { id: "regressao", title: "Regressão" },
+  { id: "romance", title: "Romance" },
+  { id: "sci-fi", title: "Sci-Fi" },
+  { id: "seinen", title: "Seinen" },
+  { id: "shounen", title: "Shounen" },
+  { id: "silence", title: "Silence" },
+  { id: "slice-of-life", title: "Slice of Life" },
+  { id: "sobrenatural", title: "Sobrenatural" },
+  { id: "super-poderes", title: "Super Poderes" },
+  { id: "suspense", title: "Suspense" },
+  { id: "tragedia", title: "Tragédia" },
+  { id: "troca-de-genero", title: "Troca de Gênero" },
+  { id: "viagem-no-tempo", title: "Viagem no Tempo" },
+  { id: "vida-cotidiana", title: "Vida Cotidiana" },
+  { id: "vida-escolar", title: "Vida Escolar" },
+  { id: "zumbis", title: "Zumbis" },
+];
+
 export type ContentTemplateSearchMetadata = {
   [key: string]: any;
   orderBy?: string;
   status?: string;
   type?: string;
+  genre?: string;
 };
 
 export interface AstraTagDto {

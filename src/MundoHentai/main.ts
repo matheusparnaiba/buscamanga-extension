@@ -34,10 +34,34 @@ const SECTIONS: { id: string; title: string; path: string; type: DiscoverSection
     type: DiscoverSectionType.chapterUpdates,
   },
   {
-    id: "popular",
-    title: "Mais Lidos",
-    path: "/category/doujinshi",
+    id: "manga_hentai",
+    title: "Mangás Hentai",
+    path: "/category/manga-hentai",
     type: DiscoverSectionType.prominentCarousel,
+  },
+  {
+    id: "doujinshi",
+    title: "Doujinshis",
+    path: "/category/doujinshi",
+    type: DiscoverSectionType.simpleCarousel,
+  },
+  {
+    id: "sem_censura",
+    title: "Hentai Sem Censura",
+    path: "/category/hentai-sem-censura",
+    type: DiscoverSectionType.simpleCarousel,
+  },
+  {
+    id: "hentai_3d",
+    title: "Hentai 3D",
+    path: "/category/hentai-3d",
+    type: DiscoverSectionType.simpleCarousel,
+  },
+  {
+    id: "comics",
+    title: "Comics Pornô",
+    path: "/category/comics",
+    type: DiscoverSectionType.simpleCarousel,
   },
 ];
 

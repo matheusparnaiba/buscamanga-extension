@@ -55,6 +55,7 @@ function cleanCoverUrl(capa?: string | null): string {
   } else {
     src = `${BASE_URL}${src.startsWith("/") ? "" : "/"}${src}`;
   }
+  src = src.replace(/\/static\/covers\/\.\.\/images\//g, "/static/images/");
   try {
     src = decodeURI(src);
   } catch {}
@@ -100,14 +101,54 @@ export class MangaDashExtension
   async getDiscoverSections(): Promise<DiscoverSection[]> {
     return [
       {
-        id: "popular",
-        title: "Mais Vistos",
+        id: "destaques",
+        title: "Destaques",
         type: DiscoverSectionType.prominentCarousel,
       },
       {
         id: "updates",
-        title: "Mais Recentes",
+        title: "Atualizações",
         type: DiscoverSectionType.chapterUpdates,
+      },
+      {
+        id: "popular",
+        title: "Mais Vistos",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "recents",
+        title: "Mangás Recentes",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "acao",
+        title: "Ação",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "fantasia",
+        title: "Fantasia",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "drama",
+        title: "Drama",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "aventura",
+        title: "Aventura",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "romance",
+        title: "Romance",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "hentai",
+        title: "Adulto (+18)",
+        type: DiscoverSectionType.simpleCarousel,
       },
     ];
   }
@@ -117,10 +158,111 @@ export class MangaDashExtension
     metadata: number | undefined,
   ): Promise<PagedResults<DiscoverSectionItem>> {
     const page = metadata ?? 1;
-    const sort = section.id === "popular" ? "populares" : "recentes";
-    const url = `${BASE_URL}/api/mangas/list?page=${page}&q=&sort=${sort}&categoria=&status=&ano=&plus18=`;
 
     try {
+      if (section.id === "destaques") {
+        if (page > 1) {
+          return { items: [], metadata: undefined };
+        }
+        const [_, buffer] = await Application.scheduleRequest({
+          url: `${BASE_URL}/`,
+          method: "GET",
+          headers: {
+            referer: `${BASE_URL}/`,
+          },
+        });
+        const html = Application.arrayBufferToUTF8String(buffer);
+        const $ = cheerio.load(html);
+        const items: DiscoverSectionItem[] = [];
+
+        $(".hero-swiper .swiper-slide").each((_, el) => {
+          const link =
+            $(el).find("a.hero-btn-v2").attr("href") || $(el).find("a").attr("href") || "";
+          const title = $(el).find(".hero-title-v2").text().trim();
+          const img = $(el).find("img").attr("src") || "";
+          const stats = $(el).find(".hero-stats-v2").text().replace(/\s+/g, " ").trim();
+          const mangaId = link.replace(/^\/manga\//, "").replace(/\/$/, "");
+          const isAdult =
+            $(el).find(".badge-plus18").length > 0 ||
+            $(el).hasClass("is-plus18") ||
+            $(el).find(".is-plus18").length > 0;
+
+          if (mangaId && title) {
+            items.push({
+              mangaId,
+              title,
+              imageUrl: cleanCoverUrl(img),
+              subtitle: stats || undefined,
+              type: "prominentCarouselItem",
+              contentRating: isAdult ? ContentRating.ADULT : ContentRating.EVERYONE,
+            });
+          }
+        });
+
+        return { items, metadata: undefined };
+      }
+
+      if (section.id === "updates") {
+        const [_, buffer] = await Application.scheduleRequest({
+          url: `${BASE_URL}/capitulos?page=${page}`,
+          method: "GET",
+          headers: {
+            referer: `${BASE_URL}/`,
+          },
+        });
+        const html = Application.arrayBufferToUTF8String(buffer);
+        const $ = cheerio.load(html);
+        const items: DiscoverSectionItem[] = [];
+
+        $(".chapters-grid .card-new").each((_, el) => {
+          const mangaLink = $(el).find(".card-title a").attr("href") || "";
+          const title = $(el).find(".card-title a").text().trim();
+          const chapLink = $(el).find("a.chapter-card-overlay").attr("href") || "";
+          const chapNum = $(el).find(".chapter-number-badge").text().trim();
+          const time = $(el).find(".chapter-time-badge").text().replace(/\s+/g, " ").trim();
+          const img = $(el).find("img").attr("src") || "";
+          const mangaId = mangaLink.replace(/^\/manga\//, "").replace(/\/$/, "");
+
+          if (mangaId && title) {
+            const subtitle = [chapNum, time].filter(Boolean).join(" • ") || "Recente";
+            items.push({
+              mangaId,
+              chapterId: chapLink || mangaId,
+              title,
+              subtitle,
+              imageUrl: cleanCoverUrl(img),
+              type: "chapterUpdatesCarouselItem",
+              contentRating: ContentRating.EVERYONE,
+            });
+          }
+        });
+
+        const hasNextPage = $(".pagination-new a.next").length > 0 || items.length >= 24;
+        return {
+          items,
+          metadata: hasNextPage ? page + 1 : undefined,
+        };
+      }
+
+      // API-driven sections
+      let sort = "populares";
+      let categoria = "";
+      let plus18 = "";
+
+      if (section.id === "popular") {
+        sort = "populares";
+      } else if (section.id === "recents") {
+        sort = "recentes";
+      } else if (section.id === "hentai") {
+        sort = "populares";
+        categoria = "hentai";
+        plus18 = "1";
+      } else {
+        sort = "populares";
+        categoria = section.id;
+      }
+
+      const url = `${BASE_URL}/api/mangas/list?page=${page}&q=&sort=${sort}&categoria=${categoria}&status=&ano=&plus18=${plus18}`;
       const [_, buffer] = await Application.scheduleRequest({
         url,
         method: "GET",
@@ -138,26 +280,18 @@ export class MangaDashExtension
         const mangaId = `${m.id}-${m.slug}`;
         const title = m.nome || "Sem título";
         const imageUrl = cleanCoverUrl(m.capa);
+        const isAdult = section.id === "hentai" || !!m.isPlus18;
 
-        if (section.id === "updates") {
-          items.push({
-            mangaId,
-            chapterId: mangaId,
-            title,
-            subtitle: m.capitulos_count ? `${m.capitulos_count} capítulos` : "Recente",
-            imageUrl,
-            type: "chapterUpdatesCarouselItem",
-            contentRating: ContentRating.EVERYONE,
-          });
-        } else {
-          items.push({
-            mangaId,
-            title,
-            imageUrl,
-            type: "prominentCarouselItem",
-            contentRating: ContentRating.EVERYONE,
-          });
-        }
+        items.push({
+          mangaId,
+          title,
+          imageUrl,
+          subtitle: m.capitulos_count
+            ? `${m.capitulos_count} caps`
+            : (m.ano_lancamento ?? undefined),
+          type: "simpleCarouselItem",
+          contentRating: isAdult ? ContentRating.ADULT : ContentRating.EVERYONE,
+        });
       }
 
       const hasNextPage = data.pagination?.has_next ?? itemsList.length >= 24;
@@ -189,7 +323,7 @@ export class MangaDashExtension
     urlBuilder.searchParams.set("categoria", category);
     urlBuilder.searchParams.set("status", status);
     urlBuilder.searchParams.set("ano", "");
-    urlBuilder.searchParams.set("plus18", "");
+    urlBuilder.searchParams.set("plus18", category === "hentai" ? "1" : "");
 
     try {
       const [_, buffer] = await Application.scheduleRequest({
@@ -210,7 +344,8 @@ export class MangaDashExtension
           mangaId: `${m.id}-${m.slug}`,
           title: m.nome || "Sem título",
           imageUrl: cleanCoverUrl(m.capa),
-          subtitle: m.ano_lancamento ?? undefined,
+          subtitle:
+            m.ano_lancamento ?? (m.capitulos_count ? `${m.capitulos_count} caps` : undefined),
         });
       }
 
@@ -271,6 +406,17 @@ export class MangaDashExtension
       status = "hiatus";
     }
 
+    const isAdult =
+      $(".badge-plus18").length > 0 ||
+      $(".is-plus18").length > 0 ||
+      tags.some(
+        (t) =>
+          t.id === "hentai" ||
+          t.id.includes("hentai") ||
+          t.title.toLowerCase().includes("hentai") ||
+          t.title.includes("+18"),
+      );
+
     return {
       mangaId: slug,
       mangaInfo: {
@@ -278,7 +424,7 @@ export class MangaDashExtension
         secondaryTitles: [],
         thumbnailUrl: cover,
         synopsis,
-        contentRating: ContentRating.EVERYONE,
+        contentRating: isAdult ? ContentRating.ADULT : ContentRating.EVERYONE,
         status,
         author,
         artist: author,

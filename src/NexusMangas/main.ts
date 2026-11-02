@@ -69,6 +69,36 @@ function mapStatus(status: string | null | undefined): string {
   }
 }
 
+function mapContentRating(rating: string | null | undefined): ContentRating {
+  switch (rating?.toUpperCase()) {
+    case "ADULT":
+    case "EROTICA":
+    case "PORNOGRAPHIC":
+    case "SEXUAL_VIOLENCE":
+      return ContentRating.ADULT;
+    case "SUGGESTIVE":
+    case "GORE":
+      return ContentRating.MATURE;
+    default:
+      return ContentRating.EVERYONE;
+  }
+}
+
+function formatRelativeTime(dateStr: string | null | undefined): string {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return "";
+  const diffMs = Date.now() - d.getTime();
+  if (diffMs < 0) return "Agora";
+  const diffMins = Math.floor(diffMs / (60 * 1000));
+  if (diffMins < 60) return `Há ${diffMins || 1} min`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `Há ${diffHours}h`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays < 7) return `Há ${diffDays}d`;
+  return d.toLocaleDateString("pt-BR");
+}
+
 export class NexusMangasExtension implements ExtensionImpl<typeof NexusMangasConfig> {
   constructor(public cheerioInstance?: any) {
     this.getHomePageSections = this.getHomePageSections.bind(this);
@@ -96,13 +126,43 @@ export class NexusMangasExtension implements ExtensionImpl<typeof NexusMangasCon
     return [
       {
         id: "popular",
-        title: "Mais Populares",
+        title: "Destaques & Populares",
         type: DiscoverSectionType.prominentCarousel,
       },
       {
         id: "updates",
         title: "Últimas Atualizações",
         type: DiscoverSectionType.chapterUpdates,
+      },
+      {
+        id: "newest",
+        title: "Recém Adicionados",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "manhwa",
+        title: "Manhwas",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "manga",
+        title: "Mangás",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "action",
+        title: "Ação & Aventura",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "romance",
+        title: "Romance & Drama",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "adult",
+        title: "Adulto (+18)",
+        type: DiscoverSectionType.simpleCarousel,
       },
     ];
   }
@@ -113,59 +173,151 @@ export class NexusMangasExtension implements ExtensionImpl<typeof NexusMangasCon
   ): Promise<PagedResults<DiscoverSectionItem>> {
     const page = metadata ?? 1;
     const offset = (page - 1) * PAGE_SIZE;
-    const order =
-      section.id === "popular" ? "avg_rating.desc.nullslast,id.desc" : "updated_at.desc,id.desc";
-
-    const url = `${REST_URL}/works?select=slug,title,cover_url,status,type&order=${order}&limit=${PAGE_SIZE}&offset=${offset}`;
-
-    const request = {
-      url,
-      method: "GET",
-      headers: {
-        apikey: ANON_KEY,
-        Authorization: `Bearer ${ANON_KEY}`,
-        Accept: "application/json",
-      },
-    };
-
-    const items: DiscoverSectionItem[] = [];
 
     try {
-      const [_, buffer] = await Application.scheduleRequest(request);
-      const data = JSON.parse(Application.arrayBufferToUTF8String(buffer));
-      const list = Array.isArray(data) ? data : [];
+      if (section.id === "updates") {
+        const url = `${REST_URL}/chapters?select=id,number,title,published_at,works!chapters_work_id_fkey!inner(slug,title,cover_url,type,content_rating)&order=published_at.desc&limit=${PAGE_SIZE}&offset=${offset}`;
+        const request = {
+          url,
+          method: "GET",
+          headers: {
+            apikey: ANON_KEY,
+            Authorization: `Bearer ${ANON_KEY}`,
+            Accept: "application/json",
+          },
+        };
 
-      for (const w of list) {
-        const mangaId = w.slug;
-        if (!mangaId) continue;
-        const title = w.title ?? mangaId;
-        const img = buildImageUrl(w.cover_url);
+        const [_, buffer] = await Application.scheduleRequest(request);
+        const data = JSON.parse(Application.arrayBufferToUTF8String(buffer));
+        const list = Array.isArray(data) ? data : [];
+        const items: DiscoverSectionItem[] = [];
 
-        if (section.id === "popular") {
+        for (const c of list) {
+          const w = c.works;
+          if (!w || !w.slug) continue;
+          const mangaId = w.slug;
+          const chapterId = c.id;
+          const title = w.title ?? mangaId;
+          const img = buildImageUrl(w.cover_url);
+          const chapNum = typeof c.number === "number" ? c.number : parseFloat(c.number ?? "0");
+          const chapLabel = c.title ? `Cap. ${chapNum} - ${c.title}` : `Cap. ${chapNum}`;
+          const time = formatRelativeTime(c.published_at);
+          const subtitle = time ? `${chapLabel} • ${time}` : chapLabel;
+
           items.push({
             mangaId,
+            chapterId,
             title,
-            imageUrl:
-              img ||
-              "https://ui-avatars.com/api/?name=" +
-                encodeURIComponent(title) +
-                "&background=random",
-            type: "prominentCarouselItem",
-            contentRating: ContentRating.EVERYONE,
-          });
-        } else {
-          items.push({
-            mangaId,
-            chapterId: mangaId,
-            title,
-            subtitle: w.type ?? undefined,
+            subtitle,
             imageUrl:
               img ||
               "https://ui-avatars.com/api/?name=" +
                 encodeURIComponent(title) +
                 "&background=random",
             type: "chapterUpdatesCarouselItem",
-            contentRating: ContentRating.EVERYONE,
+            contentRating: mapContentRating(w.content_rating),
+          });
+        }
+
+        return {
+          items,
+          metadata: list.length === PAGE_SIZE ? page + 1 : undefined,
+        };
+      }
+
+      // Works-based sections
+      const params = new URLSearchParams();
+
+      if (section.id === "popular") {
+        params.set("select", "slug,title,cover_url,status,type,avg_rating,content_rating");
+        params.set("order", "avg_rating.desc.nullslast,rating_count.desc.nullslast,id.desc");
+      } else if (section.id === "newest") {
+        params.set("select", "slug,title,cover_url,status,type,avg_rating,content_rating");
+        params.set("order", "created_at.desc,id.desc");
+      } else if (section.id === "manhwa") {
+        params.set("select", "slug,title,cover_url,status,type,avg_rating,content_rating");
+        params.set("type", "eq.MANHWA");
+        params.set("order", "avg_rating.desc.nullslast,id.desc");
+      } else if (section.id === "manga") {
+        params.set("select", "slug,title,cover_url,status,type,avg_rating,content_rating");
+        params.set("type", "eq.MANGA");
+        params.set("order", "avg_rating.desc.nullslast,id.desc");
+      } else if (section.id === "action") {
+        params.set(
+          "select",
+          "slug,title,cover_url,status,type,avg_rating,content_rating,work_genres!inner(genres!inner(name))",
+        );
+        params.set("work_genres.genres.name", "eq.Ação");
+        params.set("order", "avg_rating.desc.nullslast,id.desc");
+      } else if (section.id === "romance") {
+        params.set(
+          "select",
+          "slug,title,cover_url,status,type,avg_rating,content_rating,work_genres!inner(genres!inner(name))",
+        );
+        params.set("work_genres.genres.name", "eq.Romance");
+        params.set("order", "avg_rating.desc.nullslast,id.desc");
+      } else if (section.id === "adult") {
+        params.set("select", "slug,title,cover_url,status,type,content_rating");
+        params.set("or", "(content_rating.eq.ADULT,content_rating.eq.EROTICA)");
+        params.set("order", "updated_at.desc,id.desc");
+      } else {
+        params.set("select", "slug,title,cover_url,status,type,avg_rating,content_rating");
+        params.set("order", "avg_rating.desc.nullslast,id.desc");
+      }
+
+      params.set("limit", String(PAGE_SIZE));
+      params.set("offset", String(offset));
+
+      const request = {
+        url: `${REST_URL}/works?${params.toString()}`,
+        method: "GET",
+        headers: {
+          apikey: ANON_KEY,
+          Authorization: `Bearer ${ANON_KEY}`,
+          Accept: "application/json",
+        },
+      };
+
+      const [_, buffer] = await Application.scheduleRequest(request);
+      const data = JSON.parse(Application.arrayBufferToUTF8String(buffer));
+      const list = Array.isArray(data) ? data : [];
+      const items: DiscoverSectionItem[] = [];
+
+      for (const w of list) {
+        const mangaId = w.slug;
+        if (!mangaId) continue;
+        const mangaTitle = w.title ?? mangaId;
+        const img = buildImageUrl(w.cover_url);
+        const ratingStr = w.avg_rating ? `★ ${w.avg_rating}` : undefined;
+        const subtitle = [ratingStr, w.type].filter(Boolean).join(" • ") || undefined;
+        const contentRating =
+          section.id === "adult" ? ContentRating.ADULT : mapContentRating(w.content_rating);
+
+        if (section.id === "popular") {
+          items.push({
+            mangaId,
+            title: mangaTitle,
+            imageUrl:
+              img ||
+              "https://ui-avatars.com/api/?name=" +
+                encodeURIComponent(mangaTitle) +
+                "&background=random",
+            subtitle,
+            type: "prominentCarouselItem",
+            contentRating,
+          });
+        } else {
+          items.push({
+            mangaId,
+            title: mangaTitle,
+            imageUrl:
+              img ||
+              "https://ui-avatars.com/api/?name=" +
+                encodeURIComponent(mangaTitle) +
+                "&background=random",
+            subtitle,
+            type: "simpleCarouselItem",
+            contentRating,
           });
         }
       }
@@ -208,7 +360,7 @@ export class NexusMangasExtension implements ExtensionImpl<typeof NexusMangasCon
 
     const genreJoin = genre ? ",work_genres!inner(genres!inner(name))" : "";
     const params = new URLSearchParams();
-    params.append("select", `slug,title,cover_url,status,type${genreJoin}`);
+    params.append("select", `slug,title,cover_url,status,type,content_rating${genreJoin}`);
     params.append("order", `${order},id.desc`);
     params.append("limit", String(PAGE_SIZE));
     params.append("offset", String(offset));
@@ -248,6 +400,7 @@ export class NexusMangasExtension implements ExtensionImpl<typeof NexusMangasCon
         if (!mangaId) continue;
         const mangaTitle = w.title ?? mangaId;
         const img = buildImageUrl(w.cover_url);
+        const contentRating = mapContentRating(w.content_rating);
 
         items.push({
           mangaId,
@@ -257,7 +410,7 @@ export class NexusMangasExtension implements ExtensionImpl<typeof NexusMangasCon
             "https://ui-avatars.com/api/?name=" +
               encodeURIComponent(mangaTitle) +
               "&background=random",
-          contentRating: ContentRating.EVERYONE,
+          contentRating,
         });
       }
 
@@ -272,7 +425,7 @@ export class NexusMangasExtension implements ExtensionImpl<typeof NexusMangasCon
   }
 
   async getMangaDetails(mangaId: string): Promise<SourceManga> {
-    const url = `${REST_URL}/works?select=slug,title,description,cover_url,alternative_title,status,type,author,artist,demographic,work_genres(genres(name))&slug=eq.${mangaId}&limit=1`;
+    const url = `${REST_URL}/works?select=slug,title,description,cover_url,alternative_title,status,type,author,artist,demographic,content_rating,work_genres(genres(name))&slug=eq.${mangaId}&limit=1`;
     const request = {
       url,
       method: "GET",
@@ -299,6 +452,7 @@ export class NexusMangasExtension implements ExtensionImpl<typeof NexusMangasCon
 
     const synopsis = work.description ?? "";
     const status = mapStatus(work.status);
+    const contentRating = mapContentRating(work.content_rating);
 
     const genres: Tag[] = [];
     if (work.type) {
@@ -323,7 +477,7 @@ export class NexusMangasExtension implements ExtensionImpl<typeof NexusMangasCon
         secondaryTitles: work.alternative_title ? [work.alternative_title] : [],
         thumbnailUrl,
         synopsis,
-        contentRating: ContentRating.EVERYONE,
+        contentRating,
         status,
         author: work.author ?? "Desconhecido",
         artist: work.artist,

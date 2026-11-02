@@ -38,7 +38,7 @@ export class SettingsForm extends Form {
 }
 
 export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
-  private orderBy: "views" | "latest" | "alphabet" | "rating";
+  private orderBy: ContentTemplateSearchMetadata["orderBy"];
   private genre: string;
   private status: string;
 
@@ -54,7 +54,7 @@ export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
       Section("filters", [
         SelectRow("orderBy", {
           title: "Ordenar Por",
-          value: [this.orderBy],
+          value: [this.orderBy ?? "views"],
           options: ORDER_OPTIONS,
           minItemCount: 1,
           maxItemCount: 1,
@@ -91,8 +91,8 @@ export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
 
   async handleOrderChange(value: string[]): Promise<void> {
     const val = value[0];
-    if (val === "views" || val === "latest" || val === "alphabet" || val === "rating") {
-      this.orderBy = val;
+    if (val) {
+      this.orderBy = val as any;
     }
   }
 

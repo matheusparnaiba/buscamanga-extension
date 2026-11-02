@@ -36,10 +36,34 @@ const SECTIONS: { id: string; title: string; path: string; type: DiscoverSection
     type: DiscoverSectionType.chapterUpdates,
   },
   {
-    id: "popular",
-    title: "Mais Lidos",
-    path: "/popular",
+    id: "hentais",
+    title: "Mangás Hentai",
+    path: "/hentais",
     type: DiscoverSectionType.prominentCarousel,
+  },
+  {
+    id: "popular",
+    title: "Mais Populares",
+    path: "/popular",
+    type: DiscoverSectionType.simpleCarousel,
+  },
+  {
+    id: "bombando",
+    title: "Bombando / Hot",
+    path: "/bombando",
+    type: DiscoverSectionType.simpleCarousel,
+  },
+  {
+    id: "parodias",
+    title: "Paródias Pornô",
+    path: "/category/parodia-porno",
+    type: DiscoverSectionType.simpleCarousel,
+  },
+  {
+    id: "futanari",
+    title: "Futanari",
+    path: "/category/futanari",
+    type: DiscoverSectionType.simpleCarousel,
   },
 ];
 

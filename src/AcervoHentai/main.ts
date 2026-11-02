@@ -181,9 +181,14 @@ export class AcervoHentaiExtension implements ExtensionImpl<typeof ContentTempla
         type: DiscoverSectionType.chapterUpdates,
       },
       {
+        id: "pornhwa",
+        title: "Pornhwa / Manhwa Hentai",
+        type: DiscoverSectionType.prominentCarousel,
+      },
+      {
         id: "popular",
         title: "Mais Populares",
-        type: DiscoverSectionType.prominentCarousel,
+        type: DiscoverSectionType.simpleCarousel,
       },
       {
         id: "rating",
@@ -200,7 +205,12 @@ export class AcervoHentaiExtension implements ExtensionImpl<typeof ContentTempla
     const page = metadata ?? 1;
 
     let url: string;
-    if (section.id === "popular") {
+    if (section.id === "pornhwa") {
+      url =
+        page === 1
+          ? `${BASE_URL}/pornhwa-em-portugues/`
+          : `${BASE_URL}/pornhwa-em-portugues/page/${page}/`;
+    } else if (section.id === "popular") {
       url =
         page === 1
           ? `${BASE_URL}/manhwa/?m_orderby=views`

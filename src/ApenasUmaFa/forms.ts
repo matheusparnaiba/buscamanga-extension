@@ -12,6 +12,7 @@ import {
   GENRE_OPTIONS,
   ORDER_OPTIONS,
   STATUS_OPTIONS,
+  TYPE_OPTIONS,
   type ContentTemplateSearchMetadata,
 } from "./models";
 
@@ -41,12 +42,14 @@ export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
   private orderBy: "published" | "updated";
   private genre: string;
   private status: string;
+  private type: string;
 
   constructor(searchQuery: SearchQuery<ContentTemplateSearchMetadata>) {
     super();
     this.orderBy = searchQuery.metadata?.orderBy ?? "published";
     this.genre = searchQuery.metadata?.genre ?? "all";
     this.status = searchQuery.metadata?.status ?? "all";
+    this.type = searchQuery.metadata?.type ?? "all";
   }
 
   override getSections() {
@@ -85,6 +88,17 @@ export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
             "handleStatusChange",
           ),
         }),
+        SelectRow("type", {
+          title: "Tipo",
+          value: [this.type],
+          options: TYPE_OPTIONS,
+          minItemCount: 1,
+          maxItemCount: 1,
+          onValueChange: Application.Selector(
+            this as ContentTemplateAdvancedSearchForm,
+            "handleTypeChange",
+          ),
+        }),
       ]),
     ];
   }
@@ -104,7 +118,16 @@ export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
     this.status = value[0] ?? "all";
   }
 
+  async handleTypeChange(value: string[]): Promise<void> {
+    this.type = value[0] ?? "all";
+  }
+
   override getSearchQueryMetadata(): ContentTemplateSearchMetadata {
-    return { orderBy: this.orderBy, genre: this.genre, status: this.status };
+    return {
+      orderBy: this.orderBy,
+      genre: this.genre,
+      status: this.status,
+      type: this.type,
+    };
   }
 }

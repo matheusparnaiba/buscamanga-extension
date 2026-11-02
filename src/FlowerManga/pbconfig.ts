@@ -4,7 +4,7 @@ export default {
   name: "Flower Mangas",
   description:
     "Extensão oficial da Flower Mangas com foco em shoujo, romance, manhwas e mangás traduzidos.",
-  version: "1.0.2",
+  version: "1.0.3",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

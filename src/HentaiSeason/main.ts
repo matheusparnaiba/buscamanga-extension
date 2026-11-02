@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
 import {
   BasicRateLimiter,
   ContentRating,
@@ -105,6 +106,13 @@ export class HentaiSeasonExtension implements ExtensionImpl<typeof HentaiSeasonC
     return new SettingsForm();
   }
 
+  async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
+    return new ContentTemplateAdvancedSearchForm({
+      title: "",
+      metadata: { category: "all" },
+    });
+  }
+
   async getDiscoverSections(): Promise<DiscoverSection[]> {
     return [
       {
@@ -118,13 +126,63 @@ export class HentaiSeasonExtension implements ExtensionImpl<typeof HentaiSeasonC
         type: DiscoverSectionType.prominentCarousel,
       },
       {
+        id: "pack-imagens",
+        title: "Packs de Imagens",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
         id: "oneshot",
         title: "One-Shots",
         type: DiscoverSectionType.simpleCarousel,
       },
       {
-        id: "pack-imagens",
-        title: "Packs de Imagens",
+        id: "peitao",
+        title: "Peitão",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "bundao",
+        title: "Bundão",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "creampie",
+        title: "Creampie",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "milf",
+        title: "Milf",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "dupla-penetracao",
+        title: "Dupla Penetração",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "ahegao",
+        title: "Ahegão",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "anal",
+        title: "Anal",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "incesto",
+        title: "Incesto",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "oral",
+        title: "Oral",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "grupal",
+        title: "Grupal",
         type: DiscoverSectionType.simpleCarousel,
       },
     ];
@@ -142,7 +200,7 @@ export class HentaiSeasonExtension implements ExtensionImpl<typeof HentaiSeasonC
         page === 1
           ? `${BASE_URL}/category/doujinshi/`
           : `${BASE_URL}/category/doujinshi/page/${page}/`;
-    } else if (section.id === "oneshot") {
+    } else if (section.id === "oneshot" || section.id === "one-shot") {
       url =
         page === 1
           ? `${BASE_URL}/category/one-shot/`
@@ -152,8 +210,13 @@ export class HentaiSeasonExtension implements ExtensionImpl<typeof HentaiSeasonC
         page === 1
           ? `${BASE_URL}/category/pack-imagens/`
           : `${BASE_URL}/category/pack-imagens/page/${page}/`;
-    } else {
+    } else if (section.id === "updates") {
       url = page === 1 ? `${BASE_URL}/` : `${BASE_URL}/page/${page}/`;
+    } else {
+      url =
+        page === 1
+          ? `${BASE_URL}/tag/${section.id}/`
+          : `${BASE_URL}/tag/${section.id}/page/${page}/`;
     }
 
     const request = { url, method: "GET" };
@@ -163,12 +226,11 @@ export class HentaiSeasonExtension implements ExtensionImpl<typeof HentaiSeasonC
     const items: DiscoverSectionItem[] = [];
     const seenIds = new Set<string>();
 
-    $("div.meio div.lista ul li a, .lista li a").each((_, el) => {
+    $("div.thumb-conteudo a, div.meio div.lista ul li a, .lista li a").each((_, el) => {
       const a = $(el);
       const href = a.attr("href");
       if (!href) return;
 
-      // Ignore external ads
       if (href.startsWith("http") && !href.includes("hentaiseason.com")) return;
       if (href.includes("/delivery/") || href.includes("random")) return;
 
@@ -195,19 +257,7 @@ export class HentaiSeasonExtension implements ExtensionImpl<typeof HentaiSeasonC
               type: "prominentCarouselItem",
               contentRating: ContentRating.EVERYONE,
             });
-          } else if (section.id === "oneshot" || section.id === "pack-imagens") {
-            items.push({
-              mangaId,
-              title,
-              imageUrl:
-                img ||
-                "https://ui-avatars.com/api/?name=" +
-                  encodeURIComponent(title) +
-                  "&background=random",
-              type: "simpleCarouselItem",
-              contentRating: ContentRating.EVERYONE,
-            });
-          } else {
+          } else if (section.type === DiscoverSectionType.chapterUpdates) {
             items.push({
               mangaId,
               title,
@@ -221,22 +271,30 @@ export class HentaiSeasonExtension implements ExtensionImpl<typeof HentaiSeasonC
               type: "chapterUpdatesCarouselItem",
               contentRating: ContentRating.EVERYONE,
             });
+          } else {
+            items.push({
+              mangaId,
+              title,
+              imageUrl:
+                img ||
+                "https://ui-avatars.com/api/?name=" +
+                  encodeURIComponent(title) +
+                  "&background=random",
+              type: "simpleCarouselItem",
+              contentRating: ContentRating.EVERYONE,
+            });
           }
         }
       }
     });
 
+    const hasNextPage =
+      $("ul.paginacao li.next a, a:contains('Próxima página'), a.next").length > 0;
+
     return {
       items,
-      metadata: items.length > 0 ? page + 1 : undefined,
+      metadata: hasNextPage ? page + 1 : undefined,
     };
-  }
-
-  async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
-    return new ContentTemplateAdvancedSearchForm({
-      title: "",
-      metadata: { category: "all" },
-    });
   }
 
   async getSearchResults(
@@ -245,18 +303,34 @@ export class HentaiSeasonExtension implements ExtensionImpl<typeof HentaiSeasonC
     _sortingOption?: SortingOption,
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata ?? 1;
-    const title = query.title?.trim() ?? "";
-    const category =
-      query.metadata?.category && query.metadata.category !== "all" ? query.metadata.category : "";
+    let category = query.metadata?.category || "all";
+    const title = query.title?.trim();
 
     let url: string;
-    if (title) {
-      url = `${BASE_URL}/page/${page}/?s=${encodeURIComponent(title)}&post_type=post`;
-    } else if (category) {
+    if (category && category !== "all") {
+      let isCategory = false;
+      let slug = category;
+
+      if (slug.startsWith("category:")) {
+        isCategory = true;
+        slug = slug.replace("category:", "");
+      } else if (slug.startsWith("tag:")) {
+        isCategory = false;
+        slug = slug.replace("tag:", "");
+      } else if (slug === "doujinshi" || slug === "one-shot" || slug === "pack-imagens") {
+        isCategory = true;
+      }
+
+      const prefix = isCategory ? "category" : "tag";
       url =
         page === 1
-          ? `${BASE_URL}/category/${encodeURIComponent(category)}/`
-          : `${BASE_URL}/category/${encodeURIComponent(category)}/page/${page}/`;
+          ? `${BASE_URL}/${prefix}/${slug}/`
+          : `${BASE_URL}/${prefix}/${slug}/page/${page}/`;
+    } else if (title) {
+      url =
+        page === 1
+          ? `${BASE_URL}/?s=${encodeURIComponent(title)}`
+          : `${BASE_URL}/page/${page}/?s=${encodeURIComponent(title)}`;
     } else {
       url = page === 1 ? `${BASE_URL}/` : `${BASE_URL}/page/${page}/`;
     }
@@ -268,7 +342,7 @@ export class HentaiSeasonExtension implements ExtensionImpl<typeof HentaiSeasonC
     const items: SearchResultItem[] = [];
     const seenIds = new Set<string>();
 
-    $("div.meio div.lista ul li a, .lista li a").each((_, el) => {
+    $("div.thumb-conteudo a, div.meio div.lista ul li a, .lista li a").each((_, el) => {
       const a = $(el);
       const href = a.attr("href");
       if (!href) return;
@@ -276,23 +350,23 @@ export class HentaiSeasonExtension implements ExtensionImpl<typeof HentaiSeasonC
       if (href.startsWith("http") && !href.includes("hentaiseason.com")) return;
       if (href.includes("/delivery/") || href.includes("random")) return;
 
-      const mangaTitle =
+      const cardTitle =
         a.find(".thumb-titulo").text().trim() ||
         a.attr("title")?.trim() ||
         a.text().replace(/\s+/g, " ").trim();
       const img = getImageSrc(a.find("img").first());
 
-      if (mangaTitle) {
+      if (cardTitle) {
         const mangaId = extractMangaId(href);
         if (!seenIds.has(mangaId)) {
           seenIds.add(mangaId);
           items.push({
             mangaId,
-            title: mangaTitle,
+            title: cardTitle,
             imageUrl:
               img ||
               "https://ui-avatars.com/api/?name=" +
-                encodeURIComponent(mangaTitle) +
+                encodeURIComponent(cardTitle) +
                 "&background=random",
             contentRating: ContentRating.EVERYONE,
           });
@@ -300,9 +374,12 @@ export class HentaiSeasonExtension implements ExtensionImpl<typeof HentaiSeasonC
       }
     });
 
+    const hasNextPage =
+      $("ul.paginacao li.next a, a:contains('Próxima página'), a.next").length > 0;
+
     return {
       items,
-      metadata: items.length > 0 ? page + 1 : undefined,
+      metadata: hasNextPage ? page + 1 : undefined,
     };
   }
 
@@ -340,21 +417,35 @@ export class HentaiSeasonExtension implements ExtensionImpl<typeof HentaiSeasonC
 
     const author =
       postBox
-        .find("ul.post-itens li:contains('Artista') a, ul.post-itens li:contains('Autor') a")
+        .find(
+          "ul.post-itens li:contains('Estúdio') a, ul.post-itens li:contains('Artista') a, ul.post-itens li:contains('Autor') a, ul.post-itens li:contains('Tradutor') a",
+        )
         .first()
         .text()
         .trim() || "Hentai Season";
+
+    const parodia = postBox.find("ul.post-itens li:contains('Paródia') a").first().text().trim();
 
     const genres: Tag[] = [];
     const seenGenres = new Set<string>();
 
     postBox
       .find(
-        "ul.post-itens li:contains('Tags') a, ul.post-itens a[href*='/tag/'], ul.post-itens a[href*='/category/']",
+        "ul.post-itens a[href*='/tag/'], ul.post-itens a[href*='/category/'], a[href*='/tag/'], a[href*='/category/']",
       )
       .each((_, el) => {
         const g = $(el).text().trim();
-        if (g) {
+        if (
+          g &&
+          ![
+            "Início",
+            "Comissões",
+            "Hentai da Sorte",
+            "Pack Imagens",
+            "Doujinshi",
+            "One-shot",
+          ].includes(g)
+        ) {
           const id = sanitizeTagId(g);
           if (!seenGenres.has(id)) {
             seenGenres.add(id);
@@ -367,13 +458,13 @@ export class HentaiSeasonExtension implements ExtensionImpl<typeof HentaiSeasonC
       mangaId,
       mangaInfo: {
         primaryTitle: title,
-        secondaryTitles: [],
+        secondaryTitles: parodia ? [`Paródia: ${parodia}`] : [],
         thumbnailUrl,
         synopsis,
         contentRating: ContentRating.EVERYONE,
         status: "completed",
         author,
-        tagGroups: [{ id: "genres", title: "Tags", tags: genres }],
+        tagGroups: genres.length > 0 ? [{ id: "genres", title: "Tags", tags: genres }] : [],
         artworkUrls: image ? [image] : [thumbnailUrl],
         shareUrl: url,
       },
@@ -405,10 +496,8 @@ export class HentaiSeasonExtension implements ExtensionImpl<typeof HentaiSeasonC
     const seenPages = new Set<string>();
 
     $(
-      "div.meio div.post-box ul.post-fotos li a > img, " +
-        "div.meio div.post-box.listaImagens div.galeriaHtml img, " +
-        "div.meio div.post-box ul.post-fotos li img, " +
-        "ul.post-fotos li img",
+      "ul.post-fotos li img, div.galeriaHtml img, div.post-fotos img, ul.post-fotos a > img, " +
+        "div.meio div.post-box ul.post-fotos li a > img, div.meio div.post-box.listaImagens div.galeriaHtml img",
     ).each((_, el) => {
       const src = getImageSrc($(el));
       if (
@@ -416,6 +505,9 @@ export class HentaiSeasonExtension implements ExtensionImpl<typeof HentaiSeasonC
         src.startsWith("http") &&
         !src.includes("logo") &&
         !src.includes("banner") &&
+        !src.includes("avatar") &&
+        !src.includes("carregando.gif") &&
+        !src.includes("adblock") &&
         !seenPages.has(src)
       ) {
         seenPages.add(src);
@@ -423,7 +515,6 @@ export class HentaiSeasonExtension implements ExtensionImpl<typeof HentaiSeasonC
       }
     });
 
-    // Fallback if pages empty
     if (pages.length === 0) {
       $("div.meio div.post-box img").each((_, el) => {
         const src = getImageSrc($(el));
@@ -433,6 +524,8 @@ export class HentaiSeasonExtension implements ExtensionImpl<typeof HentaiSeasonC
           !src.includes("logo") &&
           !src.includes("banner") &&
           !src.includes("avatar") &&
+          !src.includes("carregando.gif") &&
+          !src.includes("adblock") &&
           !seenPages.has(src)
         ) {
           seenPages.add(src);
@@ -459,7 +552,6 @@ export class HentaiSeasonExtension implements ExtensionImpl<typeof HentaiSeasonC
               title: sec.title,
               containsMoreItems: true,
               type: "singleRowNormal",
-              items: [],
             })
           : {
               id: sec.id,

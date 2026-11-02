@@ -263,9 +263,24 @@ export class CovenScanExtension implements ExtensionImpl<typeof ContentTemplateC
         type: DiscoverSectionType.chapterUpdates,
       },
       {
+        id: "mature",
+        title: "Mature (+18)",
+        type: DiscoverSectionType.prominentCarousel,
+      },
+      {
+        id: "bl",
+        title: "Boys Love (BL)",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "completo",
+        title: "Obras Completas",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
         id: "popular",
         title: "Mais Lidos",
-        type: DiscoverSectionType.prominentCarousel,
+        type: DiscoverSectionType.simpleCarousel,
       },
     ];
   }
@@ -276,18 +291,33 @@ export class CovenScanExtension implements ExtensionImpl<typeof ContentTemplateC
   ): Promise<PagedResults<DiscoverSectionItem>> {
     const page = metadata ?? 1;
 
-    if (section.id === "popular" && page > 1) {
-      return { items: [], metadata: undefined };
-    }
-
-    const url =
-      section.id === "popular"
-        ? page === 1
+    let url: string;
+    if (section.id === "mature") {
+      url =
+        page === 1
+          ? `${BASE_URL}/bruxonas/manga-generos/mature/`
+          : `${BASE_URL}/bruxonas/manga-generos/mature/page/${page}/`;
+    } else if (section.id === "bl") {
+      url =
+        page === 1
+          ? `${BASE_URL}/bruxonas/manga-generos/bl/`
+          : `${BASE_URL}/bruxonas/manga-generos/bl/page/${page}/`;
+    } else if (section.id === "completo") {
+      url =
+        page === 1
+          ? `${BASE_URL}/bruxonas/manga-tag/completo/`
+          : `${BASE_URL}/bruxonas/manga-tag/completo/page/${page}/`;
+    } else if (section.id === "popular") {
+      url =
+        page === 1
           ? `${BASE_URL}/manga/?m_orderby=views`
-          : `${BASE_URL}/manga/page/${page}/?m_orderby=views`
-        : page === 1
+          : `${BASE_URL}/manga/page/${page}/?m_orderby=views`;
+    } else {
+      url =
+        page === 1
           ? `${BASE_URL}/manga/?m_orderby=latest`
           : `${BASE_URL}/manga/page/${page}/?m_orderby=latest`;
+    }
 
     const request = {
       url,
@@ -299,101 +329,82 @@ export class CovenScanExtension implements ExtensionImpl<typeof ContentTemplateC
     const items: DiscoverSectionItem[] = [];
     const seenIds = new Set<string>();
 
-    if (section.id === "popular") {
-      $(".page-item-detail, .c-tabs-item__content, .manga__item, .manga-item").each((_, el) => {
-        const titleEl = $(el)
-          .find(
-            ".post-title h2 a, .post-title h3 a, .post-title a, .slider__content h4 a, h2 a, h3 a, h4 a, h5 a",
-          )
-          .first();
-        const title = titleEl.text().replace(/\s+/g, " ").trim();
-        const linkEl = $(el).find(".post-title h2 a, .post-title a, a[href*='/manga/'], a").first();
-        const href = linkEl.attr("href");
-        const img = getImageSrc($(el).find("img").first());
+    $(".page-item-detail, .c-tabs-item__content, .manga__item, .manga-item").each((_, el) => {
+      const titleEl = $(el)
+        .find(
+          ".post-title h2 a, .post-title h3 a, .post-title a, .slider__content h4 a, .item-title a, h2 a, h3 a, h4 a, h5 a",
+        )
+        .first();
+      const title = titleEl.text().replace(/\s+/g, " ").trim();
+      const linkEl = $(el).find(".post-title h2 a, .post-title a, a[href*='/manga/'], a").first();
+      const href = linkEl.attr("href");
+      const img = getImageSrc($(el).find("img").first());
 
-        if (href && title) {
-          const idMatch = href.match(/\/manga\/([^/]+)/);
-          const mangaId = idMatch ? (idMatch[1] as string) : href;
+      const chapEl = $(el)
+        .find(
+          ".list-chapter .chapter-item .chapter a, .chapter-item a, .list-chapter a, .chapter a",
+        )
+        .first();
+      const chapHref = chapEl.attr("href")?.trim() || "";
+      const chapName = chapEl.text().replace(/\s+/g, " ").trim();
 
-          if (!seenIds.has(mangaId)) {
-            seenIds.add(mangaId);
-            items.push({
-              mangaId,
-              title,
-              imageUrl:
-                img ||
-                "https://ui-avatars.com/api/?name=" +
-                  encodeURIComponent(title) +
-                  "&background=random",
-              type: "prominentCarouselItem",
-              contentRating: ContentRating.EVERYONE,
-            });
+      if (href && title) {
+        const idMatch = href.match(/\/manga\/([^/]+)/);
+        const mangaId = idMatch ? (idMatch[1] as string) : href;
+
+        let chapterId = mangaId;
+        if (chapHref) {
+          const chapMatch = chapHref.match(/\/manga\/[^/]+\/([^/]+)/);
+          if (chapMatch?.[1]) {
+            chapterId = chapMatch[1];
+          } else {
+            chapterId = chapHref;
           }
         }
-      });
-      return { items, metadata: undefined };
-    }
 
-    if (section.id === "updates") {
-      $(".page-item-detail, .c-tabs-item__content, .manga__item, .manga-item").each((_, el) => {
-        const titleEl = $(el)
-          .find(
-            ".post-title h2 a, .post-title h3 a, .post-title a, .item-title a, h2 a, h3 a, h4 a, h5 a",
-          )
-          .first();
-        const title = titleEl.text().replace(/\s+/g, " ").trim();
-        const linkEl = $(el).find(".post-title h2 a, .post-title a, a[href*='/manga/'], a").first();
-        const href = linkEl.attr("href");
-        const img = getImageSrc($(el).find("img").first());
+        if (!seenIds.has(mangaId)) {
+          seenIds.add(mangaId);
+          const imageUrl =
+            img ||
+            "https://ui-avatars.com/api/?name=" + encodeURIComponent(title) + "&background=random";
 
-        const chapEl = $(el)
-          .find(
-            ".list-chapter .chapter-item .chapter a, .chapter-item a, .list-chapter a, .chapter a",
-          )
-          .first();
-        const chapHref = chapEl.attr("href")?.trim() || "";
-        const chapName = chapEl.text().replace(/\s+/g, " ").trim();
-
-        if (href && title) {
-          const idMatch = href.match(/\/manga\/([^/]+)/);
-          const mangaId = idMatch ? (idMatch[1] as string) : href;
-
-          let chapterId = mangaId;
-          if (chapHref) {
-            const chapMatch = chapHref.match(/\/manga\/[^/]+\/([^/]+)/);
-            if (chapMatch?.[1]) {
-              chapterId = chapMatch[1];
-            } else {
-              chapterId = chapHref;
-            }
-          }
-
-          if (!seenIds.has(mangaId)) {
-            seenIds.add(mangaId);
+          if (section.type === DiscoverSectionType.chapterUpdates) {
             items.push({
               mangaId,
               chapterId,
               title,
               subtitle: chapName,
-              imageUrl:
-                img ||
-                "https://ui-avatars.com/api/?name=" +
-                  encodeURIComponent(title) +
-                  "&background=random",
+              imageUrl,
               type: "chapterUpdatesCarouselItem",
+              contentRating: ContentRating.EVERYONE,
+            });
+          } else if (section.type === DiscoverSectionType.prominentCarousel) {
+            items.push({
+              mangaId,
+              title,
+              subtitle: chapName || undefined,
+              imageUrl,
+              type: "prominentCarouselItem",
+              contentRating: ContentRating.EVERYONE,
+            });
+          } else {
+            items.push({
+              mangaId,
+              title,
+              subtitle: chapName || undefined,
+              imageUrl,
+              type: "simpleCarouselItem",
               contentRating: ContentRating.EVERYONE,
             });
           }
         }
-      });
+      }
+    });
 
-      return {
-        items,
-        metadata: items.length > 0 ? page + 1 : undefined,
-      };
-    }
-
-    return { items, metadata: undefined };
+    return {
+      items,
+      metadata: items.length > 0 ? page + 1 : undefined,
+    };
   }
 
   async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {

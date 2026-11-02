@@ -138,6 +138,16 @@ export class ZettaHQExtension implements ExtensionImpl<typeof ZettaHQConfig> {
         title: "Coloridos",
         type: DiscoverSectionType.simpleCarousel,
       },
+      {
+        id: "lesbicas",
+        title: "Lésbicas & Yuri",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "futanari",
+        title: "Futanari",
+        type: DiscoverSectionType.simpleCarousel,
+      },
     ];
   }
 
@@ -155,6 +165,16 @@ export class ZettaHQExtension implements ExtensionImpl<typeof ZettaHQConfig> {
       url = page === 1 ? `${BASE_URL}/tag/3d/` : `${BASE_URL}/tag/3d/page/${page}/`;
     } else if (section.id === "colorido") {
       url = page === 1 ? `${BASE_URL}/tag/colorido/` : `${BASE_URL}/tag/colorido/page/${page}/`;
+    } else if (section.id === "lesbicas") {
+      url =
+        page === 1
+          ? `${BASE_URL}/category/lesbicas/`
+          : `${BASE_URL}/category/lesbicas/page/${page}/`;
+    } else if (section.id === "futanari") {
+      url =
+        page === 1
+          ? `${BASE_URL}/category/futanari/`
+          : `${BASE_URL}/category/futanari/page/${page}/`;
     } else {
       url = page === 1 ? `${BASE_URL}/` : `${BASE_URL}/page/${page}/`;
     }

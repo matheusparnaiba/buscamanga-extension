@@ -5,7 +5,8 @@ export class MainInterceptor extends PaperbackInterceptor {
   override async interceptRequest(request: Request): Promise<Request> {
     request.headers = {
       ...request.headers,
-      referer: "https://ninjacomics.xyz/",
+      referer: "https://hentaidatia.com/",
+      cookie: "tia_idade_confirmada=1",
       "user-agent": await Application.getDefaultUserAgent(),
     };
     return request;

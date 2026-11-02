@@ -10,15 +10,38 @@ const BASE_URL = "https://roxinha.online";
 
 export class MainInterceptor extends PaperbackInterceptor {
   override async interceptRequest(request: Request): Promise<Request> {
-    request.headers = {
+    const cfUserAgent = Application.getState("roxinha_cf_user_agent") as string | undefined;
+    const ua = cfUserAgent ?? (await Application.getDefaultUserAgent());
+
+    const headers: Record<string, string> = {
       ...request.headers,
       referer: request.headers?.referer || `${BASE_URL}/`,
       origin: request.headers?.origin || BASE_URL,
-      "user-agent": request.headers?.["user-agent"] || (await Application.getDefaultUserAgent()),
+      "user-agent": request.headers?.["user-agent"] || ua,
       accept: request.headers?.accept || "application/json, text/plain, */*",
       "accept-language":
         request.headers?.["accept-language"] || "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
     };
+
+    const cookieHeader = Application.getState("roxinha_cookie_header") as string | undefined;
+    if (cookieHeader && !headers["cookie"]) {
+      headers["cookie"] = cookieHeader;
+    }
+
+    const savedCookies = Application.getState("roxinha_saved_cookies") as
+      | Array<{ name: string; value: string }>
+      | undefined;
+    if (Array.isArray(savedCookies)) {
+      const cookieMap: Record<string, string> = { ...request.cookies };
+      for (const c of savedCookies) {
+        if (c?.name && c?.value) {
+          cookieMap[c.name] = c.value;
+        }
+      }
+      request.cookies = cookieMap;
+    }
+
+    request.headers = headers;
     return request;
   }
 
@@ -45,11 +68,15 @@ export class MainInterceptor extends PaperbackInterceptor {
           text.toLowerCase().includes("cloudflare"));
 
       if (isCf) {
+        const cfUserAgent = Application.getState("roxinha_cf_user_agent") as string | undefined;
         const resolutionRequest: Request = {
           url: `${BASE_URL}/`,
           method: "GET",
           headers: {
-            "user-agent": await Application.getDefaultUserAgent(),
+            "user-agent":
+              cfUserAgent && cfUserAgent.trim().length > 0
+                ? cfUserAgent.trim()
+                : await Application.getDefaultUserAgent(),
             referer: `${BASE_URL}/`,
           },
         };

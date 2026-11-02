@@ -6,28 +6,52 @@ export const ORDER_OPTIONS: Tag[] = [
   { id: "updated", title: "Últimas Atualizações" },
 ];
 
-export const GENRE_OPTIONS: Tag[] = [
-  { id: "all", title: "Todos os Gêneros" },
-  { id: "acao", title: "Ação" },
-  { id: "comedia", title: "Comédia" },
-  { id: "drama", title: "Drama" },
-  { id: "fantasia", title: "Fantasia" },
-  { id: "idols", title: "Idols" },
-  { id: "manhwa", title: "Manhwa" },
-  { id: "romance", title: "Romance" },
-  { id: "shounen-ai", title: "Shounen Ai" },
-  { id: "slice-of-life", title: "Slice Of Life" },
-  { id: "vida-escolar", title: "Vida Escolar" },
-];
-
 export const STATUS_OPTIONS: Tag[] = [
   { id: "all", title: "Todos os Status" },
-  { id: "em-lancamento", title: "Em Lançamento" },
-  { id: "completo", title: "Completo" },
+  { id: "Em Lançamento", title: "Em Lançamento" },
+  { id: "Completo", title: "Completo" },
+  { id: "Hiato", title: "Hiato" },
+  { id: "Em Breve", title: "Em Breve" },
+  { id: "Em Dia", title: "Em Dia" },
+  { id: "Dropado", title: "Dropado" },
+  { id: "Fim Da Temporada", title: "Fim Da Temporada" },
+];
+
+export const TYPE_OPTIONS: Tag[] = [
+  { id: "all", title: "Todos os Tipos" },
+  { id: "Manhwa", title: "Manhwa" },
+  { id: "Manhua", title: "Manhua" },
+  { id: "Manga", title: "Mangá" },
+  { id: "Webtoon", title: "Webtoon" },
+  { id: "Novel", title: "Novel" },
+];
+
+export const GENRE_OPTIONS: Tag[] = [
+  { id: "all", title: "Todos os Gêneros" },
+  { id: "Ação", title: "Ação" },
+  { id: "Aventura", title: "Aventura" },
+  { id: "Comédia", title: "Comédia" },
+  { id: "Drama", title: "Drama" },
+  { id: "Fantasia", title: "Fantasia" },
+  { id: "Gourmet", title: "Gourmet" },
+  { id: "Horror", title: "Horror" },
+  { id: "Idols", title: "Idols" },
+  { id: "Mistério", title: "Mistério" },
+  { id: "Romance", title: "Romance" },
+  { id: "Sci-Fi", title: "Sci-Fi" },
+  { id: "Showbiz", title: "Showbiz" },
+  { id: "Shounen ai", title: "Shounen Ai" },
+  { id: "Slice Of Life", title: "Slice of Life" },
+  { id: "Sobrenatural", title: "Sobrenatural" },
+  { id: "Vida Escolar", title: "Vida Escolar" },
+  { id: "Game", title: "Game" },
+  { id: "Sistema", title: "Sistema" },
+  { id: "Transmigração", title: "Transmigração" },
 ];
 
 export type ContentTemplateSearchMetadata = {
   orderBy?: "published" | "updated";
   genre?: string;
   status?: string;
+  type?: string;
 };

@@ -148,6 +148,11 @@ export class BrasilHentaiExtension implements ExtensionImpl<typeof BrasilHentaiC
         type: DiscoverSectionType.prominentCarousel,
       },
       {
+        id: "doujinshi",
+        title: "Doujinshis",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
         id: "3d",
         title: "Hentai 3D",
         type: DiscoverSectionType.simpleCarousel,
@@ -167,6 +172,11 @@ export class BrasilHentaiExtension implements ExtensionImpl<typeof BrasilHentaiC
         page === 1
           ? `${BASE_URL}/category/colorido/`
           : `${BASE_URL}/category/colorido/page/${page}/`;
+    } else if (section.id === "doujinshi") {
+      url =
+        page === 1
+          ? `${BASE_URL}/category/doujinshi/`
+          : `${BASE_URL}/category/doujinshi/page/${page}/`;
     } else if (section.id === "3d") {
       url =
         page === 1

@@ -14,6 +14,7 @@ import {
   GENRE_OPTIONS,
   ORDER_OPTIONS,
   STATUS_OPTIONS,
+  TYPE_OPTIONS,
   type ContentTemplateSearchMetadata,
 } from "./models";
 
@@ -41,12 +42,14 @@ export class SettingsForm extends Form {
 
 export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
   private orderBy: string;
+  private type: string;
   private genre: string;
   private status: string;
 
   constructor(searchQuery: SearchQuery<ContentTemplateSearchMetadata>) {
     super();
     this.orderBy = searchQuery.metadata?.orderBy ?? "views";
+    this.type = searchQuery.metadata?.type ?? "all";
     this.genre = searchQuery.metadata?.genre ?? "all";
     this.status = searchQuery.metadata?.status ?? "all";
   }
@@ -63,6 +66,17 @@ export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
           onValueChange: Application.Selector(
             this as ContentTemplateAdvancedSearchForm,
             "handleOrderChange",
+          ),
+        }),
+        SelectRow("type", {
+          title: "Formato / Categoria",
+          value: [this.type],
+          options: TYPE_OPTIONS,
+          minItemCount: 1,
+          maxItemCount: 1,
+          onValueChange: Application.Selector(
+            this as ContentTemplateAdvancedSearchForm,
+            "handleTypeChange",
           ),
         }),
         SelectRow("genre", {
@@ -95,6 +109,10 @@ export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
     this.orderBy = value[0] ?? "views";
   }
 
+  async handleTypeChange(value: string[]): Promise<void> {
+    this.type = value[0] ?? "all";
+  }
+
   async handleGenreChange(value: string[]): Promise<void> {
     this.genre = value[0] ?? "all";
   }
@@ -104,6 +122,11 @@ export class ContentTemplateAdvancedSearchForm extends AdvancedSearchForm {
   }
 
   override getSearchQueryMetadata(): ContentTemplateSearchMetadata {
-    return { orderBy: this.orderBy, genre: this.genre, status: this.status };
+    return {
+      orderBy: this.orderBy,
+      type: this.type,
+      genre: this.genre,
+      status: this.status,
+    };
   }
 }

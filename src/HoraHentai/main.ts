@@ -127,6 +127,11 @@ export class HoraHentaiExtension implements ExtensionImpl<typeof HoraHentaiConfi
         title: "Mangás Hentai",
         type: DiscoverSectionType.simpleCarousel,
       },
+      {
+        id: "comics",
+        title: "Comics & HQs",
+        type: DiscoverSectionType.simpleCarousel,
+      },
     ];
   }
 
@@ -149,6 +154,9 @@ export class HoraHentaiExtension implements ExtensionImpl<typeof HoraHentaiConfi
         page === 1
           ? `${BASE_URL}/category/manga-hentai/`
           : `${BASE_URL}/category/manga-hentai/page/${page}/`;
+    } else if (section.id === "comics") {
+      url =
+        page === 1 ? `${BASE_URL}/category/comics/` : `${BASE_URL}/category/comics/page/${page}/`;
     } else {
       url = page === 1 ? `${BASE_URL}/` : `${BASE_URL}/page/${page}/`;
     }

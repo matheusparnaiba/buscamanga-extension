@@ -1,10 +1,10 @@
 import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/types";
 
 export default {
-  name: "Ninja Scan",
+  name: "Tia HQ Pornô",
   description:
-    "Extensão oficial da Ninja Scan com traduções de manhwas e manhuas de combate e fantasia.",
-  version: "1.0.5",
+    "Extensão oficial do Tia HQ Pornô com quadrinhos eróticos, HQs de sexo e doujinshis em português (+18).",
+  version: "1.0.1",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,
@@ -14,7 +14,7 @@ export default {
     SourceIntents.SEARCH_RESULT_PROVIDING,
     SourceIntents.CHAPTER_PROVIDING,
   ],
-  badges: [],
+  badges: [{ label: "18+", textColor: "#FFFFFF", backgroundColor: "#DC2626" }],
   developers: [
     {
       name: "matheusparnaiba",
