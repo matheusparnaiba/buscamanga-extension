@@ -54,16 +54,36 @@ export class UniversoHentaiExtension implements ExtensionImpl<typeof UniversoHen
   async getAdvancedSearchForm(): Promise<AdvancedSearchForm> {
     return new UniversoHentaiAdvancedSearchForm({
       title: "",
-      metadata: { category: "all" },
+      metadata: { order: "latest", category: "all" },
     });
   }
 
   async getDiscoverSections(): Promise<DiscoverSection[]> {
     return [
       {
-        id: "latest",
-        title: "Últimas Galerias",
+        id: "popular",
+        title: "Mais Populares",
         type: DiscoverSectionType.prominentCarousel,
+      },
+      {
+        id: "latest",
+        title: "Últimos Lançamentos",
+        type: DiscoverSectionType.chapterUpdates,
+      },
+      {
+        id: "sem-censura",
+        title: "Sem Censura",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "doujinshi",
+        title: "Doujinshis",
+        type: DiscoverSectionType.simpleCarousel,
+      },
+      {
+        id: "comics",
+        title: "Comics & HQs",
+        type: DiscoverSectionType.simpleCarousel,
       },
     ];
   }
@@ -73,7 +93,22 @@ export class UniversoHentaiExtension implements ExtensionImpl<typeof UniversoHen
     metadata: number | undefined,
   ): Promise<PagedResults<DiscoverSectionItem>> {
     const page = metadata ?? 1;
-    const url = page === 1 ? `${BASE_URL}/` : `${BASE_URL}/page/${page}/`;
+    let url = `${BASE_URL}/`;
+
+    if (section.id === "popular") {
+      url = page === 1 ? `${BASE_URL}/popular/` : `${BASE_URL}/popular/page/${page}/`;
+    } else if (section.id === "sem-censura") {
+      url =
+        page === 1
+          ? `${BASE_URL}/tag/hentai-sem-censura/`
+          : `${BASE_URL}/tag/hentai-sem-censura/page/${page}/`;
+    } else if (section.id === "doujinshi") {
+      url = page === 1 ? `${BASE_URL}/tag/doujinshi/` : `${BASE_URL}/tag/doujinshi/page/${page}/`;
+    } else if (section.id === "comics") {
+      url = page === 1 ? `${BASE_URL}/tag/comics/` : `${BASE_URL}/tag/comics/page/${page}/`;
+    } else {
+      url = page === 1 ? `${BASE_URL}/` : `${BASE_URL}/page/${page}/`;
+    }
 
     try {
       const [_, buffer] = await Application.scheduleRequest({ url, method: "GET" });
@@ -102,7 +137,7 @@ export class UniversoHentaiExtension implements ExtensionImpl<typeof UniversoHen
             imageUrl:
               img ||
               `https://ui-avatars.com/api/?name=${encodeURIComponent(title)}&background=random`,
-            type: "prominentCarouselItem",
+            type: section.id === "popular" ? "prominentCarouselItem" : "simpleCarouselItem",
           });
         }
       });
@@ -122,9 +157,21 @@ export class UniversoHentaiExtension implements ExtensionImpl<typeof UniversoHen
     metadata: number | undefined,
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata ?? 1;
-    let url = `${BASE_URL}/`;
-    if (page > 1) url += `page/${page}/`;
-    if (query.title) url += `?s=${encodeURIComponent(query.title)}`;
+    let basePath = "";
+
+    if (query.metadata?.category && query.metadata.category !== "all") {
+      basePath = query.metadata.category.replace(/^\/+|\/+$/g, "") + "/";
+    } else if (query.metadata?.order === "popular") {
+      basePath = "popular/";
+    }
+
+    let url = `${BASE_URL}/${basePath}`;
+    if (page > 1) {
+      url += `page/${page}/`;
+    }
+    if (query.title) {
+      url += `?s=${encodeURIComponent(query.title)}`;
+    }
 
     try {
       const [_, buffer] = await Application.scheduleRequest({ url, method: "GET" });
