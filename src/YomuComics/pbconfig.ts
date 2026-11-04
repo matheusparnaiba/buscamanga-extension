@@ -4,7 +4,7 @@ export default {
   name: "Yomu Comics",
   description:
     "Extensão oficial do Yomu Comics / Yomu Mangás para leitura de mangás, manhwas e novels em português.",
-  version: "1.0.1",
+  version: "1.0.2",
   icon: "icon.png",
   language: "pt-BR",
   contentRating: ContentRating.EVERYONE,
@@ -13,8 +13,9 @@ export default {
     SourceIntents.DISCOVER_SECTION_PROVIDING,
     SourceIntents.SEARCH_RESULT_PROVIDING,
     SourceIntents.CHAPTER_PROVIDING,
+    SourceIntents.CLOUDFLARE_BYPASS_PROVIDING,
   ],
-  badges: [],
+  badges: [{ label: "Cloudflare", textColor: "#000000", backgroundColor: "#ffc107" }],
   developers: [
     {
       name: "matheusparnaiba",

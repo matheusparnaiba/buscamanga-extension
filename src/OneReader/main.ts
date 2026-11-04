@@ -94,7 +94,7 @@ export class OneReaderExtension
   }
 
   mainRateLimiter = new BasicRateLimiter("main", {
-    numberOfRequests: 8,
+    numberOfRequests: 20,
     bufferInterval: 2,
     ignoreImages: true,
   });
@@ -435,25 +435,84 @@ export class OneReaderExtension
     const mangaKey = parts[0] ?? chapter.sourceManga.mangaId;
     const number = parts[1] ?? String(chapter.chapNum);
 
-    const url = `${BASE_URL}/api/reader/works/${encodeURIComponent(mangaKey)}/chapters/${encodeURIComponent(number)}`;
+    const chapterUrl = `${BASE_URL}/api/reader/works/${encodeURIComponent(mangaKey)}/chapters/${encodeURIComponent(number)}`;
+    const referer = `${BASE_URL}/leitor?id=${encodeURIComponent(mangaKey)}&cap=${encodeURIComponent(number)}`;
 
-    const [_, buffer] = await Application.scheduleRequest({
-      url,
+    const [chapRes, buffer] = await Application.scheduleRequest({
+      url: chapterUrl,
       method: "GET",
-      headers: {
-        referer: `${BASE_URL}/leitor?id=${encodeURIComponent(mangaKey)}&cap=${encodeURIComponent(number)}`,
-      },
+      headers: { referer },
     });
+
+    let cookieHeader = (Application.getState("onereader_cookie") as string | undefined) || "";
+    const rawSetCookie =
+      (chapRes as any).headers?.["set-cookie"] || (chapRes as any).headers?.["Set-Cookie"];
+    if (rawSetCookie) {
+      const cookieLines = Array.isArray(rawSetCookie) ? rawSetCookie : [rawSetCookie];
+      for (const line of cookieLines) {
+        const match = line.match(/(or\.reader=[^;]+)/);
+        if (match?.[1]) {
+          cookieHeader = match[1];
+          Application.setState(cookieHeader, "onereader_cookie");
+          break;
+        }
+      }
+    }
 
     const jsonText = Application.arrayBufferToUTF8String(buffer);
     const data: OneReaderChapterDetailResponse = JSON.parse(jsonText);
     const rawPages = data.chapter?.pages ?? [];
 
     const pages: string[] = [];
-    for (const p of rawPages) {
-      if (typeof p === "string" && p.trim()) {
-        const fullUrl = p.startsWith("http") ? p : `${BASE_URL}${p.startsWith("/") ? "" : "/"}${p}`;
-        pages.push(sanitizeImageUrl(fullUrl));
+    const chunkSize = 10;
+
+    for (let i = 0; i < rawPages.length; i += chunkSize) {
+      const chunk = rawPages.slice(i, i + chunkSize);
+      const chunkResults = await Promise.all(
+        chunk.map(async (p) => {
+          if (typeof p !== "string" || !p.trim()) return null;
+
+          if (p.includes("/pages/")) {
+            const fullUrl = p.startsWith("http")
+              ? p
+              : `${BASE_URL}${p.startsWith("/") ? "" : "/"}${p}`;
+            try {
+              const [metaRes, metaBuf] = await Application.scheduleRequest({
+                url: fullUrl,
+                method: "GET",
+                headers: {
+                  accept: "application/vnd.onereader.media+json",
+                  referer,
+                  ...(cookieHeader ? { cookie: cookieHeader } : {}),
+                },
+              });
+
+              if (metaRes.status === 200) {
+                const metaText = Application.arrayBufferToUTF8String(metaBuf);
+                const meta = JSON.parse(metaText);
+                if (meta?.ok && meta?.url) {
+                  const key = meta.key || "";
+                  if (key) {
+                    Application.setState(key, meta.url);
+                  }
+                  return `${meta.url}#or_k=${encodeURIComponent(key)}`;
+                }
+              }
+            } catch {
+              // Fallback se falhar resolução
+            }
+            return sanitizeImageUrl(fullUrl);
+          }
+
+          const directUrl = p.startsWith("http")
+            ? p
+            : `${BASE_URL}${p.startsWith("/") ? "" : "/"}${p}`;
+          return sanitizeImageUrl(directUrl);
+        }),
+      );
+
+      for (const r of chunkResults) {
+        if (r) pages.push(r);
       }
     }
 

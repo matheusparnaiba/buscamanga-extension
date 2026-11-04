@@ -1,16 +1,19 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 import {
   BasicRateLimiter,
+  CloudflareError,
   ContentRating,
   DiscoverSectionType,
   type AdvancedSearchForm,
   type Chapter,
   type ChapterDetails,
+  type Cookie,
   type DiscoverSection,
   type DiscoverSectionItem,
   type ExtensionImpl,
   type Form,
   type PagedResults,
+  type Request,
   type SearchQuery,
   type SearchResultItem,
   type SortingOption,
@@ -85,6 +88,60 @@ export class YomuComicsExtension implements ExtensionImpl<typeof YomuComicsConfi
   async initialise(): Promise<void> {
     this.mainRateLimiter.registerInterceptor();
     this.mainInterceptor.registerInterceptor();
+  }
+
+  async saveCloudflareBypassCookies(cookies: Cookie[]): Promise<void> {
+    await this.handleCloudflareBypass(cookies);
+  }
+
+  async cloudflareBypassCompleted(
+    request?: Request,
+    cookies?: Cookie[],
+    _localStorage?: Record<string, string>,
+  ): Promise<void> {
+    let ua: string | undefined = undefined;
+    if (request?.headers) {
+      for (const key of Object.keys(request.headers)) {
+        if (key.toLowerCase() === "user-agent") {
+          ua = request.headers[key];
+          break;
+        }
+      }
+    }
+    if (ua && typeof ua === "string") {
+      Application.setState(ua, "yomu_cf_user_agent");
+    }
+    if (cookies) {
+      await this.handleCloudflareBypass(cookies);
+    }
+  }
+
+  private async handleCloudflareBypass(cookies: Cookie[]): Promise<void> {
+    if (!cookies || !Array.isArray(cookies)) return;
+
+    const cleanCookies: Array<{ name: string; value: string; domain: string; path: string }> = [];
+    const headerParts: string[] = [];
+
+    for (const c of cookies) {
+      if (!c || !c.name || !c.value) continue;
+      const rawDomain = c.domain ? c.domain.replace(/^https?:\/\//, "") : "yomumangas.com";
+      const cleanDomain = rawDomain.replace(/^\./, "");
+      const path = c.path || "/";
+
+      cleanCookies.push({
+        name: c.name,
+        value: c.value,
+        domain: cleanDomain,
+        path,
+      });
+
+      headerParts.push(`${c.name}=${c.value}`);
+    }
+
+    if (cleanCookies.length > 0) {
+      Application.setState(cleanCookies, "yomu_saved_cookies");
+      Application.setState(headerParts.join("; "), "yomu_cookie_header");
+    }
   }
 
   async getSettingsForm(): Promise<Form> {
@@ -300,7 +357,8 @@ export class YomuComicsExtension implements ExtensionImpl<typeof YomuComicsConfi
       const chapterTitle = parsedTitle
         ? `Capítulo ${c.chapter} - ${parsedTitle}`
         : `Capítulo ${c.chapter}`;
-      const chapterId = `/mangas/${id}/${slug}/${c.chapter}`;
+      const chapterSlug = slug || "manga";
+      const chapterId = `/mangas/${id}/${chapterSlug}/${c.chapter}`;
       const publishDate = c.uploaded_at ? new Date(c.uploaded_at) : undefined;
 
       chapters.push({
@@ -318,9 +376,14 @@ export class YomuComicsExtension implements ExtensionImpl<typeof YomuComicsConfi
   }
 
   async getChapterDetails(chapter: Chapter): Promise<ChapterDetails> {
-    const chapterUrl = chapter.chapterId.startsWith("http")
-      ? chapter.chapterId
-      : `${BASE_URL}${chapter.chapterId.startsWith("/") ? "" : "/"}${chapter.chapterId}`;
+    let cleanId = chapter.chapterId;
+    if (cleanId.includes("//")) {
+      cleanId = cleanId.replace(/\/+/g, "/");
+    }
+
+    const chapterUrl = cleanId.startsWith("http")
+      ? cleanId
+      : `${BASE_URL}${cleanId.startsWith("/") ? "" : "/"}${cleanId}`;
 
     const request = { url: chapterUrl, method: "GET" };
     const [_, buffer] = await Application.scheduleRequest(request);
@@ -352,14 +415,47 @@ export class YomuComicsExtension implements ExtensionImpl<typeof YomuComicsConfi
 
     if (pages.length === 0) {
       const $ = cheerio.load(html);
-      $("img").each((_, el) => {
-        const src = $(el).attr("src") || $(el).attr("data-src") || "";
-        if (src.includes("chapters") && !seen.has(src)) {
+      $(
+        'li[data-type="page"] img, div[data-type="page"] img, .reading-content img, .chapter-images img, main img, img',
+      ).each((_, el) => {
+        const src =
+          $(el).attr("src") ||
+          $(el).attr("data-src") ||
+          $(el).attr("data-original") ||
+          $(el).attr("data-lazy-src") ||
+          "";
+        if (src && !src.startsWith("data:") && !src.includes("avatar") && !src.includes("logo")) {
           const fullSrc = replaceB2Uri(src);
-          seen.add(fullSrc);
-          pages.push(fullSrc);
+          if (fullSrc && !seen.has(fullSrc)) {
+            seen.add(fullSrc);
+            pages.push(fullSrc);
+          }
         }
       });
+    }
+
+    if (pages.length === 0) {
+      const isCf =
+        html.includes("Just a moment...") ||
+        html.includes("_cf_chl_opt") ||
+        html.includes("challenges.cloudflare.com") ||
+        html.toLowerCase().includes("cloudflare");
+
+      if (isCf) {
+        const cfUserAgent = Application.getState("yomu_cf_user_agent") as string | undefined;
+        const resolutionRequest: Request = {
+          url: chapterUrl,
+          method: "GET",
+          headers: {
+            "user-agent": cfUserAgent ?? (await Application.getDefaultUserAgent()),
+            referer: `${BASE_URL}/`,
+          },
+        };
+        throw new CloudflareError(
+          resolutionRequest,
+          "Proteção Cloudflare ativa no Yomu Comics! Toque para resolver.",
+        );
+      }
     }
 
     return {
