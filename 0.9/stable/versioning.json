@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-11-04T19:39:26.236Z",
+  "buildTime": "2026-11-04T19:50:50.129Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -872,38 +872,6 @@
       "id": "KamiSamaExplorer",
       "author": "matheusparnaiba",
       "desc": "Extensão da Kami Sama Explorer dedicada às obras de Akira Toriyama, Dragon Ball e clássicos shonen.",
-      "website": "https://github.com/matheusparnaiba"
-    },
-    {
-      "name": "Kuro Mangás",
-      "description": "Extensão oficial do Kuro Mangás com catálogo diversificado de mangás, manhwas e novels.",
-      "version": "1.0.5",
-      "icon": "icon.png",
-      "language": "pt-br",
-      "contentRating": "SAFE",
-      "capabilities": [
-        32,
-        4,
-        64,
-        1,
-        16
-      ],
-      "badges": [
-        {
-          "label": "Mangás Tradicionais",
-          "textColor": "#ffffff",
-          "backgroundColor": "#3b82f6"
-        }
-      ],
-      "developers": [
-        {
-          "name": "matheusparnaiba",
-          "github": "https://github.com/matheusparnaiba"
-        }
-      ],
-      "id": "KuroMangas",
-      "author": "matheusparnaiba",
-      "desc": "Extensão oficial do Kuro Mangás com catálogo diversificado de mangás, manhwas e novels.",
       "website": "https://github.com/matheusparnaiba"
     },
     {
