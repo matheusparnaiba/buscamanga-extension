@@ -174,9 +174,7 @@ export class BrasilHentaiExtension implements ExtensionImpl<typeof BrasilHentaiC
           : `${BASE_URL}/category/colorido/page/${page}/`;
     } else if (section.id === "doujinshi") {
       url =
-        page === 1
-          ? `${BASE_URL}/category/doujinshi/`
-          : `${BASE_URL}/category/doujinshi/page/${page}/`;
+        page === 1 ? `${BASE_URL}/category/hentai/` : `${BASE_URL}/category/hentai/page/${page}/`;
     } else if (section.id === "3d") {
       url =
         page === 1

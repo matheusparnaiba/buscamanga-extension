@@ -51,7 +51,8 @@ const PAGE_SIZE = 30;
 function buildImageUrl(coverUrl: string | null | undefined): string {
   if (!coverUrl) return "";
   if (coverUrl.startsWith("http")) return coverUrl;
-  return `${FUNCTIONS_URL}/read-public-media?key=${encodeURIComponent(coverUrl)}`;
+  const clean = coverUrl.startsWith("/") ? coverUrl.slice(1) : coverUrl;
+  return `https://assets.nexusmangas.com/${clean}`;
 }
 
 function mapStatus(status: string | null | undefined): string {

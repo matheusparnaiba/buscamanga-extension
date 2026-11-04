@@ -48,7 +48,7 @@ const SECTIONS: { id: string; title: string; path: string; type: DiscoverSection
   {
     id: "sem_censura",
     title: "Hentai Sem Censura",
-    path: "/genero/hentai-sem-censura",
+    path: "/mangas/genero/sem-censura",
     type: DiscoverSectionType.prominentCarousel,
   },
   {

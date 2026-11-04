@@ -69,84 +69,6 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
     };
   }
 
-  private async tryUnlockGate(domain: string, chapter?: Chapter): Promise<boolean> {
-    try {
-      const mangaId = chapter?.sourceManga.mangaId || "";
-      const chapNum = chapter?.chapNum != null ? chapter.chapNum : 1;
-
-      const candidates = chapter
-        ? [
-            `/series/${encodeURIComponent(mangaId)}/${chapNum}`,
-            `/manhwa/${encodeURIComponent(mangaId)}/${chapNum}`,
-            `/manga/${encodeURIComponent(mangaId)}/${chapNum}`,
-          ]
-        : ["/series/manga/1"];
-
-      for (const returnTo of candidates) {
-        const unlockReq: Request = {
-          url: `${domain}/api/reader/unlock`,
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-            referer: `${domain}${returnTo}`,
-            origin: domain,
-            accept: "application/json, text/plain, */*",
-            "sec-fetch-dest": "empty",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-site": "same-origin",
-          },
-          body: JSON.stringify({ returnTo }),
-        };
-
-        const [res, buf] = await Application.scheduleRequest(unlockReq);
-        const data = Application.arrayBufferToUTF8String(buf);
-
-        const isSuccess =
-          res.status === 200 &&
-          (data.includes('"ok":true') || (res.cookies && res.cookies.length > 0));
-
-        if (isSuccess) {
-          const parsedCookies: Cookie[] = [];
-
-          if (Array.isArray(res.cookies) && res.cookies.length > 0) {
-            parsedCookies.push(...res.cookies);
-          }
-
-          const rawSetCookie = res.headers?.["set-cookie"] || res.headers?.["Set-Cookie"];
-          if (rawSetCookie) {
-            const cookieLines = Array.isArray(rawSetCookie) ? rawSetCookie : [rawSetCookie];
-            for (const line of cookieLines) {
-              const parts = line.split(";")[0]?.trim();
-              if (parts) {
-                const [cName, ...cValParts] = parts.split("=");
-                if (cName && cValParts.length) {
-                  parsedCookies.push({
-                    name: cName.trim(),
-                    value: cValParts.join("=").trim(),
-                    domain: domain.replace(/^https?:\/\//, ""),
-                    path: "/",
-                  });
-                }
-              }
-            }
-          }
-
-          if (parsedCookies.length > 0) {
-            await this.handleCloudflareBypass(parsedCookies);
-          }
-          return true;
-        }
-      }
-
-      return false;
-    } catch (err) {
-      if (err instanceof CloudflareError) {
-        throw err;
-      }
-      return false;
-    }
-  }
-
   private async getKey(v: number, e: number, chapter?: Chapter): Promise<string> {
     const cacheKey = `atfield_key_${v}_${e}`;
 
@@ -160,93 +82,68 @@ export class MangaNYXExtension implements ExtensionImpl<typeof ContentTemplateCo
       return savedKey;
     }
 
-    const domains = ["https://manganyx.org", "https://manganyx.com"];
-    let cloudflareErrorToThrow: CloudflareError | null = null;
-    let lastError: Error | null = null;
-
+    const domain = "https://manganyx.com";
     const mangaId = chapter?.sourceManga.mangaId || "";
     const chapNum = chapter?.chapNum != null ? chapter.chapNum : 1;
     const chapterPath = chapter ? `/series/${encodeURIComponent(mangaId)}/${chapNum}` : "/";
 
-    for (const domain of domains) {
-      const url = `${domain}/api/atfield/key?v=${v}&e=${e}`;
-      try {
-        const request: Request = {
-          url,
-          method: "GET",
-          headers: {
-            accept: "application/json, text/plain, */*",
-            referer: `${domain}${chapterPath}`,
-            "sec-fetch-dest": "empty",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-site": "same-origin",
-          },
-          cookies: {
-            mnx_adulto: "1",
-          },
-        };
+    const url = `${domain}/api/atfield/key?v=${v}&e=${e}`;
+    const request: Request = {
+      url,
+      method: "GET",
+      headers: {
+        accept: "application/json, text/plain, */*",
+        referer: `${domain}${chapterPath}`,
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-origin",
+      },
+      cookies: {
+        mnx_adulto: "1",
+      },
+    };
 
-        let [response, buffer] = await Application.scheduleRequest(request);
-        let data = Application.arrayBufferToUTF8String(buffer);
+    const [response, buffer] = await Application.scheduleRequest(request);
+    const data = Application.arrayBufferToUTF8String(buffer);
 
-        const cfMitigated =
-          response.headers?.["cf-mitigated"] || response.headers?.["Cf-Mitigated"];
-        const isCf =
-          cfMitigated === "challenge" ||
-          data.includes("Just a moment...") ||
-          data.includes("_cf_chl_opt") ||
-          data.includes("challenges.cloudflare.com") ||
-          (response.status === 403 &&
-            data.trim().startsWith("<") &&
-            data.toLowerCase().includes("cloudflare"));
+    const cfMitigated = response.headers?.["cf-mitigated"] || response.headers?.["Cf-Mitigated"];
+    const isCf =
+      cfMitigated === "challenge" ||
+      data.includes("Just a moment...") ||
+      data.includes("_cf_chl_opt") ||
+      data.includes("challenges.cloudflare.com") ||
+      (response.status === 403 &&
+        data.trim().startsWith("<") &&
+        data.toLowerCase().includes("cloudflare"));
 
-        if (isCf) {
-          const resolutionRequest = await this.getCloudflareResolutionRequest(domain);
-          cloudflareErrorToThrow = new CloudflareError(
-            resolutionRequest,
-            "Proteção Cloudflare ativa no MangaNYX! Toque para resolver.",
-          );
-          continue;
-        }
+    if (isCf) {
+      const resolutionRequest = await this.getCloudflareResolutionRequest(domain);
+      throw new CloudflareError(
+        resolutionRequest,
+        "Proteção Cloudflare ativa no MangaNYX! Toque para resolver.",
+      );
+    }
 
-        // Se a resposta for 403 não-Cloudflare (ex: {"error":"unauthorized"} por falta de gate/cookie),
-        // tenta obter o desbloqueio do leitor via /api/reader/unlock automaticamente
-        if (response.status === 403 && data.includes("unauthorized")) {
-          const unlockSuccess = await this.tryUnlockGate(domain, chapter);
-          if (unlockSuccess) {
-            const [retryRes, retryBuf] = await Application.scheduleRequest(request);
-            response = retryRes;
-            buffer = retryBuf;
-            data = Application.arrayBufferToUTF8String(retryBuf);
-          }
-        }
-
-        if (response.status === 200 && !data.trim().startsWith("<")) {
-          const json = JSON.parse(data);
-          if (json.k && typeof json.k === "string") {
-            this.keyCache.set(cacheKey, json.k);
-            Application.setState(json.k, cacheKey);
-            return json.k;
-          }
-        }
-
-        lastError = new Error(
-          `Resposta inválida ao obter chave de descriptografia (HTTP ${response.status})`,
-        );
-      } catch (err) {
-        if (err instanceof CloudflareError) {
-          cloudflareErrorToThrow = err;
-        } else if (err instanceof Error) {
-          lastError = err;
-        }
+    if (response.status === 200 && !data.trim().startsWith("<")) {
+      const json = JSON.parse(data);
+      if (json.k && typeof json.k === "string") {
+        this.keyCache.set(cacheKey, json.k);
+        Application.setState(json.k, cacheKey);
+        return json.k;
       }
     }
 
-    if (cloudflareErrorToThrow) {
-      throw cloudflareErrorToThrow;
+    if (response.status === 403) {
+      const resolutionRequest = await this.getCloudflareResolutionRequest(domain);
+      throw new CloudflareError(
+        resolutionRequest,
+        "Acesso restrito no MangaNYX. Abra o WebView para validar sua sessão.",
+      );
     }
 
-    throw lastError ?? new Error("Não foi possível obter a chave de descriptografia das páginas.");
+    throw new Error(
+      `Resposta inválida ao obter chave de descriptografia (HTTP ${response.status})`,
+    );
   }
 
   private async getHomeData(): Promise<any> {

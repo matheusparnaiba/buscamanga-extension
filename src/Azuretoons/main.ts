@@ -122,6 +122,11 @@ export class AzuretoonsExtension implements ExtensionImpl<typeof ContentTemplate
         const json = JSON.parse(rawText);
         list = Array.isArray(json) ? json : (json.data ?? []);
       } catch {
+        if (rawText.includes("502") || rawText.includes("Bad Gateway")) {
+          throw new Error(
+            "Servidor da Azuretoons fora do ar (Cloudflare 502 Bad Gateway). Aguarde a scan normalizar.",
+          );
+        }
         list = [];
       }
 
@@ -187,6 +192,11 @@ export class AzuretoonsExtension implements ExtensionImpl<typeof ContentTemplate
         const json = JSON.parse(rawText);
         list = Array.isArray(json) ? json : (json.data ?? []);
       } catch {
+        if (rawText.includes("502") || rawText.includes("Bad Gateway")) {
+          throw new Error(
+            "Servidor da Azuretoons fora do ar (Cloudflare 502 Bad Gateway). Aguarde a scan normalizar.",
+          );
+        }
         list = [];
       }
 

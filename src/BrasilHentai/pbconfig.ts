@@ -4,7 +4,7 @@ export default {
   name: "Brasil Hentai",
   description:
     "Extensão do Brasil Hentai com foco em doujinshis, mangás e quadrinhos adultos (+18).",
-  version: "1.0.3",
+  version: "1.0.4",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,

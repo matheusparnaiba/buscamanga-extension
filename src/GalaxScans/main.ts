@@ -125,9 +125,14 @@ async function resolveCubariPages(cubariUrl: string): Promise<string[]> {
     }
 
     if (typeof firstGroup === "string") {
-      const fullUrl = firstGroup.startsWith("http")
-        ? firstGroup
-        : `https://cubari.moe${firstGroup}`;
+      let groupPath = firstGroup.trim();
+      if (groupPath.startsWith("/proxy/api/")) {
+        groupPath = groupPath.replace("/proxy/api/", "/read/api/");
+      }
+      if (!groupPath.endsWith("/")) {
+        groupPath += "/";
+      }
+      const fullUrl = groupPath.startsWith("http") ? groupPath : `https://cubari.moe${groupPath}`;
       const [_2, buf2] = await Application.scheduleRequest({ url: fullUrl, method: "GET" });
       const groupData = JSON.parse(Application.arrayBufferToUTF8String(buf2));
       if (Array.isArray(groupData)) {
@@ -631,6 +636,7 @@ export class GalaxScansExtension implements ExtensionImpl<typeof ContentTemplate
         lower.includes("widget") ||
         lower.includes("red.png") ||
         lower.includes("01-red") ||
+        lower.includes("-red.") ||
         lower.includes("redireciona")
       ) {
         return;

@@ -4,7 +4,7 @@ export default {
   name: "Azuretoons",
   description:
     "Extensão oficial da Azuretoons com foco em manhwas, webtoons e mangás traduzidos em português.",
-  version: "1.0.2",
+  version: "1.0.3",
   icon: "icon.png",
   language: "pt-br",
   contentRating: ContentRating.EVERYONE,
