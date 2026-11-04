@@ -11,7 +11,6 @@ const SOURCES = [
   { id: "ApenasUmaFa", name: "Apenas Uma Fã", url: "https://apenasuma-fa.blogspot.com" },
   { id: "ArthurScan", name: "Arthur Scan", url: "https://arthurscan.xyz" },
   { id: "Astratoons", name: "AstraToons", url: "https://new.astratoons.com" },
-  { id: "Azuretoons", name: "Azuretoons", url: "https://azuretoons.com" },
   { id: "BorutoExplorer", name: "Boruto Explorer", url: "https://leitor.borutoexplorer.com.br" },
   { id: "BrasilHentai", name: "Brasil Hentai", url: "https://brasilhentai.com" },
   { id: "BRScans", name: "BRScans", url: "https://brscans.vercel.app" },

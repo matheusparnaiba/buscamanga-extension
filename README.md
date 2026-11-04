@@ -32,7 +32,7 @@ O **BuscaMangá Extension** é um repositório desenvolvido para suprir a demand
 
 ## 📦 Fontes Disponíveis
 
-Todas as 58 extensões estão catalogadas e sincronizadas no GitHub Pages:
+Todas as 57 extensões estão catalogadas e sincronizadas no GitHub Pages:
 
 |                                            Ícone                                            | Nome                   |  Versão  | Site Oficial                                                         | Categoria / Recurso                     |   Status    |
 | :-----------------------------------------------------------------------------------------: | :--------------------- | :------: | :------------------------------------------------------------------- | :-------------------------------------- | :---------: |
@@ -40,7 +40,6 @@ Todas as 58 extensões estão catalogadas e sincronizadas no GitHub Pages:
 |      <img src="src/ApenasUmaFa/icon.png" width="28" height="28" alt="Apenas Uma Fã" />      | **Apenas Uma Fã**      | `1.0.2`  | [apenasuma-fa.blogspot.com](https://apenasuma-fa.blogspot.com)       | Obras Independentes                     |  🟢 Ativo   |
 |       <img src="src/ArthurScan/icon.png" width="28" height="28" alt="Arthur Scan" />        | **Arthur Scan**        | `1.0.6`  | [arthurscan.xyz](https://arthurscan.xyz)                             | Ação & Cultivação                       |  🟢 Ativo   |
 |        <img src="src/Astratoons/icon.png" width="28" height="28" alt="AstraToons" />        | **AstraToons**         | `1.0.2`  | [new.astratoons.com](https://new.astratoons.com)                     | Webtoons & Mangás                       |  🟢 Ativo   |
-|        <img src="src/Azuretoons/icon.png" width="28" height="28" alt="Azuretoons" />        | **Azuretoons**         | `1.0.3`  | [azuretoons.com](https://azuretoons.com)                             | Manhwas & Ação                          |  🟢 Ativo   |
 |   <img src="src/BorutoExplorer/icon.png" width="28" height="28" alt="Boruto Explorer" />    | **Boruto Explorer**    | `1.0.5`  | [leitor.borutoexplorer.com.br](https://leitor.borutoexplorer.com.br) | Naruto & Boruto                         |  🟢 Ativo   |
 |     <img src="src/BrasilHentai/icon.png" width="28" height="28" alt="Brasil Hentai" />      | **Brasil Hentai**      | `1.0.4`  | [brasilhentai.com](https://brasilhentai.com)                         | Doujinshis & Mangás • +18               |  🟢 Ativo   |
 |           <img src="src/BRScans/icon.png" width="28" height="28" alt="BRScans" />           | **BRScans**            | `1.0.2`  | [brscans.vercel.app](https://brscans.vercel.app)                     | Leitor Ágil na Vercel                   |  🟢 Ativo   |

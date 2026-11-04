@@ -61,7 +61,6 @@ jobs:
               ApenasUmaFa: [{ label: 'Manhwas & Romances', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
               ArthurScan: [{ label: 'Ação & Cultivação', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
               Astratoons: [{ label: 'Manhwas & Webtoons', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
-              Azuretoons: [{ label: 'Webtoons & Ação', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
               BorutoExplorer: [{ label: 'Naruto & Boruto', textColor: '#ffffff', backgroundColor: '#f97316' }],
               BrasilHentai: [{ label: 'Doujinshis & Mangás', textColor: '#ffffff', backgroundColor: '#8b5cf6' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
               BRScans: [{ label: 'Manhwas & Webtoons', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
