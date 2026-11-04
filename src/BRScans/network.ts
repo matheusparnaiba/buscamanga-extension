@@ -5,8 +5,8 @@ export class MainInterceptor extends PaperbackInterceptor {
   override async interceptRequest(request: Request): Promise<Request> {
     request.headers = {
       ...request.headers,
-      referer: "https://brscans.com/",
-      origin: "https://brscans.com",
+      referer: "https://brscans.vercel.app/",
+      origin: "https://brscans.vercel.app",
       "user-agent": await Application.getDefaultUserAgent(),
     };
     return request;

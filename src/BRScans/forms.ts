@@ -16,7 +16,7 @@ export class SettingsForm extends Form {
       Section("info", [
         LabelRow("source_info", {
           title: "Fonte Oficial",
-          value: "brscans.com",
+          value: "brscans.vercel.app",
         }),
         LabelRow("status_info", {
           title: "Status da Scan",

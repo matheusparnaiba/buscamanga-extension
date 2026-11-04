@@ -29,8 +29,8 @@ import type BRScansConfig from "./pbconfig";
 
 declare const App: any;
 
-const BASE_URL = "https://brscans.com";
-const API_URL = "https://e5oer7ngt8.execute-api.sa-east-1.amazonaws.com/dev";
+const BASE_URL = "https://brscans.vercel.app";
+const API_URL = "https://3wzrvo9ltl.execute-api.sa-east-1.amazonaws.com/dev";
 
 function getImageUrl(
   images:
