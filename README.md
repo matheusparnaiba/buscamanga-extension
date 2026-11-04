@@ -32,7 +32,7 @@ O **BuscaMangá Extension** é um repositório desenvolvido para suprir a demand
 
 ## 📦 Fontes Disponíveis
 
-Todas as 59 extensões estão catalogadas e sincronizadas no GitHub Pages:
+Todas as 58 extensões estão catalogadas e sincronizadas no GitHub Pages:
 
 |                                            Ícone                                            | Nome                   |  Versão  | Site Oficial                                                         | Categoria / Recurso                     |   Status    |
 | :-----------------------------------------------------------------------------------------: | :--------------------- | :------: | :------------------------------------------------------------------- | :-------------------------------------- | :---------: |
@@ -62,7 +62,6 @@ Todas as 59 extensões estão catalogadas e sincronizadas no GitHub Pages:
 |            <img src="src/HQNow/icon.png" width="28" height="28" alt="HQ Now" />             | **HQ Now**             | `1.0.4`  | [www.hq-now.com](https://www.hq-now.com)                             | Quadrinhos Ocidentais & HQs             |  🟢 Ativo   |
 |          <img src="src/HQPorno/icon.png" width="28" height="28" alt="HQ Porno" />           | **HQ Porno**           | `1.0.6`  | [www.hqporno.net](https://www.hqporno.net)                           | Quadrinhos Eróticos • +18               |  🟢 Ativo   |
 | <img src="src/KamiSamaExplorer/icon.png" width="28" height="28" alt="Kami Sama Explorer" /> | **Kami Sama Explorer** | `1.0.4`  | [leitor.kamisama.com.br](https://leitor.kamisama.com.br)             | Dragon Ball & Shonen                    |  🟢 Ativo   |
-|       <img src="src/KuroMangas/icon.png" width="28" height="28" alt="Kuro Mangás" />        | **Kuro Mangás**        | `1.0.5`  | [kuromangas.com](https://kuromangas.com)                             | Catálogo Geral • API                    |  🟢 Ativo   |
 |     <img src="src/LeituraManga/icon.png" width="28" height="28" alt="Leitura Manga" />      | **Leitura Manga**      | `1.0.5`  | [leituramanga.net](https://leituramanga.net)                         | Mangás, Manhuas & Novels                |  🟢 Ativo   |
 |           <img src="src/Ler999/icon.png" width="28" height="28" alt="Ler 999" />            | **Ler 999**            | `1.0.2`  | [ler999.blogspot.com](https://ler999.blogspot.com)                   | Comics Ocidentais                       |  🟢 Ativo   |
 |         <img src="src/MangaDash/icon.png" width="28" height="28" alt="MangaDash" />         | **MangaDash**          | `1.0.2`  | [mangadash.net](https://mangadash.net)                               | Mangás & Agregador Ágil                 |  🟢 Ativo   |

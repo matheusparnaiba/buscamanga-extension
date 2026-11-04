@@ -33,7 +33,6 @@ const SOURCES = [
   { id: "HQNow", name: "HQ Now", url: "https://www.hq-now.com" },
   { id: "HQPorno", name: "HQ Porno", url: "https://www.hqporno.net" },
   { id: "KamiSamaExplorer", name: "Kami Sama Explorer", url: "https://leitor.kamisama.com.br" },
-  { id: "KuroMangas", name: "Kuro Mangás", url: "https://kuromangas.com" },
   { id: "LeituraManga", name: "Leitura Manga", url: "https://leituramanga.net" },
   { id: "Ler999", name: "Ler 999", url: "https://ler999.blogspot.com" },
   { id: "MangaDash", name: "MangaDash", url: "https://mangadash.net" },

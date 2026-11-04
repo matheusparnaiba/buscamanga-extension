@@ -83,7 +83,6 @@ jobs:
               HQNow: [{ label: 'HQs & Comics', textColor: '#ffffff', backgroundColor: '#ef4444' }],
               HQPorno: [{ label: 'Quadrinhos Eróticos', textColor: '#ffffff', backgroundColor: '#ef4444' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
               KamiSamaExplorer: [{ label: 'Dragon Ball & Shonen', textColor: '#ffffff', backgroundColor: '#f59e0b' }],
-              KuroMangas: [{ label: 'Mangás Tradicionais', textColor: '#ffffff', backgroundColor: '#3b82f6' }],
               LeituraManga: [{ label: 'Mangás & Manhuas', textColor: '#ffffff', backgroundColor: '#3b82f6' }],
               Ler999: [{ label: 'Manhuas & Cultivação', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
               MangaDash: [{ label: 'Shonen & Seinen', textColor: '#ffffff', backgroundColor: '#3b82f6' }],
