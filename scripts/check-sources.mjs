@@ -41,7 +41,7 @@ const SOURCES = [
   { id: "MangaFlix", name: "Manga Flix", url: "https://mangaflix.net" },
   { id: "MangaLivreBlog", name: "MangaLivre Blog", url: "https://mangalivre.blog" },
   { id: "MangaLivreTo", name: "MangaLivre To", url: "https://mangalivre.to" },
-  { id: "MangaNYX", name: "MangaNYX", url: "https://manganyx.com", cloudflare: true },
+  { id: "MangaNYX", name: "MangaNYX", url: "https://manganyx.org", cloudflare: true },
   { id: "MangaOnline", name: "Manga Online", url: "https://mangaonline.love" },
   {
     id: "MangasBrasuka",

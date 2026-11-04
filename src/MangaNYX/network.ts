@@ -331,7 +331,7 @@ export class MainInterceptor extends PaperbackInterceptor {
           url: `${targetDomain}/`,
           method: "GET",
           headers: {
-            "user-agent": cfUserAgent ?? (await Application.getDefaultUserAgent()),
+            ...(cfUserAgent ? { "user-agent": cfUserAgent } : {}),
             referer: `${targetDomain}/`,
           },
         };
