@@ -227,51 +227,28 @@ export class NexusMangasExtension implements ExtensionImpl<typeof NexusMangasCon
       }
 
       // Works-based sections
-      const params = new URLSearchParams();
+      let queryPath = `works?select=slug,title,cover_url,status,type,avg_rating,content_rating&limit=${PAGE_SIZE}&offset=${offset}`;
 
       if (section.id === "popular") {
-        params.set("select", "slug,title,cover_url,status,type,avg_rating,content_rating");
-        params.set("order", "avg_rating.desc.nullslast,rating_count.desc.nullslast,id.desc");
+        queryPath += "&order=avg_rating.desc.nullslast,rating_count.desc.nullslast,id.desc";
       } else if (section.id === "newest") {
-        params.set("select", "slug,title,cover_url,status,type,avg_rating,content_rating");
-        params.set("order", "created_at.desc,id.desc");
+        queryPath += "&order=created_at.desc,id.desc";
       } else if (section.id === "manhwa") {
-        params.set("select", "slug,title,cover_url,status,type,avg_rating,content_rating");
-        params.set("type", "eq.MANHWA");
-        params.set("order", "avg_rating.desc.nullslast,id.desc");
+        queryPath += "&type=eq.MANHWA&order=avg_rating.desc.nullslast,id.desc";
       } else if (section.id === "manga") {
-        params.set("select", "slug,title,cover_url,status,type,avg_rating,content_rating");
-        params.set("type", "eq.MANGA");
-        params.set("order", "avg_rating.desc.nullslast,id.desc");
+        queryPath += "&type=eq.MANGA&order=avg_rating.desc.nullslast,id.desc";
       } else if (section.id === "action") {
-        params.set(
-          "select",
-          "slug,title,cover_url,status,type,avg_rating,content_rating,work_genres!inner(genres!inner(name))",
-        );
-        params.set("work_genres.genres.name", "eq.Ação");
-        params.set("order", "avg_rating.desc.nullslast,id.desc");
+        queryPath = `works?select=slug,title,cover_url,status,type,avg_rating,content_rating,work_genres!inner(genres!inner(name))&work_genres.genres.name=eq.Ação&order=avg_rating.desc.nullslast,id.desc&limit=${PAGE_SIZE}&offset=${offset}`;
       } else if (section.id === "romance") {
-        params.set(
-          "select",
-          "slug,title,cover_url,status,type,avg_rating,content_rating,work_genres!inner(genres!inner(name))",
-        );
-        params.set("work_genres.genres.name", "eq.Romance");
-        params.set("order", "avg_rating.desc.nullslast,id.desc");
+        queryPath = `works?select=slug,title,cover_url,status,type,avg_rating,content_rating,work_genres!inner(genres!inner(name))&work_genres.genres.name=eq.Romance&order=avg_rating.desc.nullslast,id.desc&limit=${PAGE_SIZE}&offset=${offset}`;
       } else if (section.id === "adult") {
-        params.set("select", "slug,title,cover_url,status,type,content_rating");
-        params.set("or", "(content_rating.eq.ADULT,content_rating.eq.EROTICA)");
-        params.set("order", "updated_at.desc,id.desc");
+        queryPath = `works?select=slug,title,cover_url,status,type,content_rating&or=(content_rating.eq.ADULT,content_rating.eq.EROTICA)&order=updated_at.desc,id.desc&limit=${PAGE_SIZE}&offset=${offset}`;
       } else {
-        params.set("select", "slug,title,cover_url,status,type,avg_rating,content_rating");
-        params.set("order", "avg_rating.desc.nullslast,id.desc");
+        queryPath += "&order=avg_rating.desc.nullslast,id.desc";
       }
 
-      params.set("limit", String(PAGE_SIZE));
-      params.set("offset", String(offset));
-
-      const queryString = params.toString().replace(/%2C/g, ",");
       const request = {
-        url: `${REST_URL}/works?${queryString}`,
+        url: `${REST_URL}/${queryPath}`,
         method: "GET",
         headers: {
           apikey: ANON_KEY,
@@ -292,36 +269,20 @@ export class NexusMangasExtension implements ExtensionImpl<typeof NexusMangasCon
         const img = buildImageUrl(w.cover_url);
         const ratingStr = w.avg_rating ? `★ ${w.avg_rating}` : undefined;
         const subtitle = [ratingStr, w.type].filter(Boolean).join(" • ") || undefined;
-        const contentRating =
-          section.id === "adult" ? ContentRating.ADULT : mapContentRating(w.content_rating);
+        const itemType = section.id === "popular" ? "prominentCarouselItem" : "simpleCarouselItem";
 
-        if (section.id === "popular") {
-          items.push({
-            mangaId,
-            title: mangaTitle,
-            imageUrl:
-              img ||
-              "https://ui-avatars.com/api/?name=" +
-                encodeURIComponent(mangaTitle) +
-                "&background=random",
-            subtitle,
-            type: "prominentCarouselItem",
-            contentRating,
-          });
-        } else {
-          items.push({
-            mangaId,
-            title: mangaTitle,
-            imageUrl:
-              img ||
-              "https://ui-avatars.com/api/?name=" +
-                encodeURIComponent(mangaTitle) +
-                "&background=random",
-            subtitle,
-            type: "simpleCarouselItem",
-            contentRating,
-          });
-        }
+        items.push({
+          mangaId,
+          title: mangaTitle,
+          imageUrl:
+            img ||
+            "https://ui-avatars.com/api/?name=" +
+              encodeURIComponent(mangaTitle) +
+              "&background=random",
+          subtitle,
+          type: itemType,
+          contentRating: ContentRating.EVERYONE,
+        } as any);
       }
 
       return {
