@@ -113,7 +113,19 @@ jobs:
               Vegitoons: [{ label: 'Manhwas & Comics', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
               YomuComics: [{ label: 'Next.js & Acervo', textColor: '#ffffff', backgroundColor: '#6366f1' }],
               YuriOnAir: [{ label: 'Yuri & Shoujo Ai', textColor: '#ffffff', backgroundColor: '#ec4899' }],
-              ZettaHQ: [{ label: 'Hentai 3D & Comics', textColor: '#ffffff', backgroundColor: '#ef4444' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }]
+              ZettaHQ: [{ label: 'Hentai 3D & Comics', textColor: '#ffffff', backgroundColor: '#ef4444' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
+              AnimeXNovel: [{ label: 'Mangás & Novels', textColor: '#ffffff', backgroundColor: '#3b82f6' }],
+              CovenScan: [{ label: 'Smut & Romance Adulto', textColor: '#ffffff', backgroundColor: '#ec4899' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
+              EuphoriaScan: [{ label: 'Pornhwas & Webtoons', textColor: '#ffffff', backgroundColor: '#8b5cf6' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
+              HentaiFusion: [{ label: 'Quadrinhos Hentai', textColor: '#ffffff', backgroundColor: '#8b5cf6' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
+              HentaiKai: [{ label: 'Mangás Hentai', textColor: '#ffffff', backgroundColor: '#8b5cf6' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
+              HentaiTeca: [{ label: 'Mangás Hentai', textColor: '#ffffff', backgroundColor: '#8b5cf6' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
+              HuntersScans: [{ label: 'Caçadores & Fantasia', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
+              LittleTyrant: [{ label: 'Manhwas & Ação', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
+              MangoToons: [{ label: 'Manhwas & Webtoons', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
+              NinjaScan: [{ label: 'Ação & Cultivação', textColor: '#ffffff', backgroundColor: '#8b5cf6' }],
+              SuperEcchi: [{ label: 'Ecchi & Hentai', textColor: '#ffffff', backgroundColor: '#8b5cf6' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
+              UniversoHentai: [{ label: 'Galerias Hentai', textColor: '#ffffff', backgroundColor: '#8b5cf6' }, { label: '18+', textColor: '#ffffff', backgroundColor: '#dc2626' }],
             };
             v.sources = v.sources.map(s => {
               s.author = (s.developers && s.developers[0]) ? s.developers[0].name : 'matheusparnaiba';

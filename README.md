@@ -1,3 +1,15 @@
+| <img src="src/AnimeXNovel/icon.png" width="28" height="28" alt="Anime X Novel" /> | **Anime X Novel** | `1.0.0` | [animexnovel.com](https://www.animexnovel.com) | Mangás & Novels Traduzidos | 🟢 Ativo |
+| <img src="src/CovenScan/icon.png" width="28" height="28" alt="Coven Scan" /> | **Coven Scan** | `1.0.0` | [covendasbruxonas.com](https://covendasbruxonas.com/bruxonas) | Smut & Romance Adulto • +18 | 🟢 Ativo |
+| <img src="src/EuphoriaScan/icon.png" width="28" height="28" alt="Euphoria Scan" /> | **Euphoria Scan** | `1.0.0` | [euphoriascan.com](https://euphoriascan.com) | Pornhwas & Webtoons • +18 | 🟢 Ativo |
+| <img src="src/HentaiFusion/icon.png" width="28" height="28" alt="Hentai Fusion" /> | **Hentai Fusion** | `1.0.0` | [hentaifusion.me](https://hentaifusion.me) | Quadrinhos Hentai • +18 | 🟢 Ativo |
+| <img src="src/HentaiKai/icon.png" width="28" height="28" alt="Hentai Kai" /> | **Hentai Kai** | `1.0.0` | [hentaikai.com](https://hentaikai.com) | Mangás Hentai & Doujins • +18 | 🟢 Ativo |
+| <img src="src/HentaiTeca/icon.png" width="28" height="28" alt="Hentai Teca" /> | **Hentai Teca** | `1.0.0` | [hentaiteca.online](https://hentaiteca.online) | Mangás Hentai & Doujinshis • +18 | 🟢 Ativo |
+| <img src="src/HuntersScans/icon.png" width="28" height="28" alt="Hunters Scans" /> | **Hunters Scans** | `1.0.0` | [readhunters.xyz](https://readhunters.xyz) | Caçadores & Fantasia | 🟢 Ativo |
+| <img src="src/LittleTyrant/icon.png" width="28" height="28" alt="Little Tyrant" /> | **Little Tyrant** | `1.0.0` | [tiraninha.world](https://tiraninha.world) | Manhwas & Ação | 🟢 Ativo |
+| <img src="src/MangoToons/icon.png" width="28" height="28" alt="Mango Toons" /> | **Mango Toons** | `1.0.0` | [mangotoons.com](https://mangotoons.com) | Manhwas & Webtoons Modernos | 🟢 Ativo |
+| <img src="src/NinjaScan/icon.png" width="28" height="28" alt="Ninja Scan" /> | **Ninja Scan** | `1.0.0` | [ninjacomics.xyz](https://ninjacomics.xyz) | Ação & Cultivação | 🟢 Ativo |
+| <img src="src/SuperEcchi/icon.png" width="28" height="28" alt="Super Ecchi" /> | **Super Ecchi** | `1.0.0` | [superecchi.com](https://superecchi.com) | Ecchi & Hentai • +18 | 🟢 Ativo |
+| <img src="src/UniversoHentai/icon.png" width="28" height="28" alt="Universo Hentai" /> | **Universo Hentai** | `1.0.0` | [universohentai.com](https://universohentai.com) | Galerias de Hentai • +18 | 🟢 Ativo |
 <div align="center">
 
 <img src="assets/buscamanga-rounded.png" alt="BuscaMangá Logo" width="160" />
@@ -9,7 +21,7 @@
 Coleção otimizada de fontes para leitura de mangás, manhwas, manhuas e quadrinhos nacionais diretamente no aplicativo Paperback.
 
 [![Paperback v0.9+](https://img.shields.io/badge/Paperback-v0.9+-F97316?style=for-the-badge&logo=apple&logoColor=white)](https://paperback.moe/)
-[![Fontes Disponíveis](https://img.shields.io/badge/Fontes-59%20Dispon%C3%ADveis-10B981?style=for-the-badge&logo=safari&logoColor=white)](#-fontes-disponíveis)
+[![Fontes Disponíveis](https://img.shields.io/badge/Fontes-69%20Dispon%C3%ADveis-10B981?style=for-the-badge&logo=safari&logoColor=white)](#-fontes-disponíveis)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](LICENSE)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Ativo-success?style=for-the-badge&logo=github)](https://matheusparnaiba.github.io/buscamanga-extension/)
@@ -32,7 +44,7 @@ O **BuscaMangá Extension** é um repositório desenvolvido para suprir a demand
 
 ## 📦 Fontes Disponíveis
 
-Todas as 57 extensões estão catalogadas e sincronizadas no GitHub Pages:
+Todas as 69 extensões estão catalogadas e sincronizadas no GitHub Pages:
 
 |                                            Ícone                                            | Nome                   |  Versão  | Site Oficial                                                         | Categoria / Recurso                     |   Status    |
 | :-----------------------------------------------------------------------------------------: | :--------------------- | :------: | :------------------------------------------------------------------- | :-------------------------------------- | :---------: |
