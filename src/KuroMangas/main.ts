@@ -252,14 +252,32 @@ export class KuroMangasExtension implements ExtensionImpl<typeof KuroMangasConfi
         };
       }
     } catch (e) {
-      if (
-        e instanceof CloudflareError ||
-        (e && typeof e === "object" && (e as any).name === "CloudflareError")
-      ) {
-        throw e;
-      }
       console.error(`Erro ao carregar seção ${section.title}:`, e);
-      return { items: [], metadata: undefined };
+      return {
+        items: [
+          section.id === "popular"
+            ? {
+                mangaId: "kuro-login-aviso",
+                title: "Login Necessário no Kuro Mangás",
+                subtitle: "Toque para instruções de login",
+                imageUrl:
+                  "https://ui-avatars.com/api/?name=Login+Necessario&background=ef4444&color=fff&size=512",
+                type: "prominentCarouselItem",
+                contentRating: ContentRating.EVERYONE,
+              }
+            : {
+                mangaId: "kuro-login-aviso",
+                chapterId: "aviso-login",
+                title: "Login Necessário no Kuro Mangás",
+                subtitle: "Toque para instruções de login",
+                imageUrl:
+                  "https://ui-avatars.com/api/?name=Login+Necessario&background=ef4444&color=fff&size=512",
+                type: "chapterUpdatesCarouselItem",
+                contentRating: ContentRating.EVERYONE,
+              },
+        ],
+        metadata: undefined,
+      };
     }
   }
 
@@ -356,6 +374,32 @@ export class KuroMangasExtension implements ExtensionImpl<typeof KuroMangasConfi
   }
 
   async getMangaDetails(mangaId: string): Promise<SourceManga> {
+    if (mangaId === "kuro-login-aviso") {
+      return {
+        mangaId: "kuro-login-aviso",
+        mangaInfo: {
+          primaryTitle: "Login Necessário no Kuro Mangás",
+          secondaryTitles: [],
+          thumbnailUrl:
+            "https://ui-avatars.com/api/?name=Login+Kuro&background=ef4444&color=fff&size=512",
+          synopsis:
+            "O site kuromangas.com agora exige login obrigatório para exibir qualquer obra ou capítulo.\n\n" +
+            "📌 Como ativar:\n" +
+            "1. No Paperback, vá na aba Configurações (Settings / engrenagem)\n" +
+            "2. Abra Extensões -> Kuro Mangás\n" +
+            "3. Toque em 'Autenticar / Resolver Cloudflare (Webview)'\n" +
+            "4. Faça login com sua conta do site e feche o Webview\n\n" +
+            "Assim que você fizer login, a tela inicial e todo o catálogo carregarão normalmente!",
+          contentRating: ContentRating.EVERYONE,
+          status: "ongoing",
+          author: "Kuro Mangás",
+          tagGroups: [],
+          artworkUrls: [],
+          shareUrl: `${BASE_URL}/login`,
+        },
+      };
+    }
+
     const url = `${API_URL}/mangas/${mangaId}`;
     const request = {
       url,
@@ -409,6 +453,19 @@ export class KuroMangasExtension implements ExtensionImpl<typeof KuroMangasConfi
   }
 
   async getChapters(sourceManga: SourceManga, _sinceDate?: Date): Promise<Chapter[]> {
+    if (sourceManga.mangaId === "kuro-login-aviso") {
+      return [
+        {
+          chapterId: "aviso-login",
+          sourceManga,
+          langCode: "PT-BR",
+          chapNum: 1,
+          title: "Acesse Configurações -> Extensões -> Kuro Mangás para logar",
+          volume: 0,
+        },
+      ];
+    }
+
     const mangaId = sourceManga.mangaId;
     const url = `${API_URL}/mangas/${mangaId}/chapters?limit=100&page=1`;
     const request = {
@@ -465,6 +522,16 @@ export class KuroMangasExtension implements ExtensionImpl<typeof KuroMangasConfi
   }
 
   async getChapterDetails(chapter: Chapter): Promise<ChapterDetails> {
+    if (chapter.chapterId === "aviso-login") {
+      return {
+        id: chapter.chapterId,
+        mangaId: chapter.sourceManga.mangaId,
+        pages: [
+          "https://ui-avatars.com/api/?name=Faca+Login+nas+Configuracoes&background=ef4444&color=fff&size=800",
+        ],
+      };
+    }
+
     const chapterId = chapter.chapterId.replace(/^\/?(?:chapter|chapters)\//, "");
     const url = `${API_URL}/chapters/${chapterId}`;
     const request = {

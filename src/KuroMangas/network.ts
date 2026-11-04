@@ -27,8 +27,10 @@ export class MainInterceptor extends PaperbackInterceptor {
         request.headers?.["accept-language"] || "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
     };
 
-    if (customCookie && !headers.cookie) {
-      headers.cookie = customCookie;
+    const existingCookie = headers.cookie || (headers as any).Cookie;
+    if (customCookie) {
+      headers.cookie = existingCookie ? `${existingCookie}; ${customCookie}` : customCookie;
+      delete (headers as any).Cookie;
     }
 
     if (!headers["x-request-ctx"] && !headers["X-Request-Ctx"]) {

@@ -71,7 +71,10 @@ export class SettingsForm extends Form {
     ];
   }
 
-  async handleWebviewComplete(_request?: any, cookies?: Cookie[]): Promise<void> {
+  async handleWebviewComplete(request?: any, cookies?: Cookie[]): Promise<void> {
+    if (request?.headers?.["user-agent"]) {
+      Application.setState(request.headers["user-agent"], "kuro_cf_user_agent");
+    }
     if (cookies && Array.isArray(cookies)) {
       const headerParts: string[] = [];
       let vx = "";
