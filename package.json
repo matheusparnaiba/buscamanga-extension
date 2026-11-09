@@ -23,7 +23,7 @@
     "crypto-js": "^4.2.0"
   },
   "devDependencies": {
-    "@paperback/toolchain": "^1.0.0-alpha.92",
+    "@paperback/toolchain": "^1.0.0-alpha.94",
     "@paperback/types": "^1.0.0-alpha.92",
     "@types/crypto-js": "^4.2.2",
     "husky": "^9.1.7",
